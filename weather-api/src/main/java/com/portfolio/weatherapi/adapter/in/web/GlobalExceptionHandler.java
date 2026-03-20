@@ -5,7 +5,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.elasticsearch.core.ElasticsearchException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -75,16 +74,6 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT)
                 .body(ErrorResponse.of(504, "Gateway Timeout",
                         "Não foi possível alcançar o provedor de clima. Tente novamente em instantes."));
-    }
-
-    @ExceptionHandler(ElasticsearchException.class)
-    public ResponseEntity<ErrorResponse> handleElasticsearchError(
-            ElasticsearchException ex, HttpServletRequest req) {
-        log.error("Elasticsearch indisponível: {}  [{} {}]",
-                ex.getMessage(), req.getMethod(), req.getRequestURI());
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                .body(ErrorResponse.of(503, "Service Unavailable",
-                        "Armazenamento de dados temporariamente indisponível. Tente novamente em instantes."));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)

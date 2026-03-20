@@ -48,27 +48,28 @@ export async function buildServer(): Promise<FastifyInstance> {
   });
 
   server.setErrorHandler((error, request, reply) => {
-    const statusCode = error.statusCode ?? 500;
+    const err = error as { statusCode?: number; validation?: unknown; code?: string; message?: string; name?: string };
+    const statusCode = err.statusCode ?? 500;
 
     // Erros de validação do Fastify → 422
-    if (error.validation || error.code === 'FST_ERR_VALIDATION') {
+    if (err.validation || err.code === 'FST_ERR_VALIDATION') {
       return reply.status(422).send({
         status: 422,
         error: 'Unprocessable Entity',
-        message: error.message,
+        message: err.message ?? 'Erro de validação',
       });
     }
 
     if (statusCode >= 500) {
-      server.log.error({ err: error, method: request.method, url: request.url }, error.message);
+      server.log.error({ err: err, method: request.method, url: request.url }, err.message);
     } else {
-      server.log.warn({ statusCode, url: request.url }, error.message);
+      server.log.warn({ statusCode, url: request.url }, err.message);
     }
 
     return reply.status(statusCode).send({
       status: statusCode,
-      error: error.name,
-      message: error.message,
+      error: err.name ?? 'Error',
+      message: err.message ?? 'Internal Server Error',
     });
   });
 

@@ -62,33 +62,34 @@ async function buildServer() {
 
   // ── Error handler ──────────────────────────────────────────
   server.setErrorHandler((error, request, reply) => {
-    const status = error.statusCode ?? 500;
+    const err = error as { statusCode?: number; code?: string; validation?: unknown; message?: string; name?: string; stack?: string };
+    const status = err.statusCode ?? 500;
 
     // Erros de validação do Fastify (400)
-    if (error.code === 'FST_ERR_VALIDATION' || error.validation) {
-      logger.warn(`Validação falhou: ${error.message}  [${request.method} ${request.url}]`);
+    if (err.code === 'FST_ERR_VALIDATION' || err.validation) {
+      logger.warn(`Validação falhou: ${err.message ?? 'erro desconhecido'}  [${request.method} ${request.url}]`);
       return reply.status(422).send({
         status: 422,
         error: 'Unprocessable Entity',
-        message: error.message,
+        message: err.message ?? 'Erro de validação',
       });
     }
 
     if (status >= 500) {
-      logger.error(`Erro interno: ${error.message}`, {
+      logger.error(`Erro interno: ${err.message ?? 'erro desconhecido'}`, {
         method: request.method,
         url: request.url,
         ip: request.ip,
-        stack: error.stack,
+        stack: err.stack,
       });
     } else {
-      logger.warn(`Erro ${status}: ${error.message}  [${request.method} ${request.url}]`);
+      logger.warn(`Erro ${status}: ${err.message ?? 'erro desconhecido'}  [${request.method} ${request.url}]`);
     }
 
     return reply.status(status).send({
       status,
-      error: error.name,
-      message: error.message,
+      error: err.name ?? 'Error',
+      message: err.message ?? 'Erro interno',
     });
   });
 
@@ -125,7 +126,8 @@ async function main() {
     logger.info(`Upstream Weather → ${process.env.WEATHER_API_URL}`);
     logger.info(`Upstream NPS    → ${process.env.NPS_API_URL}`);
   } catch (err) {
-    logger.error('Falha ao iniciar servidor', err);
+    const unknownErr = err as Error | string | null | undefined;
+    logger.error('Falha ao iniciar servidor', unknownErr instanceof Error ? unknownErr : new Error(String(unknownErr)));
     process.exit(1);
   }
 

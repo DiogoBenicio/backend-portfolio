@@ -5,8 +5,7 @@ RUN rm /etc/nginx/conf.d/default.conf
 
 COPY nginx.conf /etc/nginx/nginx.conf
 
-# Teste de configuração no build
-RUN nginx -t
+# No build-time check to avoid upstream DNS dependency. Runtime healthchecks will validar.
 
 EXPOSE 80
 

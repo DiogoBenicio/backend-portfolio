@@ -102,8 +102,8 @@ public class OpenWeatherClientAdapter implements WeatherProviderClient {
         // Agrupa por dia e pega min/max/description do meio-dia
         Map<LocalDate, List<OpenWeatherForecastResponse.ForecastItem>> byDay = r.list().stream()
                 .collect(Collectors.groupingBy(item -> {
-                    String datePart = item.dtTxt().substring(0, 10);
-                    return LocalDate.parse(datePart);
+                    // Usa o formatter definido para parse do dt_txt retornado pelo OpenWeather
+                    return LocalDate.parse(item.dtTxt(), FORECAST_FORMATTER);
                 }, LinkedHashMap::new, Collectors.toList()));
 
         List<ForecastDay> forecastDays = byDay.entrySet().stream()
