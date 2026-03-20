@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
-// Cidades para construir o campo de vento — /weather individual (plano gratuito OWM)
+// Cidades usadas para campo de vento e zonas de chuva
 const WIND_CITIES = [
   'Uberlândia,BR',
   'Sao Paulo,BR',
@@ -16,25 +16,30 @@ const WIND_CITIES = [
   'Goiania,BR',
 ]
 
-// Grade regular cobrindo o Brasil
 const GRID = { la1: 6, la2: -36, lo1: -74, lo2: -28, nx: 24, ny: 22 } as const
 
 interface CityWind {
   lat: number
   lng: number
-  u: number // componente eastward (m/s)
-  v: number // componente northward (m/s)
+  u: number
+  v: number
+}
+
+export interface RainZone {
+  lat: number
+  lng: number
+  name: string
+  rainMmPerHour: number
+  intensity: 'fraca' | 'moderada' | 'forte'
 }
 
 function buildVelocityData(cities: CityWind[]) {
   const { la1, la2, lo1, lo2, nx, ny } = GRID
   const dlat = (la1 - la2) / (ny - 1)
   const dlon = (lo2 - lo1) / (nx - 1)
-
   const uData: number[] = []
   const vData: number[] = []
 
-  // Interpolação IDW (Inverse Distance Weighting) sobre a grade
   for (let j = 0; j < ny; j++) {
     for (let i = 0; i < nx; i++) {
       const lat = la1 - j * dlat
@@ -67,16 +72,22 @@ function buildVelocityData(cities: CityWind[]) {
   }
 
   return [
-    { header: { ...header, parameterNumber: 2 }, data: uData }, // U component
-    { header: { ...header, parameterNumber: 3 }, data: vData }, // V component
+    { header: { ...header, parameterNumber: 2 }, data: uData },
+    { header: { ...header, parameterNumber: 3 }, data: vData },
   ]
+}
+
+type OWMItem = {
+  name: string
+  coord: { lat: number; lon: number }
+  wind?: { speed: number; deg: number }
+  rain?: { '1h'?: number; '3h'?: number }
 }
 
 export function useWindField(apiKey: string) {
   return useQuery({
     queryKey: ['windField'],
     queryFn: async () => {
-      // Chamadas individuais em paralelo — endpoint /weather disponível no plano gratuito
       const results = await Promise.allSettled(
         WIND_CITIES.map((city) =>
           fetch(
@@ -85,29 +96,42 @@ export function useWindField(apiKey: string) {
         )
       )
 
-      type CityWeatherItem = {
-        coord: { lat: number; lon: number }
-        wind?: { speed: number; deg: number }
-      }
+      const items: OWMItem[] = results
+        .filter((r): r is PromiseFulfilledResult<OWMItem> => r.status === 'fulfilled')
+        .map((r) => r.value)
 
-      const cities: CityWind[] = results
-        .filter(
-          (r): r is PromiseFulfilledResult<CityWeatherItem> =>
-            r.status === 'fulfilled' && r.value?.wind?.speed != null
-        )
-        .map((r) => {
-          const { coord, wind } = r.value
-          const rad = (wind!.deg * Math.PI) / 180
+      // Campo de vento (IDW)
+      const windCities: CityWind[] = items
+        .filter((item) => item.wind?.speed != null)
+        .map((item) => {
+          const rad = (item.wind!.deg * Math.PI) / 180
           return {
-            lat: coord.lat,
-            lng: coord.lon,
-            u: -wind!.speed * Math.sin(rad),
-            v: -wind!.speed * Math.cos(rad),
+            lat: item.coord.lat,
+            lng: item.coord.lon,
+            u: -item.wind!.speed * Math.sin(rad),
+            v: -item.wind!.speed * Math.cos(rad),
           }
         })
 
-      if (cities.length < 3) throw new Error('Dados insuficientes de vento')
-      return buildVelocityData(cities)
+      // Zonas de chuva por intensidade
+      const rainZones: RainZone[] = items
+        .map((item) => {
+          const mm = item.rain?.['1h'] ?? item.rain?.['3h'] ?? 0
+          if (mm < 0.1) return null
+          return {
+            lat: item.coord.lat,
+            lng: item.coord.lon,
+            name: item.name,
+            rainMmPerHour: mm,
+            intensity:
+              mm < 2.5 ? ('fraca' as const) : mm < 7.5 ? ('moderada' as const) : ('forte' as const),
+          }
+        })
+        .filter((z): z is RainZone => z !== null)
+
+      if (windCities.length < 3) throw new Error('Dados insuficientes')
+
+      return { velocityData: buildVelocityData(windCities), rainZones }
     },
     enabled: !!apiKey,
     staleTime: 10 * 60 * 1000,

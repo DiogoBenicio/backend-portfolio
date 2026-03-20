@@ -1,11 +1,11 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { useCurrentWeather } from '@/hooks/useCurrentWeather'
-import { useWindField } from '@/hooks/useWindField'
+import { useWindField, type RainZone } from '@/hooks/useWindField'
 import { formatTemperature, formatWindSpeed } from '@/lib/utils/weatherUtils'
 import { cn } from '@/lib/utils/cn'
 
@@ -23,6 +23,32 @@ const velocityReady =
     ? import('leaflet-velocity').catch(() => null)
     : Promise.resolve(null)
 
+// ── Intensidades de chuva ────────────────────────────────────────────────────
+
+const RAIN_LEVELS = {
+  fraca: {
+    label: 'Chuva fraca',
+    color: '#22d3ee',
+    fillOpacity: 0.38,
+    strokeOpacity: 0.7,
+    radius: 65_000,
+  },
+  moderada: {
+    label: 'Chuva moderada',
+    color: '#3b82f6',
+    fillOpacity: 0.55,
+    strokeOpacity: 0.85,
+    radius: 85_000,
+  },
+  forte: {
+    label: 'Chuva forte',
+    color: '#6366f1',
+    fillOpacity: 0.72,
+    strokeOpacity: 1,
+    radius: 110_000,
+  },
+} as const
+
 // ── Configuração das camadas ──────────────────────────────────────────────────
 
 const LAYER_CONFIGS = {
@@ -31,11 +57,10 @@ const LAYER_CONFIGS = {
     emoji: '🌧',
     activeClass: 'bg-blue-600 text-white',
     paneName: 'precipPane',
-    tileOpacity: 0.88,
-    cssFilter: 'saturate(4) hue-rotate(195deg) brightness(1.35)',
+    renderType: 'zones' as const,
     legend: {
-      colors: ['#d0e8fc', '#74b3e5', '#1a6fc4', '#0a2f6e', '#020d1f'],
-      labels: ['0', '1', '5', '20', '50+'],
+      colors: ['#22d3ee', '#3b82f6', '#6366f1'],
+      labels: ['Fraca', 'Moderada', 'Forte'],
       unit: 'mm/h',
     },
   },
@@ -44,6 +69,7 @@ const LAYER_CONFIGS = {
     emoji: '💨',
     activeClass: 'bg-teal-500 text-white',
     paneName: 'windPane',
+    renderType: 'tile' as const,
     tileOpacity: 0.22,
     cssFilter: 'none',
     legend: {
@@ -57,6 +83,7 @@ const LAYER_CONFIGS = {
     emoji: '☁️',
     activeClass: 'bg-slate-600 text-white',
     paneName: 'cloudPane',
+    renderType: 'tile' as const,
     tileOpacity: 0.92,
     cssFilter: 'contrast(2.8) brightness(0.65) saturate(1.6)',
     legend: {
@@ -87,10 +114,121 @@ function CustomPanes() {
       if (!map.getPane(cfg.paneName)) {
         const pane = map.createPane(cfg.paneName)
         pane.style.zIndex = String(400 + Object.keys(LAYER_CONFIGS).indexOf(id))
-        if (cfg.cssFilter !== 'none') pane.style.filter = cfg.cssFilter
+        if (cfg.renderType === 'tile' && cfg.cssFilter !== 'none') {
+          pane.style.filter = cfg.cssFilter
+        }
       }
     }
   }, [map])
+  return null
+}
+
+// ── Zonas de chuva coloridas por intensidade ─────────────────────────────────
+
+function RainZones({ zones }: { zones: RainZone[] }) {
+  if (zones.length === 0) return null
+  return (
+    <>
+      {zones.map((zone) => {
+        const level = RAIN_LEVELS[zone.intensity]
+        return (
+          <Circle
+            key={zone.name}
+            center={[zone.lat, zone.lng]}
+            radius={level.radius}
+            pathOptions={{
+              color: level.color,
+              fillColor: level.color,
+              fillOpacity: level.fillOpacity,
+              weight: 2,
+              opacity: level.strokeOpacity,
+            }}
+          >
+            <Popup>
+              <div className="text-sm min-w-[160px]">
+                <p className="font-semibold text-gray-900">{zone.name}</p>
+                <p className="font-medium mt-1" style={{ color: level.color }}>
+                  {level.label}: {zone.rainMmPerHour.toFixed(1)} mm/h
+                </p>
+              </div>
+            </Popup>
+          </Circle>
+        )
+      })}
+    </>
+  )
+}
+
+// ── Animação de gotas de chuva (canvas) ──────────────────────────────────────
+
+function RainAnimation() {
+  const map = useMap()
+
+  useEffect(() => {
+    const container = map.getContainer()
+
+    const canvas = document.createElement('canvas')
+    canvas.style.cssText =
+      'position:absolute;top:0;left:0;pointer-events:none;z-index:450;border-radius:0.75rem;'
+    container.appendChild(canvas)
+
+    type Drop = { x: number; y: number; speed: number; len: number; opacity: number }
+    let drops: Drop[] = []
+    let animId: number
+
+    function init() {
+      canvas.width = container.clientWidth
+      canvas.height = container.clientHeight
+      drops = Array.from({ length: 220 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        speed: 5 + Math.random() * 8,
+        len: 12 + Math.random() * 18,
+        opacity: 0.18 + Math.random() * 0.52,
+      }))
+    }
+
+    function draw() {
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+
+      for (const d of drops) {
+        ctx.beginPath()
+        // Ângulo leve para simular vento (15°)
+        ctx.moveTo(d.x, d.y)
+        ctx.lineTo(d.x - d.len * 0.27, d.y + d.len)
+        ctx.strokeStyle = `rgba(147, 210, 255, ${d.opacity})`
+        ctx.lineWidth = 1.4
+        ctx.lineCap = 'round'
+        ctx.stroke()
+
+        d.y += d.speed
+        d.x -= d.speed * 0.27
+
+        if (d.y > canvas.height + d.len) {
+          d.y = -d.len - Math.random() * 40
+          d.x = Math.random() * (canvas.width + 60)
+        }
+        if (d.x < -30) d.x = canvas.width + Math.random() * 40
+      }
+
+      animId = requestAnimationFrame(draw)
+    }
+
+    init()
+    draw()
+
+    const ro = new ResizeObserver(init)
+    ro.observe(container)
+
+    return () => {
+      cancelAnimationFrame(animId)
+      ro.disconnect()
+      canvas.remove()
+    }
+  }, [map])
+
   return null
 }
 
@@ -133,7 +271,7 @@ function VelocityLayer({ data, apiKey }: { data: unknown; apiKey: string }) {
         map.addLayer(layer)
         layerRef.current = layer
       } catch {
-        // leaflet-velocity indisponível — ignora silenciosamente
+        /* leaflet-velocity indisponível */
       }
     })
 
@@ -238,13 +376,13 @@ function LayerControls({
               onClick={() => toggle(id)}
               className={cn(
                 'flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all',
-                active.has(id) ? cfg.activeClass : 'bg-gray-50 text-gray-600 hover:bg-gray-100',
+                active.has(id) ? cfg.activeClass : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
               )}
             >
               <span>{cfg.emoji}</span>
               {cfg.label}
             </button>
-          ),
+          )
         )}
       </div>
     </div>
@@ -254,9 +392,9 @@ function LayerControls({
 // ── Legenda de cores ─────────────────────────────────────────────────────────
 
 function MapLegend({ active }: { active: Set<LayerId> }) {
-  const activeLayers = (Object.entries(LAYER_CONFIGS) as [LayerId, (typeof LAYER_CONFIGS)[LayerId]][]).filter(
-    ([id]) => active.has(id),
-  )
+  const activeLayers = (
+    Object.entries(LAYER_CONFIGS) as [LayerId, (typeof LAYER_CONFIGS)[LayerId]][]
+  ).filter(([id]) => active.has(id))
   if (activeLayers.length === 0) return null
 
   return (
@@ -265,28 +403,45 @@ function MapLegend({ active }: { active: Set<LayerId> }) {
       onMouseDown={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}
     >
-      <div className="rounded-xl bg-white/97 shadow-xl backdrop-blur-sm border border-gray-100 p-3 flex flex-col gap-3 min-w-[160px]">
+      <div className="rounded-xl bg-white/97 shadow-xl backdrop-blur-sm border border-gray-100 p-3 flex flex-col gap-3 min-w-[168px]">
         {activeLayers.map(([id, cfg]) => (
           <div key={id}>
             <p className="text-[9px] font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
               {cfg.emoji} {cfg.label}
             </p>
-            {/* Barra de gradiente */}
-            <div
-              className="h-2.5 rounded-full mb-1"
-              style={{
-                background: `linear-gradient(to right, ${cfg.legend.colors.join(', ')})`,
-              }}
-            />
-            {/* Labels */}
-            <div className="flex justify-between">
-              {cfg.legend.labels.map((l) => (
-                <span key={l} className="text-[9px] text-gray-400">
-                  {l}
-                </span>
-              ))}
-            </div>
-            <p className="text-[9px] text-gray-400 mt-0.5 text-right">{cfg.legend.unit}</p>
+
+            {/* Chuva: 3 caixas coloridas com label */}
+            {id === 'precipitation_new' ? (
+              <div className="flex flex-col gap-1">
+                {cfg.legend.labels.map((label, i) => (
+                  <div key={label} className="flex items-center gap-2">
+                    <span
+                      className="inline-block h-3 w-5 rounded-sm flex-shrink-0"
+                      style={{ backgroundColor: cfg.legend.colors[i], opacity: 0.85 }}
+                    />
+                    <span className="text-[10px] text-gray-600">{label}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              /* Outros: barra de gradiente */
+              <>
+                <div
+                  className="h-2.5 rounded-full mb-1"
+                  style={{
+                    background: `linear-gradient(to right, ${cfg.legend.colors.join(', ')})`,
+                  }}
+                />
+                <div className="flex justify-between">
+                  {cfg.legend.labels.map((l) => (
+                    <span key={l} className="text-[9px] text-gray-400">
+                      {l}
+                    </span>
+                  ))}
+                </div>
+                <p className="text-[9px] text-gray-400 mt-0.5 text-right">{cfg.legend.unit}</p>
+              </>
+            )}
           </div>
         ))}
       </div>
@@ -294,28 +449,41 @@ function MapLegend({ active }: { active: Set<LayerId> }) {
   )
 }
 
-// ── Camadas meteorológicas (tiles + velocity) ────────────────────────────────
+// ── Camadas meteorológicas ───────────────────────────────────────────────────
 
 function WeatherLayers({ active, apiKey }: { active: Set<LayerId>; apiKey: string }) {
-  const { data: windData } = useWindField(apiKey)
+  const { data } = useWindField(apiKey)
 
   return (
     <>
-      {(Object.entries(LAYER_CONFIGS) as [LayerId, (typeof LAYER_CONFIGS)[LayerId]][])
-        .filter(([id]) => active.has(id))
-        .map(([id, cfg]) => (
-          <TileLayer
-            key={id}
-            url={`https://tile.openweathermap.org/map/${id}/{z}/{x}/{y}.png?appid=${apiKey}`}
-            opacity={cfg.tileOpacity}
-            pane={cfg.paneName}
-            attribution='Weather &copy; <a href="https://openweathermap.org">OpenWeatherMap</a>'
-          />
-        ))}
+      {/* Tiles para vento e nuvens */}
+      {(['wind_new', 'clouds_new'] as LayerId[])
+        .filter((id) => active.has(id))
+        .map((id) => {
+          const cfg = LAYER_CONFIGS[id]
+          if (cfg.renderType !== 'tile') return null
+          return (
+            <TileLayer
+              key={id}
+              url={`https://tile.openweathermap.org/map/${id}/{z}/{x}/{y}.png?appid=${apiKey}`}
+              opacity={cfg.tileOpacity}
+              pane={cfg.paneName}
+              attribution='Weather &copy; <a href="https://openweathermap.org">OpenWeatherMap</a>'
+            />
+          )
+        })}
 
-      {/* Partículas animadas de vento — substituem o tile quando ativo */}
-      {active.has('wind_new') && windData && (
-        <VelocityLayer data={windData} apiKey={apiKey} />
+      {/* Chuva: zonas coloridas por intensidade + animação de gotas */}
+      {active.has('precipitation_new') && (
+        <>
+          <RainZones zones={data?.rainZones ?? []} />
+          <RainAnimation />
+        </>
+      )}
+
+      {/* Partículas animadas de vento */}
+      {active.has('wind_new') && data?.velocityData && (
+        <VelocityLayer data={data.velocityData} apiKey={apiKey} />
       )}
     </>
   )
@@ -347,12 +515,11 @@ export function WeatherMap() {
     })
 
   const defaultCities = DEFAULT_CITIES.filter(
-    (c) => c.name.toLowerCase() !== selectedCity?.name.toLowerCase(),
+    (c) => c.name.toLowerCase() !== selectedCity?.name.toLowerCase()
   )
 
   return (
     <>
-      {/* Keyframes para o pin pulsante */}
       <style>{`
         @keyframes pulse-pin {
           0%, 100% { transform: scale(1); opacity: 1; }
