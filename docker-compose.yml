@@ -1,0 +1,134 @@
+version: '3.9'
+
+services:
+  # ─── Infraestrutura ───────────────────────────────────────
+  elasticsearch:
+    image: elasticsearch:8.11.0
+    container_name: portfolio-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - portfolio-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health?wait_for_status=yellow || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: portfolio-postgres
+    environment:
+      POSTGRES_DB: nps_db
+      POSTGRES_USER: nps_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nps_secret_2025}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - portfolio-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nps_user -d nps_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ─── Projeto 1: Weather API (interno — sem porta exposta) ──
+  weather-api:
+    build:
+      context: ./weather-api
+      dockerfile: Dockerfile
+    container_name: portfolio-weather-api
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY}
+      ELASTICSEARCH_URIS: http://elasticsearch:9200
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    networks:
+      - portfolio-network
+    restart: unless-stopped
+
+  # ─── Projeto 2: NPS API (interno — sem porta exposta) ─────
+  nps-api:
+    build:
+      context: ./nps-api
+      dockerfile: Dockerfile
+    container_name: portfolio-nps-api
+    environment:
+      DATABASE_URL: postgresql://nps_user:${POSTGRES_PASSWORD:-nps_secret_2025}@postgres:5432/nps_db
+      PORT: 3001
+      NODE_ENV: production
+      CORS_ORIGIN: http://gateway-api:4000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - portfolio-network
+    restart: unless-stopped
+
+  # ─── Projeto 3: Frontend (interno — sem porta exposta) ────
+  portfolio-frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: portfolio-frontend
+    environment:
+      NEXT_PUBLIC_WEATHER_API_URL: /api/weather
+      NEXT_PUBLIC_NPS_API_URL: /api/nps
+    depends_on:
+      - weather-api
+      - nps-api
+    networks:
+      - portfolio-network
+    restart: unless-stopped
+
+  # ─── Projeto 4: API Gateway (interno — sem porta exposta) ─
+  gateway-api:
+    build:
+      context: ./gateway-api
+      dockerfile: Dockerfile
+    container_name: portfolio-api-gateway
+    environment:
+      PORT: 4000
+      NODE_ENV: production
+      JWT_SECRET: ${JWT_SECRET:-dev_secret_change_in_production_min_32_chars}
+      JWT_EXPIRES_IN: 2h
+      ADMIN_USER: ${ADMIN_USER:-admin}
+      ADMIN_PASS: ${ADMIN_PASS:-admin2025}
+      WEATHER_API_URL: http://weather-api:8080
+      NPS_API_URL: http://nps-api:3001
+    depends_on:
+      - weather-api
+      - nps-api
+    networks:
+      - portfolio-network
+    restart: unless-stopped
+
+  # ─── Projeto 5: Nginx — ÚNICO ponto de entrada ────────────
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: portfolio-nginx
+    ports:
+      - "80:80"   # Única porta exposta ao host
+    depends_on:
+      - portfolio-frontend
+      - gateway-api
+    networks:
+      - portfolio-network
+    restart: unless-stopped
+
+volumes:
+  elasticsearch-data:
+  postgres-data:
+
+networks:
+  portfolio-network:
+    driver: bridge

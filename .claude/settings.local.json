@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mv projects/api-gateway gateway-api)",
+      "Bash(mv projects/nps-api nps-api)",
+      "Bash(mv projects/weather-api weather-api)",
+      "Bash(mv projects/portfolio-frontend frontend)",
+      "Bash(mv projects/nginx nginx)",
+      "Bash(npm install:*)",
+      "Bash(find /backend-portfolio/frontend/src/hooks -name useServiceHealth*)",
+      "Bash(npm run:*)"
+    ]
+  }
+}
