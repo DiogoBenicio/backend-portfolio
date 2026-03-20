@@ -1,11 +1,11 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, useMap, Circle } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { useCurrentWeather } from '@/hooks/useCurrentWeather'
-import { useWindField, type RainZone } from '@/hooks/useWindField'
+import { useWindField } from '@/hooks/useWindField'
 import { formatTemperature, formatWindSpeed } from '@/lib/utils/weatherUtils'
 import { cn } from '@/lib/utils/cn'
 
@@ -23,32 +23,6 @@ const velocityReady =
     ? import('leaflet-velocity').catch(() => null)
     : Promise.resolve(null)
 
-// ── Intensidades de chuva ────────────────────────────────────────────────────
-
-const RAIN_LEVELS = {
-  fraca: {
-    label: 'Chuva fraca',
-    color: '#22d3ee',
-    fillOpacity: 0.38,
-    strokeOpacity: 0.7,
-    radius: 65_000,
-  },
-  moderada: {
-    label: 'Chuva moderada',
-    color: '#3b82f6',
-    fillOpacity: 0.55,
-    strokeOpacity: 0.85,
-    radius: 85_000,
-  },
-  forte: {
-    label: 'Chuva forte',
-    color: '#6366f1',
-    fillOpacity: 0.72,
-    strokeOpacity: 1,
-    radius: 110_000,
-  },
-} as const
-
 // ── Configuração das camadas ──────────────────────────────────────────────────
 
 const LAYER_CONFIGS = {
@@ -57,10 +31,13 @@ const LAYER_CONFIGS = {
     emoji: '🌧',
     activeClass: 'bg-blue-600 text-white',
     paneName: 'precipPane',
-    renderType: 'zones' as const,
+    renderType: 'tile' as const,
+    tileOpacity: 1,
+    // saturate extremo + contrast transforma o tile em azul-elétrico sólido
+    cssFilter: 'saturate(9) contrast(4.5) brightness(1.2) hue-rotate(200deg)',
     legend: {
-      colors: ['#22d3ee', '#3b82f6', '#6366f1'],
-      labels: ['Fraca', 'Moderada', 'Forte'],
+      colors: ['#bfefff', '#5bc8f5', '#1477cc', '#0a3d8f', '#020f3a'],
+      labels: ['0', '1', '5', '20', '50+'],
       unit: 'mm/h',
     },
   },
@@ -122,42 +99,6 @@ function CustomPanes() {
     }
   }, [map])
   return null
-}
-
-// ── Zonas de chuva coloridas por intensidade ─────────────────────────────────
-
-function RainZones({ zones }: { zones: RainZone[] }) {
-  if (zones.length === 0) return null
-  return (
-    <>
-      {zones.map((zone) => {
-        const level = RAIN_LEVELS[zone.intensity]
-        return (
-          <Circle
-            key={zone.name}
-            center={[zone.lat, zone.lng]}
-            radius={level.radius}
-            pathOptions={{
-              color: level.color,
-              fillColor: level.color,
-              fillOpacity: level.fillOpacity,
-              weight: 2,
-              opacity: level.strokeOpacity,
-            }}
-          >
-            <Popup>
-              <div className="text-sm min-w-[160px]">
-                <p className="font-semibold text-gray-900">{zone.name}</p>
-                <p className="font-medium mt-1" style={{ color: level.color }}>
-                  {level.label}: {zone.rainMmPerHour.toFixed(1)} mm/h
-                </p>
-              </div>
-            </Popup>
-          </Circle>
-        )
-      })}
-    </>
-  )
 }
 
 // ── Animação de gotas de chuva (canvas) ──────────────────────────────────────
@@ -457,8 +398,8 @@ function WeatherLayers({ active, apiKey }: { active: Set<LayerId>; apiKey: strin
 
   return (
     <>
-      {/* Tiles para vento e nuvens */}
-      {(['wind_new', 'clouds_new'] as LayerId[])
+      {/* Tiles: chuva, vento e nuvens */}
+      {(Object.keys(LAYER_CONFIGS) as LayerId[])
         .filter((id) => active.has(id))
         .map((id) => {
           const cfg = LAYER_CONFIGS[id]
@@ -474,16 +415,8 @@ function WeatherLayers({ active, apiKey }: { active: Set<LayerId>; apiKey: strin
           )
         })}
 
-      {/* Chuva: zonas coloridas por intensidade + animação de gotas */}
-      {active.has('precipitation_new') && (
-        <>
-          <RainZones zones={data?.rainZones ?? []} />
-          <RainAnimation />
-        </>
-      )}
-
-      {/* Nuvens: animação de chuva por baixo das nuvens (sem zonas) */}
-      {active.has('clouds_new') && !active.has('precipitation_new') && <RainAnimation />}
+      {/* Animação de gotas: visível quando chuva ou nuvens ativas */}
+      {(active.has('precipitation_new') || active.has('clouds_new')) && <RainAnimation />}
 
       {/* Partículas animadas de vento */}
       {active.has('wind_new') && data?.velocityData && (
