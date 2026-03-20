@@ -25,6 +25,17 @@ const velocityReady =
 
 // ── Configuração das camadas ──────────────────────────────────────────────────
 
+// Fundo sólido para o pane de chuva (preenche pixels transparentes do tile)
+const PANE_BACKGROUNDS: Record<string, string> = {
+  precipPane: '#050e24',
+}
+
+// Filtro CSS aplicado ao tile via className (não afeta o fundo do pane)
+const TILE_FILTER_CLASS: Partial<Record<string, string>> = {
+  precipitation_new: 'wm-rain-tile',
+  temp_new: 'wm-temp-tile',
+}
+
 const LAYER_CONFIGS = {
   precipitation_new: {
     label: 'Chuva',
@@ -33,11 +44,10 @@ const LAYER_CONFIGS = {
     paneName: 'precipPane',
     renderType: 'tile' as const,
     tileOpacity: 1,
-    // saturate extremo + contrast transforma o tile em azul-elétrico sólido
-    cssFilter: 'saturate(9) contrast(4.5) brightness(1.2) hue-rotate(200deg)',
     legend: {
-      colors: ['#bfefff', '#5bc8f5', '#1477cc', '#0a3d8f', '#020f3a'],
-      labels: ['0', '1', '5', '20', '50+'],
+      // Cores reais do RainViewer colorScheme 4 (Meteored)
+      colors: ['#9ecae1', '#3d9bff', '#1a5ccc', '#f5e642', '#ff5200'],
+      labels: ['Leve', '', 'Mod.', '', 'Forte'],
       unit: 'mm/h',
     },
   },
@@ -48,26 +58,36 @@ const LAYER_CONFIGS = {
     paneName: 'windPane',
     renderType: 'tile' as const,
     tileOpacity: 0.22,
-    cssFilter: 'none',
     legend: {
       colors: ['#3498db', '#2ecc71', '#f1c40f', '#e67e22', '#e74c3c'],
       labels: ['0', '3', '8', '15', '25+'],
       unit: 'm/s',
     },
   },
-  clouds_new: {
-    label: 'Nuvens',
-    emoji: '☁️',
-    activeClass: 'bg-slate-600 text-white',
-    paneName: 'cloudPane',
+  temp_new: {
+    label: 'Temperatura',
+    emoji: '🌡',
+    activeClass: 'bg-orange-500 text-white',
+    paneName: 'tempPane',
     renderType: 'tile' as const,
-    tileOpacity: 1,
-    // sepia adiciona cor ao tile cinza → hue-rotate desloca para azul-acinzentado → saturate intensifica
-    cssFilter: 'sepia(1) hue-rotate(185deg) saturate(5) contrast(2.2) brightness(0.55)',
+    tileOpacity: 0.82,
     legend: {
-      colors: ['#c7e9ff', '#7ec8f5', '#3a8fcf', '#1a4f80', '#0a1f3a'],
-      labels: ['0', '25', '50', '75', '100'],
-      unit: '%',
+      colors: ['#6b48ff', '#4096ff', '#00c2ff', '#00e676', '#ffeb3b', '#ff9800', '#f44336'],
+      labels: ['-20', '0', '10', '20', '30', '40', '50+'],
+      unit: '°C',
+    },
+  },
+  pressure_new: {
+    label: 'Pressão',
+    emoji: '🔵',
+    activeClass: 'bg-purple-500 text-white',
+    paneName: 'pressPane',
+    renderType: 'tile' as const,
+    tileOpacity: 0.82,
+    legend: {
+      colors: ['#6b48ff', '#3f51b5', '#00bcd4', '#66bb6a', '#ff9800', '#f44336'],
+      labels: ['960', '980', '1000', '1013', '1030', '1050+'],
+      unit: 'hPa',
     },
   },
 } as const
@@ -83,7 +103,7 @@ const DEFAULT_CITIES: CityPin[] = [
   { name: 'Belo Horizonte', lat: -19.9167, lng: -43.9345 },
 ]
 
-// ── Setup de panes com filtros CSS ───────────────────────────────────────────
+// ── Setup de panes ────────────────────────────────────────────────────────────
 
 function CustomPanes() {
   const map = useMap()
@@ -92,13 +112,43 @@ function CustomPanes() {
       if (!map.getPane(cfg.paneName)) {
         const pane = map.createPane(cfg.paneName)
         pane.style.zIndex = String(400 + Object.keys(LAYER_CONFIGS).indexOf(id))
-        if (cfg.renderType === 'tile' && cfg.cssFilter !== 'none') {
-          pane.style.filter = cfg.cssFilter
-        }
+        // Fundo sólido: preenche as áreas sem dados do tile OWM (pixels transparentes)
+        const bg = PANE_BACKGROUNDS[cfg.paneName]
+        if (bg) pane.style.backgroundColor = bg
       }
     }
   }, [map])
   return null
+}
+
+// ── RainViewer — radar real (sem API key, gratuito) ──────────────────────────
+
+function RainViewerLayer({ pane }: { pane: string }) {
+  const [tileUrl, setTileUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch('https://api.rainviewer.com/public/weather-maps.json')
+      .then((r) => r.json())
+      .then((data) => {
+        const latest: string | undefined = data.radar?.past?.at(-1)?.path
+        if (latest) {
+          // colorScheme 4 = verde→amarelo→laranja→vermelho (padrão radar)
+          setTileUrl(`https://tilecache.rainviewer.com${latest}/512/{z}/{x}/{y}/4/1_1.png`)
+        }
+      })
+      .catch(() => null)
+  }, [])
+
+  if (!tileUrl) return null
+
+  return (
+    <TileLayer
+      url={tileUrl}
+      opacity={1}
+      pane={pane}
+      attribution='Radar &copy; <a href="https://rainviewer.com">RainViewer</a>'
+    />
+  )
 }
 
 // ── Animação de gotas de chuva (canvas) ──────────────────────────────────────
@@ -352,38 +402,21 @@ function MapLegend({ active }: { active: Set<LayerId> }) {
               {cfg.emoji} {cfg.label}
             </p>
 
-            {/* Chuva: 3 caixas coloridas com label */}
-            {id === 'precipitation_new' ? (
-              <div className="flex flex-col gap-1">
-                {cfg.legend.labels.map((label, i) => (
-                  <div key={label} className="flex items-center gap-2">
-                    <span
-                      className="inline-block h-3 w-5 rounded-sm flex-shrink-0"
-                      style={{ backgroundColor: cfg.legend.colors[i], opacity: 0.85 }}
-                    />
-                    <span className="text-[10px] text-gray-600">{label}</span>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              /* Outros: barra de gradiente */
-              <>
-                <div
-                  className="h-2.5 rounded-full mb-1"
-                  style={{
-                    background: `linear-gradient(to right, ${cfg.legend.colors.join(', ')})`,
-                  }}
-                />
-                <div className="flex justify-between">
-                  {cfg.legend.labels.map((l) => (
-                    <span key={l} className="text-[9px] text-gray-400">
-                      {l}
-                    </span>
-                  ))}
-                </div>
-                <p className="text-[9px] text-gray-400 mt-0.5 text-right">{cfg.legend.unit}</p>
-              </>
-            )}
+            {/* Barra de gradiente para todas as camadas */}
+            <div
+              className="h-2.5 rounded-full mb-1"
+              style={{
+                background: `linear-gradient(to right, ${cfg.legend.colors.join(', ')})`,
+              }}
+            />
+            <div className="flex justify-between">
+              {cfg.legend.labels.map((l, i) => (
+                <span key={i} className="text-[9px] text-gray-400">
+                  {l}
+                </span>
+              ))}
+            </div>
+            <p className="text-[9px] text-gray-400 mt-0.5 text-right">{cfg.legend.unit}</p>
           </div>
         ))}
       </div>
@@ -398,25 +431,36 @@ function WeatherLayers({ active, apiKey }: { active: Set<LayerId>; apiKey: strin
 
   return (
     <>
-      {/* Tiles: chuva, vento e nuvens */}
-      {(Object.keys(LAYER_CONFIGS) as LayerId[])
+      {/* Chuva: radar RainViewer + precipitação acumulada OWM sobrepostos */}
+      {active.has('precipitation_new') && (
+        <>
+          <RainViewerLayer pane={LAYER_CONFIGS.precipitation_new.paneName} />
+          {/* Accumulated precipitation — intensifica zonas de chuva persistente */}
+          <TileLayer
+            url={`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${apiKey}`}
+            opacity={0.55}
+            pane={LAYER_CONFIGS.precipitation_new.paneName}
+            className="wm-rain-tile"
+          />
+        </>
+      )}
+
+      {/* Vento, temperatura, umidade, pressão: tiles OWM */}
+      {(['wind_new', 'temp_new', 'pressure_new'] as LayerId[])
         .filter((id) => active.has(id))
         .map((id) => {
           const cfg = LAYER_CONFIGS[id]
-          if (cfg.renderType !== 'tile') return null
           return (
             <TileLayer
               key={id}
               url={`https://tile.openweathermap.org/map/${id}/{z}/{x}/{y}.png?appid=${apiKey}`}
               opacity={cfg.tileOpacity}
               pane={cfg.paneName}
+              className={TILE_FILTER_CLASS[id] ?? ''}
               attribution='Weather &copy; <a href="https://openweathermap.org">OpenWeatherMap</a>'
             />
           )
         })}
-
-      {/* Animação de gotas: visível quando chuva ou nuvens ativas */}
-      {(active.has('precipitation_new') || active.has('clouds_new')) && <RainAnimation />}
 
       {/* Partículas animadas de vento */}
       {active.has('wind_new') && data?.velocityData && (
@@ -461,6 +505,13 @@ export function WeatherMap() {
         @keyframes pulse-pin {
           0%, 100% { transform: scale(1); opacity: 1; }
           50% { transform: scale(1.35); opacity: 0.75; }
+        }
+        /* Filtros por tile — aplicados ao tile, não ao fundo do pane */
+        .wm-rain-tile {
+          filter: saturate(12) contrast(5) hue-rotate(195deg) brightness(1.4) !important;
+        }
+        .wm-temp-tile {
+          filter: saturate(3) contrast(1.6) brightness(1.1) !important;
         }
       `}</style>
 

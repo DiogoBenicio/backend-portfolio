@@ -18,7 +18,7 @@ const WeatherMap = dynamic(
 
 export default function MapPage() {
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-4">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Mapa de Clima</h1>
         <p className="mt-1 text-sm text-gray-500">
@@ -26,13 +26,12 @@ export default function MapPage() {
         </p>
       </div>
 
-      <div className="h-[600px] w-full overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+      <div
+        className="w-full overflow-hidden rounded-xl border border-gray-200 shadow-sm"
+        style={{ height: 'calc(100svh - 11rem)' }}
+      >
         <WeatherMap />
       </div>
-
-      <p className="text-xs text-gray-400 text-center">
-        Dados fornecidos por OpenWeather API via Weather API backend · Mapas por OpenStreetMap
-      </p>
     </div>
   )
 }
