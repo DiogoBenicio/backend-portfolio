@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { CitySearch } from '@/components/weather/CitySearch'
 import { CurrentWeatherCard } from '@/components/weather/CurrentWeatherCard'
 import { TemperatureChart } from '@/components/weather/TemperatureChart'
@@ -18,6 +18,15 @@ export default function WeatherPage() {
   const { data: current, isLoading: loadingCurrent, error: errorCurrent } = useCurrentWeather(city)
 
   const { data: forecast, isLoading: loadingForecast } = useForecast(city)
+
+  useEffect(() => {
+    if (current) {
+      localStorage.setItem(
+        'selectedMapCity',
+        JSON.stringify({ name: current.city, lat: current.latitude, lng: current.longitude })
+      )
+    }
+  }, [current])
 
   return (
     <div className="space-y-6">
