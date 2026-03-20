@@ -8,7 +8,13 @@
       "Bash(mv projects/nginx nginx)",
       "Bash(npm install:*)",
       "Bash(find /backend-portfolio/frontend/src/hooks -name useServiceHealth*)",
-      "Bash(npm run:*)"
+      "Bash(npm run:*)",
+      "Bash(find /backend-portfolio/gateway-api -name *.test.ts -o -name *.spec.ts)",
+      "Bash(find /backend-portfolio/frontend -name *.test.ts* -o -name *.spec.ts*)",
+      "Bash(npm test:*)",
+      "Bash(mvn test:*)",
+      "Bash(java -version)",
+      "Bash(mvn -version)"
     ]
   }
 }
