@@ -84,10 +84,11 @@ const LAYER_CONFIGS = {
     activeClass: 'bg-slate-600 text-white',
     paneName: 'cloudPane',
     renderType: 'tile' as const,
-    tileOpacity: 0.92,
-    cssFilter: 'contrast(2.8) brightness(0.65) saturate(1.6)',
+    tileOpacity: 1,
+    // sepia adiciona cor ao tile cinza → hue-rotate desloca para azul-acinzentado → saturate intensifica
+    cssFilter: 'sepia(1) hue-rotate(185deg) saturate(5) contrast(2.2) brightness(0.55)',
     legend: {
-      colors: ['#ebebeb', '#b0b0b0', '#717171', '#383838', '#0a0a0a'],
+      colors: ['#c7e9ff', '#7ec8f5', '#3a8fcf', '#1a4f80', '#0a1f3a'],
       labels: ['0', '25', '50', '75', '100'],
       unit: '%',
     },
@@ -480,6 +481,9 @@ function WeatherLayers({ active, apiKey }: { active: Set<LayerId>; apiKey: strin
           <RainAnimation />
         </>
       )}
+
+      {/* Nuvens: animação de chuva por baixo das nuvens (sem zonas) */}
+      {active.has('clouds_new') && !active.has('precipitation_new') && <RainAnimation />}
 
       {/* Partículas animadas de vento */}
       {active.has('wind_new') && data?.velocityData && (
