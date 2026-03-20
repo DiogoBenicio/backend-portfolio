@@ -11,6 +11,7 @@ import { LoadingSpinner } from '@/components/ui/loadingspinner'
 import { ErrorMessage } from '@/components/ui/errormessage'
 import { useCurrentWeather } from '@/hooks/useCurrentWeather'
 import { useForecast } from '@/hooks/useForecast'
+import { PageContainer } from '@/components/layout/PageContainer'
 
 export default function WeatherPage() {
   const [city, setCity] = useState('Uberlândia')
@@ -29,6 +30,7 @@ export default function WeatherPage() {
   }, [current])
 
   return (
+    <PageContainer>
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Dashboard de Clima</h1>
@@ -84,5 +86,6 @@ export default function WeatherPage() {
         </>
       ) : null}
     </div>
+    </PageContainer>
   )
 }

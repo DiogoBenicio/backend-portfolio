@@ -6,6 +6,7 @@ import { ServiceStatusBar } from '@/components/ecosystem/ServiceStatusBar'
 import { ArchitectureDiagram } from '@/components/ecosystem/ArchitectureDiagram'
 import { ServiceCard } from '@/components/ecosystem/ServiceCard'
 import { LiveMetrics } from '@/components/ecosystem/LiveMetrics'
+import { PageContainer } from '@/components/layout/PageContainer'
 
 const SERVICES = [
   {
@@ -67,6 +68,7 @@ export default function EcosystemPage() {
   const statuses = useServiceHealth()
 
   return (
+    <PageContainer>
     <div className="mx-auto max-w-5xl space-y-8 px-6 py-8">
       {/* Header */}
       <header className="space-y-1">
@@ -115,5 +117,6 @@ export default function EcosystemPage() {
         <LiveMetrics />
       </section>
     </div>
+    </PageContainer>
   )
 }

@@ -6,11 +6,13 @@ import { LoadingSpinner } from '@/components/ui/loadingspinner'
 import { useNpsSummary } from '@/hooks/useNpsSummary'
 import { getNpsZoneColor, getNpsZoneBg } from '@/lib/utils/npsUtils'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { PageContainer } from '@/components/layout/PageContainer'
 
 export default function NpsPage() {
   const { data: summary, isLoading } = useNpsSummary('portfolio')
 
   return (
+    <PageContainer>
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Avalie o Portfólio</h1>
@@ -110,5 +112,6 @@ export default function NpsPage() {
         </div>
       </div>
     </div>
+    </PageContainer>
   )
 }

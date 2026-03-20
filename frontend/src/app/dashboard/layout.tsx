@@ -8,9 +8,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <Sidebar />
       </div>
 
-      {/* Conteúdo principal */}
+      {/* Conteúdo principal — sem wrapper fixo; cada página define seu próprio container */}
       <main className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-6xl px-4 py-8 md:px-8">{children}</div>
+        {children}
       </main>
     </div>
   )
