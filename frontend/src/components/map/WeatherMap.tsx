@@ -122,12 +122,12 @@ function VelocityLayer({ data, apiKey }: { data: unknown; apiKey: string }) {
             directionString: 'Direção',
           },
           data,
-          maxVelocity: 18,
-          velocityScale: 0.006,
-          particleAge: 100,
-          lineWidth: 2,
-          particleMultiplier: 1 / 250,
-          frameRate: 16,
+          maxVelocity: 15,
+          velocityScale: 0.015,
+          particleAge: 140,
+          lineWidth: 3,
+          particleMultiplier: 1 / 80,
+          frameRate: 20,
           colorScale: ['#3498db', '#2ecc71', '#f1c40f', '#e67e22', '#e74c3c'],
         })
         map.addLayer(layer)
