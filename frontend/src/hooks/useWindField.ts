@@ -1,27 +1,19 @@
 import { useQuery } from '@tanstack/react-query'
 
-// IDs de cidades brasileiras no OpenWeatherMap (endpoint /group aceita até 20)
-const CITY_IDS = [
-  3448439, // São Paulo
-  3451190, // Rio de Janeiro
-  3469058, // Brasília
-  3470127, // Belo Horizonte
-  3450554, // Salvador
-  3399415, // Fortaleza
-  3663517, // Manaus
-  3407730,  // Belém
-  3452925, // Porto Alegre
-  3390760, // Recife
-  3445831, // Uberlândia
-  3464975, // Curitiba
-  3462372, // Goiânia
-  3394429, // Natal
-  3386368, // Teresina
-  3467747, // Campo Grande
-  3671660, // Porto Velho
-  3458417, // Florianópolis
-  3471075, // Aracaju
-  3387580, // São Luís
+// Cidades para construir o campo de vento — /weather individual (plano gratuito OWM)
+const WIND_CITIES = [
+  'Uberlândia,BR',
+  'Sao Paulo,BR',
+  'Rio de Janeiro,BR',
+  'Brasilia,BR',
+  'Belo Horizonte,BR',
+  'Salvador,BR',
+  'Fortaleza,BR',
+  'Manaus,BR',
+  'Porto Alegre,BR',
+  'Recife,BR',
+  'Curitiba,BR',
+  'Goiania,BR',
 ]
 
 // Grade regular cobrindo o Brasil
@@ -84,21 +76,33 @@ export function useWindField(apiKey: string) {
   return useQuery({
     queryKey: ['windField'],
     queryFn: async () => {
-      const res = await fetch(
-        `https://api.openweathermap.org/data/2.5/group?id=${CITY_IDS.join(',')}&appid=${apiKey}&units=metric`,
+      // Chamadas individuais em paralelo — endpoint /weather disponível no plano gratuito
+      const results = await Promise.allSettled(
+        WIND_CITIES.map((city) =>
+          fetch(
+            `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`
+          ).then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+        )
       )
-      if (!res.ok) throw new Error('Erro ao buscar dados de vento')
-      const json = await res.json()
 
-      const cities: CityWind[] = (json.list ?? [])
-        .filter((item: { wind?: { speed?: number; deg?: number } }) => item.wind?.speed != null && item.wind?.deg != null)
-        .map((item: { coord: { lat: number; lon: number }; wind: { speed: number; deg: number } }) => {
-          const rad = (item.wind.deg * Math.PI) / 180
+      type CityWeatherItem = {
+        coord: { lat: number; lon: number }
+        wind?: { speed: number; deg: number }
+      }
+
+      const cities: CityWind[] = results
+        .filter(
+          (r): r is PromiseFulfilledResult<CityWeatherItem> =>
+            r.status === 'fulfilled' && r.value?.wind?.speed != null
+        )
+        .map((r) => {
+          const { coord, wind } = r.value
+          const rad = (wind!.deg * Math.PI) / 180
           return {
-            lat: item.coord.lat,
-            lng: item.coord.lon,
-            u: -item.wind.speed * Math.sin(rad),
-            v: -item.wind.speed * Math.cos(rad),
+            lat: coord.lat,
+            lng: coord.lon,
+            u: -wind!.speed * Math.sin(rad),
+            v: -wind!.speed * Math.cos(rad),
           }
         })
 
