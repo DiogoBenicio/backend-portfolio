@@ -7,6 +7,10 @@ spring:
     connection-timeout: 5s
     socket-timeout: 30s
 
+  output:
+    ansi:
+      enabled: always
+
 server:
   port: ${SERVER_PORT:8080}
 
@@ -31,11 +35,6 @@ management:
   endpoint:
     health:
       show-details: always
-
-spring:
-  output:
-    ansi:
-      enabled: always
 
 logging:
   pattern:

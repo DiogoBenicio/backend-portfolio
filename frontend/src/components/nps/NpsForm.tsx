@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useSubmitNps } from '@/hooks/useSubmitNps'
 import { ScoreSelector } from './ScoreSelector'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { NpsThankYou } from './NpsThankYou'
 
 export function NpsForm() {

@@ -1,6 +1,6 @@
 import { CheckCircle2 } from 'lucide-react'
 import { getScoreCategory } from '@/lib/utils/npsUtils'
-import { Badge } from '@/components/ui/Badge'
+import { Badge } from '@/components/ui/badge'
 
 interface NpsThankYouProps {
   score: number

@@ -22,10 +22,10 @@ weatherClient.interceptors.response.use(
 
 export const weatherApi = {
   getCurrent: (city: string, country?: string): Promise<CurrentWeather> =>
-    weatherClient.get('/api/v1/weather/current', { params: { city, country } }).then((r) => r.data),
+    weatherClient.get('/current', { params: { city, country } }).then((r) => r.data),
 
   getForecast: (city: string, days = 5): Promise<ForecastResponse> =>
-    weatherClient.get('/api/v1/weather/forecast', { params: { city, days } }).then((r) => r.data),
+    weatherClient.get('/forecast', { params: { city, days } }).then((r) => r.data),
 
   getHistory: (
     city: string,
@@ -33,11 +33,8 @@ export const weatherApi = {
     to?: string,
     page = 0,
     size = 20
-  ): Promise<WeatherHistory> =>
-    weatherClient
-      .get('/api/v1/weather/history', { params: { city, from, to, page, size } })
-      .then((r) => r.data),
+  ): Promise<WeatherHistory> => weatherClient.get('/history', { params: { city, from, to, page, size } }).then((r) => r.data),
 
   getCities: (): Promise<string[]> =>
-    weatherClient.get('/api/v1/weather/cities').then((r) => r.data),
+    weatherClient.get('/cities').then((r) => r.data),
 }

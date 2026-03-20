@@ -22,15 +22,15 @@ npsClient.interceptors.response.use(
 
 export const npsApi = {
   submit: (input: SubmitNpsInput): Promise<NpsResponseItem> =>
-    npsClient.post('/api/v1/nps/responses', input).then((r) => r.data),
+    npsClient.post('/responses', input).then((r) => r.data),
 
   getSummary: (page?: string): Promise<NpsSummary> =>
-    npsClient.get('/api/v1/nps/summary', { params: { page } }).then((r) => r.data),
+    npsClient.get('/summary', { params: { page } }).then((r) => r.data),
 
   listResponses: (params?: {
     page?: string
     limit?: number
     offset?: number
   }): Promise<NpsListResult> =>
-    npsClient.get('/api/v1/nps/responses', { params }).then((r) => r.data),
+    npsClient.get('/responses', { params }).then((r) => r.data),
 }

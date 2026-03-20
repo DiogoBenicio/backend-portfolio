@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { LoadingSpinner } from '@/components/ui/loadingspinner'
 
 // Importação dinâmica: Leaflet depende de `window` (não funciona no SSR)
 const WeatherMap = dynamic(

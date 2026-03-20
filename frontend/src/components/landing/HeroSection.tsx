@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ArrowRight, Cloud, MapPin, Star } from 'lucide-react'
-import { Button } from '@/components/ui/Button'
+import { Button } from '@/components/ui/button'
 import { IconTexture } from './IconTexture'
 
 export function HeroSection() {

@@ -3,7 +3,7 @@
 import { cn } from '@/lib/utils/cn'
 import type { ServiceHealthResult, ServiceStatus } from '@/hooks/useServiceHealth'
 
-const SERVICES: { key: string; label: string }[] = [
+const SERVICES: { key: keyof ServiceHealthResult; label: string }[] = [
   { key: 'nginx', label: 'Nginx' },
   { key: 'gateway', label: 'Gateway-API' },
   { key: 'weather', label: 'Weather-API' },

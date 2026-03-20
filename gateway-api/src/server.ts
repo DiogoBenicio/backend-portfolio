@@ -56,6 +56,18 @@ async function buildServer() {
     timestamp: new Date().toISOString(),
   }));
 
+  server.get('/api/v1/health', async () => {
+    const npsOk = await fetch(`${env.npsApiUrl}/api/v1/health`).then((r) => r.ok).catch(() => false);
+    return {
+      status: 'ok',
+      service: 'gateway-api',
+      timestamp: new Date().toISOString(),
+      upstream: {
+        nps: npsOk ? 'ok' : 'down',
+      },
+    };
+  });
+
   // ── Rotas ──────────────────────────────────────────────────
   registerAuthRoutes(server);
   registerProxyRoutes(server);

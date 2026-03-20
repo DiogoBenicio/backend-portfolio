@@ -1,5 +1,5 @@
 import { Droplets, Wind, Thermometer, Gauge } from 'lucide-react'
-import { Card, CardContent } from '@/components/ui/Card'
+import { Card, CardContent } from '@/components/ui/card'
 import type { CurrentWeather } from '@/types/weather'
 import { formatTemperature, formatWindSpeed, getWeatherIconUrl } from '@/lib/utils/weatherUtils'
 import Image from 'next/image'

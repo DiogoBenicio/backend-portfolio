@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils/cn'
 import { useCurrentWeather } from '@/hooks/useCurrentWeather'
 import { useNpsSummary } from '@/hooks/useNpsSummary'
 import { getNpsZoneColor, getNpsZoneBg } from '@/lib/utils/npsUtils'
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { LoadingSpinner } from '@/components/ui/loadingspinner'
 
 function SectionTitle({ icon: Icon, label }: { icon: typeof Cloud; label: string }) {
   return (
@@ -27,7 +27,7 @@ function WeatherWidget() {
   if (isLoading) {
     return (
       <div className="flex h-32 items-center justify-center">
-        <LoadingSpinner size="sm" label="Carregando clima..." />
+        <LoadingSpinner size={24} label="Carregando clima..." />
       </div>
     )
   }
@@ -69,7 +69,7 @@ function NpsWidget() {
   if (isLoading) {
     return (
       <div className="flex h-32 items-center justify-center">
-        <LoadingSpinner size="sm" label="Carregando NPS..." />
+        <LoadingSpinner size={24} label="Carregando NPS..." />
       </div>
     )
   }

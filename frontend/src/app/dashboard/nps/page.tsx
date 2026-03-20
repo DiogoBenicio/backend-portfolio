@@ -1,8 +1,8 @@
 'use client'
 
 import { NpsForm } from '@/components/nps/NpsForm'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
-import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { LoadingSpinner } from '@/components/ui/loadingspinner'
 import { useNpsSummary } from '@/hooks/useNpsSummary'
 import { getNpsZoneColor, getNpsZoneBg } from '@/lib/utils/npsUtils'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'

@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { Search } from 'lucide-react'
-import { Input } from '@/components/ui/Input'
-import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/input'
+import { Button } from '@/components/ui/button'
 
 interface CitySearchProps {
   onSearch: (city: string) => void

@@ -11,7 +11,7 @@ export async function authMiddleware(
   const { method, url } = request;
 
   // Rotas de saúde nunca exigem auth
-  if (url === '/health') return;
+  if (url === '/health' || url === '/api/health' || url === '/api/v1/health') return;
 
   // Verifica se é rota pública
   if (isPublicRoute(method, url)) return;
