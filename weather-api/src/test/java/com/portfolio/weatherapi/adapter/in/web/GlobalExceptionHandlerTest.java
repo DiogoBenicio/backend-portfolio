@@ -15,7 +15,6 @@ import org.springframework.web.reactive.function.client.WebClientRequestExceptio
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
