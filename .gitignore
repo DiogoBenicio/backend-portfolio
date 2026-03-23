@@ -9,6 +9,8 @@ yarn.lock
 dist/
 build/
 .next/
+*.class
+**/target/
 
 # Docker
 docker-compose.override.yml
