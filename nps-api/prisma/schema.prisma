@@ -11,6 +11,7 @@ model NpsResponse {
   id        String   @id @default(cuid())
   score     Int
   comment   String?
+  name      String?
   page      String   @default("portfolio")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

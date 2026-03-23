@@ -16,8 +16,10 @@ export const PUBLIC_ROUTES: Array<{ method: string; pattern: RegExp }> = [
   { method: 'POST', pattern: /^\/api\/auth\/login$/ },
   { method: 'GET',  pattern: /^\/api\/weather\/current/ },
   { method: 'GET',  pattern: /^\/api\/weather\/forecast/ },
-  { method: 'POST', pattern: /^\/api\/nps\/responses$/ },
-  { method: 'GET',  pattern: /^\/api\/nps\/summary/ },
+  { method: 'POST',   pattern: /^\/api\/nps\/responses$/ },
+  { method: 'GET',    pattern: /^\/api\/nps\/responses/ },
+  { method: 'DELETE', pattern: /^\/api\/nps\/responses\// },
+  { method: 'GET',    pattern: /^\/api\/nps\/summary/ },
 ];
 
 export function isPublicRoute(method: string, path: string): boolean {

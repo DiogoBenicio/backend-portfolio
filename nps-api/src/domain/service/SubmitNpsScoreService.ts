@@ -13,6 +13,7 @@ export class SubmitNpsScoreService implements SubmitNpsScoreUseCase {
     return this.repository.create({
       score: input.score,
       comment: input.comment,
+      name: input.name,
       page: input.page ?? 'portfolio',
     });
   }

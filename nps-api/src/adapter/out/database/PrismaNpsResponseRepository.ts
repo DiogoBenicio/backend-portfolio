@@ -14,6 +14,7 @@ export class PrismaNpsResponseRepository implements NpsResponseRepository {
       data: {
         score: input.score,
         comment: input.comment,
+        name: input.name,
         page: input.page,
       },
     });
@@ -41,5 +42,9 @@ export class PrismaNpsResponseRepository implements NpsResponseRepository {
       where,
       orderBy: { createdAt: 'desc' },
     });
+  }
+
+  async deleteById(id: string): Promise<void> {
+    await this.prisma.npsResponse.delete({ where: { id } });
   }
 }

@@ -3,6 +3,7 @@ import { NpsResponse } from '../../model/NpsResponse';
 export interface SubmitNpsScoreInput {
   score: number;
   comment?: string;
+  name?: string;
   page?: string;
 }
 

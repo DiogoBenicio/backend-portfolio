@@ -15,6 +15,7 @@ export interface NpsResponseItem {
   id: string
   score: number
   comment?: string | null
+  name?: string | null
   page: string
   createdAt: string
 }
@@ -29,5 +30,6 @@ export interface NpsListResult {
 export interface SubmitNpsInput {
   score: number
   comment?: string
+  name?: string
   page?: string
 }

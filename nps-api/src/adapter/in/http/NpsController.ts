@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from 'fastify';
 import { GetNpsSummaryUseCase } from '../../../domain/port/in/GetNpsSummaryUseCase';
 import { ListNpsResponsesUseCase } from '../../../domain/port/in/ListNpsResponsesUseCase';
 import { SubmitNpsScoreUseCase } from '../../../domain/port/in/SubmitNpsScoreUseCase';
+import { NpsResponseRepository } from '../../../domain/port/out/NpsResponseRepository';
 import {
   getSummarySchema,
   listResponsesSchema,
@@ -12,6 +13,7 @@ import { logger } from '../../../utils/logger';
 interface SubmitBody {
   score: number;
   comment?: string;
+  name?: string;
   page?: string;
 }
 
@@ -29,7 +31,8 @@ export function registerNpsRoutes(
   fastify: FastifyInstance,
   submitUseCase: SubmitNpsScoreUseCase,
   summaryUseCase: GetNpsSummaryUseCase,
-  listUseCase: ListNpsResponsesUseCase
+  listUseCase: ListNpsResponsesUseCase,
+  repository: NpsResponseRepository
 ): void {
   fastify.post<{ Body: SubmitBody }>(
     '/api/v1/nps/responses',
@@ -84,6 +87,23 @@ export function registerNpsRoutes(
           status: 500,
           error: 'Internal Server Error',
           message: 'Não foi possível listar as avaliações.',
+        });
+      }
+    }
+  );
+
+  fastify.delete<{ Params: { id: string } }>(
+    '/api/v1/nps/responses/:id',
+    async (req, reply) => {
+      try {
+        await repository.deleteById(req.params.id);
+        return reply.status(204).send();
+      } catch (err) {
+        logger.error('Erro ao apagar resposta NPS', err);
+        return reply.status(500).send({
+          status: 500,
+          error: 'Internal Server Error',
+          message: 'Não foi possível apagar a avaliação.',
         });
       }
     }

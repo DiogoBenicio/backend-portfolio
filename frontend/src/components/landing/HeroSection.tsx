@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, Cloud, MapPin, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -5,17 +6,21 @@ import { IconTexture } from './IconTexture'
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 to-blue-50 px-6 py-24 md:px-16 md:py-32">
+    <section className="relative overflow-hidden bg-gradient-to-br from-slate-200 to-blue-100 px-6 py-24 md:px-16 md:py-32">
       <IconTexture />
 
       <div className="relative z-10 mx-auto max-w-4xl">
         <div className="flex flex-col items-start gap-8 md:flex-row md:items-center md:gap-16">
-          {/* Foto / Avatar */}
+          {/* Foto */}
           <div className="shrink-0">
             <div className="relative h-36 w-36 overflow-hidden rounded-2xl border-4 border-white shadow-xl md:h-44 md:w-44">
-              <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-blue-500 to-blue-700 text-5xl font-bold text-white">
-                DB
-              </div>
+              <Image
+                src="/images/Diogo.jpg"
+                alt="Diogo Silveira Benício"
+                fill
+                className="object-cover object-[center_25%]"
+                priority
+              />
             </div>
           </div>
 

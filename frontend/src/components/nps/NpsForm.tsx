@@ -9,6 +9,7 @@ import { NpsThankYou } from './NpsThankYou'
 export function NpsForm() {
   const [score, setScore] = useState<number | null>(null)
   const [comment, setComment] = useState('')
+  const [name, setName] = useState('')
   const [submitted, setSubmitted] = useState(false)
   const { mutate, isPending } = useSubmitNps()
 
@@ -16,7 +17,12 @@ export function NpsForm() {
     e.preventDefault()
     if (score === null) return
     mutate(
-      { score, comment: comment.trim() || undefined, page: 'portfolio' },
+      {
+        score,
+        comment: comment.trim() || undefined,
+        name: name.trim() || undefined,
+        page: 'portfolio',
+      },
       { onSuccess: () => setSubmitted(true) }
     )
   }
@@ -30,6 +36,20 @@ export function NpsForm() {
           Em uma escala de 0 a 10, o quanto você recomendaria este portfólio para colegas?
         </label>
         <ScoreSelector value={score} onChange={setScore} />
+      </div>
+
+      <div>
+        <label className="mb-2 block text-sm font-medium text-gray-700">
+          Seu nome (opcional)
+        </label>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Como posso te chamar?"
+          maxLength={100}
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
       </div>
 
       <div>

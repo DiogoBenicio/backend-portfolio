@@ -38,7 +38,7 @@ async function main() {
   const listUseCase = new ListNpsResponsesService(repository);
 
   const server = await buildServer();
-  registerNpsRoutes(server, submitUseCase, summaryUseCase, listUseCase);
+  registerNpsRoutes(server, submitUseCase, summaryUseCase, listUseCase, repository);
 
   const port = Number(process.env.PORT ?? 3001);
   const host = '0.0.0.0';

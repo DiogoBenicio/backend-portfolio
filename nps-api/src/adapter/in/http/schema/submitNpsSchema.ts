@@ -14,6 +14,11 @@ export const submitNpsSchema = {
         maxLength: 1000,
         description: 'Comentário opcional',
       },
+      name: {
+        type: 'string',
+        maxLength: 100,
+        description: 'Nome do avaliador (opcional)',
+      },
       page: {
         type: 'string',
         maxLength: 100,
@@ -46,6 +51,30 @@ export const getSummarySchema = {
 };
 
 export const listResponsesSchema = {
+  response: {
+    200: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: { type: 'string' },
+              score: { type: 'integer' },
+              comment: { type: ['string', 'null'] },
+              name: { type: ['string', 'null'] },
+              page: { type: 'string' },
+              createdAt: { type: 'string', format: 'date-time' },
+            },
+          },
+        },
+        total: { type: 'integer' },
+        limit: { type: 'integer' },
+        offset: { type: 'integer' },
+      },
+    },
+  },
   querystring: {
     type: 'object',
     properties: {

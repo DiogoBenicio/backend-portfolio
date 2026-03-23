@@ -2,6 +2,7 @@ export interface NpsResponse {
   id: string;
   score: number;
   comment?: string | null;
+  name?: string | null;
   page: string;
   createdAt: Date;
 }
