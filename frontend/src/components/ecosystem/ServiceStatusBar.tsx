@@ -42,7 +42,7 @@ export function ServiceStatusBar({ statuses }: Props) {
   const allOnline = SERVICES.every((s) => statuses[s.key] === 'online')
 
   return (
-    <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border border-gray-200 bg-white px-5 py-4 shadow-sm">
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border border-white/50 bg-white/70 px-5 py-4 shadow-md backdrop-blur-sm">
       <div className="flex items-center gap-2">
         <span
           className={cn(

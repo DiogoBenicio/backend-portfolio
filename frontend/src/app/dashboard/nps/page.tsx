@@ -133,7 +133,7 @@ export default function NpsPage() {
               return (
                 <div
                   key={item.id}
-                  className={`flex flex-col gap-4 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm ${scoreBg}`}
+                  className={`flex flex-col gap-4 rounded-2xl border border-white/50 bg-white/70 p-6 shadow-md backdrop-blur-sm ${scoreBg}`}
                 >
                   {/* Topo: avatar + nome + data + apagar */}
                   <div className="flex items-center gap-4">

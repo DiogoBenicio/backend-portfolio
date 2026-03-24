@@ -134,7 +134,7 @@ export function LiveMetrics() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {/* Weather live */}
-      <div className="rounded-xl border border-orange-200 bg-white p-5 shadow-sm">
+      <div className="rounded-xl border border-orange-200/60 bg-white/70 p-5 shadow-md backdrop-blur-sm">
         <SectionTitle icon={Cloud} label="Clima em São Paulo" />
         <WeatherWidget />
         <p className="mt-3 text-[10px] text-gray-400">
@@ -143,7 +143,7 @@ export function LiveMetrics() {
       </div>
 
       {/* NPS live */}
-      <div className="rounded-xl border border-green-200 bg-white p-5 shadow-sm">
+      <div className="rounded-xl border border-indigo-200/60 bg-white/70 p-5 shadow-md backdrop-blur-sm">
         <SectionTitle icon={Star} label="NPS Global do Portfólio" />
         <NpsWidget />
         <p className="mt-3 text-[10px] text-gray-400">via NPS-API → Nginx → Gateway → PostgreSQL</p>

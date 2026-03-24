@@ -54,7 +54,7 @@ const LAYER_CONFIGS = {
   wind_new: {
     label: 'Vento',
     emoji: '💨',
-    activeClass: 'bg-teal-500 text-white',
+    activeClass: 'bg-indigo-600 text-white',
     paneName: 'windPane',
     renderType: 'tile' as const,
     tileOpacity: 0.22,
@@ -80,7 +80,7 @@ const LAYER_CONFIGS = {
   pressure_new: {
     label: 'Pressão',
     emoji: '🔵',
-    activeClass: 'bg-purple-500 text-white',
+    activeClass: 'bg-indigo-600 text-white',
     paneName: 'pressPane',
     renderType: 'tile' as const,
     tileOpacity: 0.82,

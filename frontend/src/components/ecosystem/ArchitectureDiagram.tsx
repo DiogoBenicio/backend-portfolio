@@ -109,7 +109,7 @@ interface Props {
 
 export function ArchitectureDiagram({ statuses }: Props) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="rounded-xl border border-white/50 bg-white/70 p-6 shadow-md backdrop-blur-sm">
       <div className="mb-5 flex items-center gap-2">
         <Layers size={16} className="text-gray-500" />
         <h2 className="text-sm font-semibold text-gray-700">Diagrama Arquitetural</h2>
@@ -178,11 +178,11 @@ export function ArchitectureDiagram({ statuses }: Props) {
         />
         <DiagramNode
           nodeKey="frontend"
-          icon={<Monitor size={13} className="text-purple-500" />}
+          icon={<Monitor size={13} className="text-indigo-500" />}
           label="Frontend"
           sublabel="Next.js 14"
-          border="border-purple-200"
-          bg="bg-purple-50"
+          border="border-indigo-200"
+          bg="bg-indigo-50"
         />
         <DiagramNode
           nodeKey="gateway"
@@ -204,11 +204,11 @@ export function ArchitectureDiagram({ statuses }: Props) {
         />
         <DiagramNode
           nodeKey="nps"
-          icon={<Star size={13} className="text-green-500" />}
+          icon={<Star size={13} className="text-indigo-500" />}
           label="NPS-API"
           sublabel="Fastify 4 + Prisma"
-          border="border-green-200"
-          bg="bg-green-50"
+          border="border-indigo-200"
+          bg="bg-indigo-50"
           status={statuses.nps}
         />
         <DiagramNode
@@ -220,10 +220,10 @@ export function ArchitectureDiagram({ statuses }: Props) {
         />
         <DiagramNode
           nodeKey="postgres"
-          icon={<Database size={12} className="text-green-400" />}
+          icon={<Database size={12} className="text-indigo-400" />}
           label="PostgreSQL"
-          border="border-green-300"
-          bg="bg-green-50/60"
+          border="border-indigo-300"
+          bg="bg-indigo-50/60"
         />
       </div>
 

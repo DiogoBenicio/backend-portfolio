@@ -10,7 +10,7 @@ const PATTERN_COLORS: Record<string, string> = {
   Hexagonal: 'bg-orange-100 text-orange-700',
   'Layered SOA': 'bg-blue-100 text-blue-700',
   'Reverse Proxy': 'bg-gray-100 text-gray-700',
-  'SSR / React': 'bg-purple-100 text-purple-700',
+  'SSR / React': 'bg-indigo-100 text-indigo-700',
 }
 
 interface Props {
@@ -36,7 +36,7 @@ export function ServiceCard({
 }: Props) {
   return (
     <div
-      className={cn('flex flex-col gap-3 rounded-xl border-2 bg-white p-5 shadow-sm', borderColor)}
+      className={cn('flex flex-col gap-3 rounded-xl border-2 bg-white/70 p-5 shadow-md backdrop-blur-sm', borderColor)}
     >
       {/* Header */}
       <div className="flex items-start justify-between gap-2">

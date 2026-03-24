@@ -14,7 +14,14 @@
       "Bash(npm test:*)",
       "Bash(mvn test:*)",
       "Bash(java -version)",
-      "Bash(mvn -version)"
+      "Bash(mvn -version)",
+      "Bash(openssl rand:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npx prettier:*)",
+      "Bash(node_modules/.bin/tsc --noEmit)",
+      "Bash(xargs cat:*)",
+      "Bash(docker compose:*)",
+      "Bash(curl -s \"http://localhost:4000/api/nps/summary?page=portfolio\")"
     ]
   }
 }
