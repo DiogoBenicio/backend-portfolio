@@ -33,8 +33,8 @@ export const weatherApi = {
     to?: string,
     page = 0,
     size = 20
-  ): Promise<WeatherHistory> => weatherClient.get('/history', { params: { city, from, to, page, size } }).then((r) => r.data),
+  ): Promise<WeatherHistory> =>
+    weatherClient.get('/history', { params: { city, from, to, page, size } }).then((r) => r.data),
 
-  getCities: (): Promise<string[]> =>
-    weatherClient.get('/cities').then((r) => r.data),
+  getCities: (): Promise<string[]> => weatherClient.get('/cities').then((r) => r.data),
 }

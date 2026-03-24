@@ -31,61 +31,61 @@ export default function WeatherPage() {
 
   return (
     <PageContainer>
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Dashboard de Clima</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Dados em tempo real via OpenWeather API · Histórico no Elasticsearch
-        </p>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard de Clima</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            Dados em tempo real via OpenWeather API · Histórico no Elasticsearch
+          </p>
+        </div>
+
+        <CitySearch onSearch={setCity} defaultCity={city} />
+
+        {loadingCurrent ? (
+          <LoadingSpinner label="Buscando dados do clima..." />
+        ) : errorCurrent ? (
+          <ErrorMessage message="Cidade não encontrada ou erro na API. Verifique o nome e tente novamente." />
+        ) : current ? (
+          <>
+            <CurrentWeatherCard weather={current} />
+
+            <div className="grid gap-6 lg:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Temperatura (°C)</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {loadingForecast ? (
+                    <LoadingSpinner size={20} />
+                  ) : forecast ? (
+                    <TemperatureChart forecast={forecast.forecast} />
+                  ) : null}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Umidade Relativa (%)</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {forecast && <HumidityChart forecast={forecast.forecast} />}
+                </CardContent>
+              </Card>
+            </div>
+
+            {forecast && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Previsão para os próximos dias</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ForecastCard forecast={forecast.forecast} />
+                </CardContent>
+              </Card>
+            )}
+          </>
+        ) : null}
       </div>
-
-      <CitySearch onSearch={setCity} defaultCity={city} />
-
-      {loadingCurrent ? (
-        <LoadingSpinner label="Buscando dados do clima..." />
-      ) : errorCurrent ? (
-        <ErrorMessage message="Cidade não encontrada ou erro na API. Verifique o nome e tente novamente." />
-      ) : current ? (
-        <>
-          <CurrentWeatherCard weather={current} />
-
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Temperatura (°C)</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {loadingForecast ? (
-                  <LoadingSpinner size={20} />
-                ) : forecast ? (
-                  <TemperatureChart forecast={forecast.forecast} />
-                ) : null}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Umidade Relativa (%)</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {forecast && <HumidityChart forecast={forecast.forecast} />}
-              </CardContent>
-            </Card>
-          </div>
-
-          {forecast && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Previsão para os próximos dias</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <ForecastCard forecast={forecast.forecast} />
-              </CardContent>
-            </Card>
-          )}
-        </>
-      ) : null}
-    </div>
     </PageContainer>
   )
 }

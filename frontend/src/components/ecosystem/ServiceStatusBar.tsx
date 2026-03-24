@@ -34,11 +34,11 @@ function StatusDot({ status }: { status: ServiceStatus }) {
                 willChange: 'opacity',
               }
             : status === 'offline'
-            ? {
-                animation: 'blinkPulse 1.0s ease-in-out infinite',
-                willChange: 'opacity',
-              }
-            : undefined
+              ? {
+                  animation: 'blinkPulse 1.0s ease-in-out infinite',
+                  willChange: 'opacity',
+                }
+              : undefined
         }
       />
     </>

@@ -48,9 +48,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <main
         className={cn(
           'relative z-10 pt-14 transition-all duration-200 md:pt-0',
-          collapsed
-            ? 'md:pl-16 xl:pr-16'
-            : 'md:pl-60 xl:pr-60'
+          collapsed ? 'md:pl-16 xl:pr-16' : 'md:pl-60 xl:pr-60'
         )}
       >
         {children}

@@ -1,5 +1,4 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import type { AxiosInstance, AxiosRequestConfig } from 'axios'
 
 // Captura chamadas feitas pela instância interna do weatherClient
 const mockGet = vi.fn()
@@ -25,14 +24,18 @@ describe('weatherApi.getCurrent', () => {
   it('deve chamar GET /current com params city e country', async () => {
     mockGet.mockResolvedValue({ data: { city: 'Fortaleza', temperature: 30 } })
     const result = await weatherApi.getCurrent('Fortaleza', 'BR')
-    expect(mockGet).toHaveBeenCalledWith('/current', { params: { city: 'Fortaleza', country: 'BR' } })
+    expect(mockGet).toHaveBeenCalledWith('/current', {
+      params: { city: 'Fortaleza', country: 'BR' },
+    })
     expect(result).toEqual({ city: 'Fortaleza', temperature: 30 })
   })
 
   it('deve chamar GET /current sem country quando omitido', async () => {
     mockGet.mockResolvedValue({ data: { city: 'Recife' } })
     await weatherApi.getCurrent('Recife')
-    expect(mockGet).toHaveBeenCalledWith('/current', { params: { city: 'Recife', country: undefined } })
+    expect(mockGet).toHaveBeenCalledWith('/current', {
+      params: { city: 'Recife', country: undefined },
+    })
   })
 })
 

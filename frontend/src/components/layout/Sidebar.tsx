@@ -3,8 +3,16 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
-  Cloud, Map, Star, Home, Github, Linkedin,
-  BarChart2, Layers, ChevronLeft, ChevronRight,
+  Cloud,
+  Map,
+  Star,
+  Home,
+  Github,
+  Linkedin,
+  BarChart2,
+  Layers,
+  ChevronLeft,
+  ChevronRight,
 } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 
@@ -116,7 +124,9 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
 
       {/* Links externos */}
       <div className="border-t border-white/40 p-2">
-        <div className={cn('flex', collapsed ? 'flex-col items-center gap-1' : 'items-center gap-1')}>
+        <div
+          className={cn('flex', collapsed ? 'flex-col items-center gap-1' : 'items-center gap-1')}
+        >
           <a
             href="https://github.com/diogosbenicio"
             target="_blank"

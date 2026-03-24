@@ -31,8 +31,7 @@ export const npsApi = {
     page?: string
     limit?: number
     offset?: number
-  }): Promise<NpsListResult> =>
-    npsClient.get('/responses', { params }).then((r) => r.data),
+  }): Promise<NpsListResult> => npsClient.get('/responses', { params }).then((r) => r.data),
 
   deleteResponse: (id: string): Promise<void> =>
     npsClient.delete(`/responses/${id}`).then(() => undefined),

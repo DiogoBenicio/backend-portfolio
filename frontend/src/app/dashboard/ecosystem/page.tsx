@@ -69,54 +69,54 @@ export default function EcosystemPage() {
 
   return (
     <PageContainer>
-    <div className="mx-auto max-w-5xl space-y-8 px-6 py-8">
-      {/* Header */}
-      <header className="space-y-1">
-        <div className="flex items-center gap-2">
-          <Layers size={22} className="text-gray-700" />
-          <h1 className="text-2xl font-bold text-gray-900">Ecossistema BackEnd</h1>
-        </div>
-        <p className="text-gray-500">
-          Visão geral dos serviços, arquitetura e métricas em tempo real.
-        </p>
-      </header>
+      <div className="mx-auto max-w-5xl space-y-8 px-6 py-8">
+        {/* Header */}
+        <header className="space-y-1">
+          <div className="flex items-center gap-2">
+            <Layers size={22} className="text-gray-700" />
+            <h1 className="text-2xl font-bold text-gray-900">Ecossistema BackEnd</h1>
+          </div>
+          <p className="text-gray-500">
+            Visão geral dos serviços, arquitetura e métricas em tempo real.
+          </p>
+        </header>
 
-      {/* Status bar */}
-      <ServiceStatusBar statuses={statuses} />
+        {/* Status bar */}
+        <ServiceStatusBar statuses={statuses} />
 
-      {/* Diagrama arquitetural */}
-      <ArchitectureDiagram statuses={statuses} />
+        {/* Diagrama arquitetural */}
+        <ArchitectureDiagram statuses={statuses} />
 
-      {/* Cards dos serviços */}
-      <section>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
-          Serviços
-        </h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {SERVICES.map((service) => (
-            <ServiceCard
-              key={service.name}
-              icon={service.icon}
-              name={service.name}
-              description={service.description}
-              pattern={service.pattern}
-              tech={[...service.tech]}
-              borderColor={service.borderColor}
-              status={service.key ? statuses[service.key as keyof typeof statuses] : undefined}
-              docsUrl={'docsUrl' in service ? service.docsUrl : undefined}
-            />
-          ))}
-        </div>
-      </section>
+        {/* Cards dos serviços */}
+        <section>
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
+            Serviços
+          </h2>
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {SERVICES.map((service) => (
+              <ServiceCard
+                key={service.name}
+                icon={service.icon}
+                name={service.name}
+                description={service.description}
+                pattern={service.pattern}
+                tech={[...service.tech]}
+                borderColor={service.borderColor}
+                status={service.key ? statuses[service.key as keyof typeof statuses] : undefined}
+                docsUrl={'docsUrl' in service ? service.docsUrl : undefined}
+              />
+            ))}
+          </div>
+        </section>
 
-      {/* Métricas live */}
-      <section>
-        <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
-          Métricas em tempo real
-        </h2>
-        <LiveMetrics />
-      </section>
-    </div>
+        {/* Métricas live */}
+        <section>
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
+            Métricas em tempo real
+          </h2>
+          <LiveMetrics />
+        </section>
+      </div>
     </PageContainer>
   )
 }

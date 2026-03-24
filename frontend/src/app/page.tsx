@@ -111,7 +111,8 @@ export default function HomePage() {
 
               <div className="mt-auto rounded-lg border border-blue-100 bg-white px-3 py-2">
                 <p className="text-[11px] text-gray-400">
-                  Stack: <span className="font-medium text-gray-600">Node.js · Fastify · TypeScript</span>
+                  Stack:{' '}
+                  <span className="font-medium text-gray-600">Node.js · Fastify · TypeScript</span>
                 </p>
               </div>
             </div>
