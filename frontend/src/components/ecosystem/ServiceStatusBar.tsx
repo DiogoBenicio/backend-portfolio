@@ -12,15 +12,36 @@ const SERVICES: { key: keyof ServiceHealthResult; label: string }[] = [
 
 function StatusDot({ status }: { status: ServiceStatus }) {
   return (
-    <span
-      className={cn(
-        'inline-block h-2 w-2 rounded-full',
-        status === 'online' && 'bg-green-500',
-        status === 'degraded' && 'bg-yellow-400',
-        status === 'offline' && 'bg-red-500',
-        status === 'checking' && 'animate-pulse bg-gray-300'
-      )}
-    />
+    <>
+      <style>{`
+        @keyframes blinkPulse {
+          0%, 100% { opacity: 0; }
+          30%, 70% { opacity: 1; }
+        }
+      `}</style>
+      <span
+        className={cn(
+          'inline-block h-2 w-2 rounded-full',
+          status === 'online' && 'bg-green-500',
+          status === 'degraded' && 'bg-yellow-400',
+          status === 'offline' && 'bg-red-500',
+          status === 'checking' && 'bg-gray-300'
+        )}
+        style={
+          status === 'online'
+            ? {
+                animation: 'blinkPulse 2.8s ease-in-out infinite',
+                willChange: 'opacity',
+              }
+            : status === 'offline'
+            ? {
+                animation: 'blinkPulse 1.0s ease-in-out infinite',
+                willChange: 'opacity',
+              }
+            : undefined
+        }
+      />
+    </>
   )
 }
 

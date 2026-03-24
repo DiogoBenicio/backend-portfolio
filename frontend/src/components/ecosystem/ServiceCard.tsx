@@ -35,9 +35,16 @@ export function ServiceCard({
   docsUrl,
 }: Props) {
   return (
-    <div
-      className={cn('flex flex-col gap-3 rounded-xl border-2 bg-white/70 p-5 shadow-md backdrop-blur-sm', borderColor)}
-    >
+    <>
+      <style>{`
+        @keyframes blinkPulse {
+          0%, 100% { opacity: 0; }
+          30%, 70% { opacity: 1; }
+        }
+      `}</style>
+      <div
+        className={cn('flex flex-col gap-3 rounded-xl border-2 bg-white/70 p-5 shadow-md backdrop-blur-sm', borderColor)}
+      >
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2">
@@ -50,8 +57,21 @@ export function ServiceCard({
                 status === 'online' && 'bg-green-500',
                 status === 'degraded' && 'bg-yellow-400',
                 status === 'offline' && 'bg-red-500',
-                status === 'checking' && 'animate-pulse bg-gray-300'
+                status === 'checking' && 'bg-gray-300'
               )}
+              style={
+                status === 'online'
+                  ? {
+                      animation: 'blinkPulse 3.2s ease-in-out infinite',
+                      willChange: 'opacity',
+                    }
+                  : status === 'offline'
+                  ? {
+                      animation: 'blinkPulse 0.9s ease-in-out infinite',
+                      willChange: 'opacity',
+                    }
+                  : undefined
+              }
             />
           )}
         </div>
@@ -90,5 +110,6 @@ export function ServiceCard({
         ))}
       </div>
     </div>
+    </>
   )
 }
