@@ -1,28 +1,28 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Cloud, Database, Server, Code2, GitBranch, Cpu, Globe, Zap, Terminal, Layers } from 'lucide-react'
 
-const COLOR_PATTERN = ['#3b82f6', '#2563eb', '#1d4ed8', '#4f46e5', '#6b7280'] // blue shades + gray
+const COLOR_PATTERN = ['#3b82f6', '#2563eb', '#1d4ed8', '#4f46e5', '#6b7280', '#6b7280'] // blue shades + gray
 
 const ICON_TEMPLATES = [
-  { Icon: Cloud,     baseSize: 130, color: '#3b82f6', delay: '0s'   },
-  { Icon: Database,  baseSize: 110, color: '#4f46e5', delay: '1.5s' },
-  { Icon: Zap,       baseSize: 42,  color: '#f97316', delay: '3s'   },
-  { Icon: Server,    baseSize: 140, color: '#4f46e5', delay: '0.8s' },
-  { Icon: Code2,     baseSize: 50,  color: '#3b82f6', delay: '2s'   },
-  { Icon: GitBranch, baseSize: 40,  color: '#f97316', delay: '1s'   },
-  { Icon: Cpu,       baseSize: 44,  color: '#3b82f6', delay: '2.5s' },
-  { Icon: Globe,     baseSize: 38,  color: '#4f46e5', delay: '0.5s' },
-  { Icon: Terminal,  baseSize: 36,  color: '#f97316', delay: '3.5s' },
-  { Icon: Layers,    baseSize: 42,  color: '#3b82f6', delay: '1.8s' },
-  { Icon: Code2,     baseSize: 50,  color: '#4f46e5', delay: '0.3s' },
-  { Icon: Zap,       baseSize: 38,  color: '#f97316', delay: '2.2s' },
-  { Icon: Cloud,     baseSize: 64,  color: '#60a5fa', delay: '1.2s' },
-  { Icon: Server,    baseSize: 58,  color: '#818cf8', delay: '0.7s' },
-  { Icon: GitBranch, baseSize: 42,  color: '#f97316', delay: '1.1s' },
-  { Icon: Globe,     baseSize: 44,  color: '#4f46e5', delay: '0.9s' },
-  { Icon: Layers,    baseSize: 120, color: '#3b82f6', delay: '0.8s' },
+  { Icon: Cloud,     baseSize: 130, delay: '0s'   },
+  { Icon: Database,  baseSize: 110, delay: '1.5s' },
+  { Icon: Zap,       baseSize: 42,  delay: '3s'   },
+  { Icon: Server,    baseSize: 140, delay: '0.8s' },
+  { Icon: Code2,     baseSize: 50,  delay: '2s'   },
+  { Icon: GitBranch, baseSize: 40,  delay: '1s'   },
+  { Icon: Cpu,       baseSize: 44,  delay: '2.5s' },
+  { Icon: Globe,     baseSize: 38,  delay: '0.5s' },
+  { Icon: Terminal,  baseSize: 36,  delay: '3.5s' },
+  { Icon: Layers,    baseSize: 42,  delay: '1.8s' },
+  { Icon: Code2,     baseSize: 50,  delay: '0.3s' },
+  { Icon: Zap,       baseSize: 38,  delay: '2.2s' },
+  { Icon: Cloud,     baseSize: 64,  delay: '1.2s' },
+  { Icon: Server,    baseSize: 58,  delay: '0.7s' },
+  { Icon: GitBranch, baseSize: 42,  delay: '1.1s' },
+  { Icon: Globe,     baseSize: 44,  delay: '0.9s' },
+  { Icon: Layers,    baseSize: 120, delay: '0.8s' },
 ]
 
 const CSS = `
@@ -43,19 +43,56 @@ const CSS = `
     0%,100% { opacity: 0.07; }
     50%      { opacity: 0.13; }
   }
+  @keyframes moveRight {
+    from { transform: translateX(0); }
+    to   { transform: translateX(130vw); }
+  }
 `
 
 const ANIMS = ['dt1', 'dt2', 'dt3']
 
+const rand = (min: number, max: number) => Math.random() * (max - min) + min
+
+const createIcon = (id: number) => {
+  const template = ICON_TEMPLATES[Math.floor(Math.random() * ICON_TEMPLATES.length)]
+  return {
+    id,
+    Icon: template.Icon,
+    top: rand(6, 94),
+    left: rand(-18, -8), // start off-screen à esquerda
+    size: Math.round(template.baseSize * (0.6 + Math.random() * 0.8)),
+    color: COLOR_PATTERN[Math.floor(Math.random() * COLOR_PATTERN.length)],
+    duration: rand(35, 55),   // velocidade suave
+    delay: `${Math.random() * 2}s`,
+  }
+}
+
 export function DashboardTexture() {
-  const icons = useMemo(() => {
-    return ICON_TEMPLATES.map((template, index) => ({
-      ...template,
-      top: Math.random() * 88 + 6,    // 6% a 94%
-      left: Math.random() * 88 + 6,   // 6% a 94%
-      size: Math.round(template.baseSize * (0.8 + Math.random() * 0.6)),
-      color: COLOR_PATTERN[index % COLOR_PATTERN.length],
-    }))
+  const [icons, setIcons] = useState<any[]>([])
+  const nextId = useRef(1)
+
+  useEffect(() => {
+    // Gera ícones só no cliente para evitar mismatches SSR/CSR
+    const initialIcons = Array.from({ length: 6 }, (_, i) => createIcon(i + 1))
+    setIcons(initialIcons)
+    nextId.current = initialIcons.length + 1
+  }, [])
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const id = nextId.current++
+      const newIcon = createIcon(id)
+      setIcons((current) => {
+        const updated = [...current, newIcon].slice(-35)
+        return updated
+      })
+
+      setTimeout(() => {
+        setIcons((current) => current.filter((icon) => icon.id !== id))
+      }, newIcon.duration * 1000 + 1500) // tempo da animação + margem
+    }, 800)
+
+    return () => clearInterval(interval)
   }, [])
 
   return (
@@ -175,17 +212,19 @@ export function DashboardTexture() {
       </svg>
 
       {/* Camada 2 — Ícones animados */}
-      {icons.map(({ Icon, top, left, size, color, delay }, i) => (
+      {icons.map(({ id, Icon, top, left, size, color, delay, duration }) => (
         <div
-          key={i}
+          key={id}
           className="absolute"
           style={{
             top: `${top}%`,
-            left: `${left}%`,
+            left: `${left}vw`,
             color,
             opacity: 0.08,
-            animation: `${ANIMS[i % 3]} ${9 + (i % 4) * 1.5}s ease-in-out infinite`,
+            animation: `moveRight ${duration}s linear infinite`,
             animationDelay: delay,
+            transform: 'translateX(0)',
+            willChange: 'transform',
           }}
         >
           <Icon size={size} />
