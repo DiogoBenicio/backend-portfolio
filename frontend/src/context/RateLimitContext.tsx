@@ -72,6 +72,12 @@ export function RateLimitProvider({ children }: { children: React.ReactNode }) {
   }, [isBlocked, blockedUntil])
 
   const blockUser = useCallback(() => {
+    // Se já há um bloco ativo, não resetar o countdown
+    const stored = localStorage.getItem(RL_KEY)
+    if (stored) {
+      const existing = parseInt(stored, 10)
+      if (!isNaN(existing) && existing > Date.now()) return
+    }
     const until = Date.now() + 3_600_000
     localStorage.setItem(RL_KEY, String(until))
     setIsBlocked(true)
