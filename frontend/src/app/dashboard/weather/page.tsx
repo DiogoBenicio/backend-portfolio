@@ -16,6 +16,7 @@ import { useCurrentWeather } from '@/hooks/useCurrentWeather'
 import { useForecast } from '@/hooks/useForecast'
 import { useWeatherSensors } from '@/hooks/useWeatherSensors'
 import { PageContainer } from '@/components/layout/PageContainer'
+import { isRateLimitError } from '@/lib/errors'
 import { OpenMeteoLogo } from '@/components/ui/OpenMeteoLogo'
 import { OpenWeatherLogo } from '@/components/ui/OpenWeatherLogo'
 import { ElasticLogo } from '@/components/ui/ElasticLogo'
@@ -84,7 +85,7 @@ export default function WeatherPage() {
 
         {loadingCurrent ? (
           <LoadingSpinner label="Buscando dados do clima..." />
-        ) : errorCurrent ? (
+        ) : errorCurrent && !isRateLimitError(errorCurrent) ? (
           <ErrorMessage message="Cidade não encontrada ou erro na API. Verifique o nome e tente novamente." />
         ) : current ? (
           <>

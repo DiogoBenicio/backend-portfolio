@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, keepPreviousData } from '@tanstack/react-query'
 import { weatherApi } from '@/lib/api/weatherClient'
 
 export function useCurrentWeather(city: string, country?: string) {
@@ -8,5 +8,6 @@ export function useCurrentWeather(city: string, country?: string) {
     enabled: !!city,
     staleTime: 5 * 60 * 1000, // 5 minutos
     retry: 1,
+    placeholderData: keepPreviousData,
   })
 }

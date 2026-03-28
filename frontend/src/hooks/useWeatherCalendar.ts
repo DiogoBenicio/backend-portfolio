@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, keepPreviousData } from '@tanstack/react-query'
 import { weatherApi } from '@/lib/api/weatherClient'
 
 export function useWeatherCalendar(city: string, year: number, month: number) {
@@ -8,5 +8,6 @@ export function useWeatherCalendar(city: string, year: number, month: number) {
     enabled: !!city && !!year && !!month,
     staleTime: 5 * 60 * 1000, // 5 minutos
     retry: 1,
+    placeholderData: keepPreviousData,
   })
 }

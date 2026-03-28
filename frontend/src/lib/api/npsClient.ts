@@ -1,5 +1,6 @@
 import axios, { AxiosError } from 'axios'
 import type { NpsSummary, NpsListResult, NpsResponseItem, SubmitNpsInput } from '@/types/nps'
+import { RateLimitError } from '@/lib/errors'
 
 const npsClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_NPS_API_URL ?? 'http://localhost:3001',
@@ -21,6 +22,7 @@ npsClient.interceptors.response.use(
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('rate-limit', { detail: { retryAfter } }))
       }
+      return Promise.reject(new RateLimitError())
     }
     return Promise.reject(error)
   }

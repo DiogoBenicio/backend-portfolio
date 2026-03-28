@@ -6,6 +6,7 @@ import type {
   SensorDataResponse,
   CalendarResponse,
 } from '@/types/weather'
+import { RateLimitError } from '@/lib/errors'
 
 const weatherClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_WEATHER_API_URL ?? 'http://localhost:8080',
@@ -13,7 +14,7 @@ const weatherClient = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
-function isRateLimitError(error: AxiosError): boolean {
+function isRateLimitAxiosError(error: AxiosError): boolean {
   if (error.response?.status === 429) return true
   // Gateway pode retornar 500 com mensagem de rate limit antes do fix ser deployado
   if (error.response?.status === 500) {
@@ -26,11 +27,12 @@ function isRateLimitError(error: AxiosError): boolean {
 weatherClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    if (isRateLimitError(error)) {
+    if (isRateLimitAxiosError(error)) {
       const retryAfter = error.response?.headers['retry-after'] as string | undefined
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('rate-limit', { detail: { retryAfter } }))
       }
+      return Promise.reject(new RateLimitError())
     }
     return Promise.reject(error)
   }

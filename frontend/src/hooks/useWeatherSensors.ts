@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, keepPreviousData } from '@tanstack/react-query'
 import { weatherApi } from '@/lib/api/weatherClient'
 
 export function useWeatherSensors(city: string, from: string, to: string) {
@@ -8,5 +8,6 @@ export function useWeatherSensors(city: string, from: string, to: string) {
     enabled: !!city && !!from && !!to,
     staleTime: 10 * 60 * 1000, // 10 minutos — backend faz gap-fill, dados são completos
     retry: 1,
+    placeholderData: keepPreviousData,
   })
 }
