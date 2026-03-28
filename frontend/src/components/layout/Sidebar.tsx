@@ -129,7 +129,7 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
           className={cn('flex', collapsed ? 'flex-col items-center gap-1' : 'items-center gap-1')}
         >
           <a
-            href="https://github.com/diogosbenicio"
+            href="https://github.com/DiogoBenicio/backend-portfolio"
             target="_blank"
             rel="noopener noreferrer"
             title="GitHub"
