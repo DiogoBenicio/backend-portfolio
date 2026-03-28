@@ -1,0 +1,13 @@
+node_modules
+dist
+coverage
+.env*
+!.env.example
+npm-debug.log*
+README.md
+*.md
+.git
+.gitignore
+tsconfig.tsbuildinfo
+src/test
+vitest.config.ts

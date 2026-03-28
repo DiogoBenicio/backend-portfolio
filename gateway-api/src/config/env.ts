@@ -12,11 +12,11 @@ export const env = {
   port: Number(optional('PORT', '4000')),
   nodeEnv: optional('NODE_ENV', 'development'),
 
-  jwtSecret: optional('JWT_SECRET', 'dev_secret_change_in_production_min_32_chars'),
+  jwtSecret: required('JWT_SECRET'),
   jwtExpiresIn: optional('JWT_EXPIRES_IN', '2h'),
 
-  adminUser: optional('ADMIN_USER', 'admin'),
-  adminPass: optional('ADMIN_PASS', 'admin2025'),
+  adminUser: required('ADMIN_USER'),
+  adminPass: required('ADMIN_PASS'),
 
   weatherApiUrl: optional('WEATHER_API_URL', 'http://localhost:8080'),
   npsApiUrl: optional('NPS_API_URL', 'http://localhost:3001'),

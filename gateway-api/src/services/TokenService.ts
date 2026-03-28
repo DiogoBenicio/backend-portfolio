@@ -21,7 +21,7 @@ export class TokenService {
   }
 
   verify(token: string): TokenPayload & JwtPayload {
-    return jwt.verify(token, this.secret) as TokenPayload & JwtPayload;
+    return jwt.verify(token, this.secret, { algorithms: ['HS256'] }) as TokenPayload & JwtPayload;
   }
 
   refresh(token: string): string {
