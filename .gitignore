@@ -60,6 +60,9 @@ tsconfig.tsbuildinfo
 Thumbs.db
 desktop.ini
 
+# ─── Documentação interna ────────────────────────────────
+docs/
+
 # ─── Claude Code ─────────────────────────────────────────
 .claude/
 .remember/
