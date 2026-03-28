@@ -129,6 +129,23 @@ echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 
 ## 7. Configurar parâmetro do kernel para Elasticsearch
 
+O Elasticsearch já está configurado no `docker-compose.yml` para consumo mínimo de memória:
+
+| Configuração | Valor | Efeito |
+|---|---|---|
+| `ES_JAVA_OPTS=-Xms256m -Xmx256m` | heap fixo em 256 MB | evita expansão dinâmica |
+| `-XX:+UseG1GC` | garbage collector G1 | mais eficiente em heaps pequenos |
+| `-XX:G1HeapRegionSize=4m` | regiões menores no G1 | reduz fragmentação |
+| `indices.memory.index_buffer_size=10%` | buffer de indexação limitado | padrão é 10%, garante o teto |
+| `thread_pool.write.queue_size=100` | fila de escrita menor | reduz overhead em baixo volume |
+| `mem_limit: 512m` | limite total do container | o processo Java + OS não passa de 512 MB |
+
+Com isso, o Elasticsearch roda em ~400–500 MB de RAM total, versus os ~1 GB padrão.
+
+> **Nota:** para workloads de produção com alto volume de dados, aumente `Xmx` para pelo menos 1 GB. Para portfólio, 256 MB é suficiente.
+
+
+
 ```bash
 # Elasticsearch exige vm.max_map_count >= 262144
 echo 'vm.max_map_count=262144' | sudo tee -a /etc/sysctl.conf
