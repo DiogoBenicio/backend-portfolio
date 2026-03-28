@@ -243,7 +243,6 @@ class ElasticsearchWeatherAdapterTest {
             verify(operations, never()).search(any(CriteriaQuery.class), any(), any(IndexCoordinates.class));
         }
 
-        @SuppressWarnings("unchecked")
         @Test
         @DisplayName("deve retornar dias distintos com dados para o mês correto")
         void shouldReturnDistinctDays() {

@@ -4,7 +4,6 @@ import com.portfolio.weatherapi.adapter.in.web.mapper.WeatherMapper;
 import com.portfolio.weatherapi.application.dto.*;
 import com.portfolio.weatherapi.domain.port.in.*;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
