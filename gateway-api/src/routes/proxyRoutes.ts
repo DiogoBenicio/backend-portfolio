@@ -66,11 +66,11 @@ const NPS_RATE_LIMIT = {
   },
 };
 
-// Limite ainda mais restrito para rotas de consulta pesada (demo)
+// Limite para rotas de consulta pesada (demo)
 const HEAVY_RATE_LIMIT = {
   config: {
     rateLimit: {
-      max: 30,
+      max: 60,
       timeWindow: '1 minute',
       errorResponseBuilder: (_req: unknown, context: { after: string; ttl: number }) => ({
         status: 429,
