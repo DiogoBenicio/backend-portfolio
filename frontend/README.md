@@ -1,30 +1,38 @@
 # Portfolio Frontend
 
 Landing page + dashboard com visualizações de clima e formulário NPS.
-Construído com Next.js 14 App Router + shadcn/ui + Tailwind CSS.
 
-## Seções
+![Next.js](https://img.shields.io/badge/Next.js_14-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
+![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-000000?style=for-the-badge&logo=shadcnui&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
-| Rota                 | Descrição                                                                             |
-| -------------------- | ------------------------------------------------------------------------------------- |
-| `/`                  | Landing page com Hero (foto, dados, tech stack, arquitetura)                          |
-| `/dashboard/weather` | Dashboard de clima: busca por cidade, clima atual, gráficos Recharts, previsão 5 dias |
-| `/dashboard/map`     | Mapa interativo Leaflet com marcadores de cidades e popup de clima em tempo real      |
-| `/dashboard/nps`     | Formulário NPS (0-10) + painel de resultados com score, zonas e distribuição          |
+## Rotas
+
+| Rota | Descrição |
+|---|---|
+| `/` | Landing page com hero, stack e diagrama de arquitetura |
+| `/dashboard/weather` | Clima atual, gráficos de sensores, previsão 5 dias e heatmap mensal |
+| `/dashboard/map` | Mapa interativo Leaflet com marcadores e popup de clima em tempo real |
+| `/dashboard/nps` | Formulário NPS (0–10) + painel com score, zonas e distribuição |
+| `/dashboard/ecosystem` | Diagrama interativo da arquitetura de microsserviços e status dos serviços |
 
 ## Design
 
 - Paleta sóbria: `white/gray-50` fundo, `gray-900` texto, `blue-600` acento
 - Gráficos monocromáticos em tons de azul (Recharts)
-- `IconTexture` na hero section: grid de ícones Lucide com `opacity-[0.04]` como textura
-- Sidebar com navegação responsiva (oculta em mobile)
+- Sidebar responsiva com colapso em mobile
 - Totalmente responsivo com CSS Grid do Tailwind
 
-## UI Library
+## Cache (TanStack Query)
 
-**shadcn/ui** — componentes copiados em `src/components/ui/` com controle total:
-
-- `Button`, `Card`, `Input`, `Badge`, `LoadingSpinner`, `ErrorMessage`
+| Dado | staleTime |
+|---|---|
+| Clima atual | 5 min |
+| Sensores históricos | 10 min |
+| Previsão | 1 min |
 
 ## Executar localmente
 
@@ -40,22 +48,25 @@ Acesse http://localhost:3000
 
 ```bash
 # Da raiz do repositório:
-docker-compose up portfolio-frontend
+docker compose up --build -d frontend nginx
+docker compose logs -f frontend
 ```
 
-## Dependências de APIs
+## Testes
 
-- `NEXT_PUBLIC_WEATHER_API_URL` → Weather API (porta 8080)
-- `NEXT_PUBLIC_NPS_API_URL` → NPS API (porta 3001)
+```bash
+npm test
+npm run test:coverage
+```
 
 ## Stack
 
 - Next.js 14 (App Router, output standalone)
 - TypeScript 5
-- shadcn/ui (Radix UI primitives)
-- Tailwind CSS 3
-- TanStack Query 5 (React Query)
-- Recharts 2 (gráficos)
-- Leaflet 1.9 + React-Leaflet 4 (mapa — importado dinamicamente para evitar SSR)
+- Tailwind CSS 3 + shadcn/ui (Radix UI primitives)
+- TanStack Query 5 (React Query — cache e estado de servidor)
+- Recharts 2 (gráficos de temperatura, umidade, sensores)
+- Leaflet 1.9 + React-Leaflet 4 (mapa — importado dinamicamente, sem SSR)
 - Lucide React (ícones)
 - Axios 1 (HTTP client)
+- Vitest (testes unitários)
