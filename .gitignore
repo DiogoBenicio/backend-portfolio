@@ -20,7 +20,8 @@ docker-compose.override.yml
 .idea/
 
 # Claude Code
-.claude/settings.local.json
+.claude/
+.remember/
 
 # TypeScript build cache
 tsconfig.tsbuildinfo
