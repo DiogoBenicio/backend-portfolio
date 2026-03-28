@@ -11,7 +11,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.time.Instant;
 
-@Document(indexName = "weather-data")
+@Document(indexName = "weather-data", createIndex = false)
 @Data
 @Builder
 @NoArgsConstructor
@@ -62,6 +62,12 @@ public class WeatherDocument {
 
     @Field(type = FieldType.Double)
     private double rainfall;
+
+    @Field(type = FieldType.Double)
+    private double dewPoint;
+
+    @Field(type = FieldType.Double)
+    private double radiation;
 
     @Field(type = FieldType.Date)
     private Instant timestamp;

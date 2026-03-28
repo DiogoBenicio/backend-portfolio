@@ -17,6 +17,8 @@ public record Weather(
         String icon,
         int uvIndex,
         double rainfall,
+        double dewPoint,
+        double radiation,
         Instant timestamp
 ) {
     public static Weather of(
@@ -31,6 +33,6 @@ public record Weather(
         return new Weather(city, country, latitude, longitude,
                 temperature, feelsLike, humidity, pressure,
                 windSpeed, windDirection, description, icon,
-                uvIndex, rainfall, Instant.now());
+                uvIndex, rainfall, 0.0, 0.0, Instant.now());
     }
 }

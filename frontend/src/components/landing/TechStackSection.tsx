@@ -6,39 +6,39 @@ const projects = [
     description:
       'API Java Spring Boot 3. Consulta OpenWeather API e armazena dados históricos no Elasticsearch 8.',
     tech: ['Java 21', 'Spring Boot 3', 'Elasticsearch 8', 'WebClient', 'Docker'],
-    color: 'bg-orange-50 border-orange-200',
-    accent: 'text-orange-600',
+    color: 'bg-orange-50 border-orange-200 dark:bg-orange-900/20 dark:border-orange-800/50',
+    accent: 'text-orange-600 dark:text-orange-400',
     pattern: 'Hexagonal',
-    patternColor: 'bg-indigo-100 text-indigo-700',
+    patternColor: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
   },
   {
     title: 'NPS API',
     description:
       'Sistema de avaliação NPS em Node.js. Fastify 4, TypeScript e PostgreSQL via Prisma ORM.',
     tech: ['Node.js 20', 'TypeScript', 'Fastify 4', 'Prisma', 'PostgreSQL'],
-    color: 'bg-indigo-50 border-indigo-200',
-    accent: 'text-indigo-600',
+    color: 'bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800/50',
+    accent: 'text-indigo-600 dark:text-indigo-400',
     pattern: 'Hexagonal',
-    patternColor: 'bg-indigo-100 text-indigo-700',
+    patternColor: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
   },
   {
     title: 'Portfolio Frontend',
     description:
       'Landing page + dashboard com visualizações de clima (Recharts), mapa interativo (Leaflet) e formulário NPS.',
     tech: ['Next.js 14', 'shadcn/ui', 'Tailwind', 'Recharts', 'Leaflet'],
-    color: 'bg-blue-50 border-blue-200',
-    accent: 'text-blue-600',
+    color: 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800/50',
+    accent: 'text-blue-600 dark:text-blue-400',
     pattern: 'Next.js App Router',
-    patternColor: 'bg-blue-100 text-blue-700',
+    patternColor: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
   },
 ]
 
 export function TechStackSection() {
   return (
-    <section className="bg-white px-6 py-16 md:px-16">
+    <section className="bg-white px-6 py-16 dark:bg-slate-900 md:px-16">
       <div className="mx-auto max-w-5xl">
-        <h2 className="mb-3 text-2xl font-bold text-gray-900">Projetos</h2>
-        <p className="mb-10 text-gray-500">
+        <h2 className="mb-3 text-2xl font-bold text-gray-900 dark:text-slate-100">Projetos</h2>
+        <p className="mb-10 text-gray-500 dark:text-slate-400">
           Três projetos interconectados, cada um com seu padrão arquitetural adequado.
         </p>
 
@@ -54,12 +54,12 @@ export function TechStackSection() {
                     {p.pattern}
                   </span>
                 </div>
-                <p className="mb-4 text-sm text-gray-600">{p.description}</p>
+                <p className="mb-4 text-sm text-gray-600 dark:text-slate-300">{p.description}</p>
                 <div className="flex flex-wrap gap-1.5">
                   {p.tech.map((t) => (
                     <span
                       key={t}
-                      className="rounded-full bg-white px-2 py-0.5 text-xs font-medium text-gray-600 shadow-sm ring-1 ring-gray-200"
+                      className="rounded-full bg-white px-2 py-0.5 text-xs font-medium text-gray-600 shadow-sm ring-1 ring-gray-200 dark:bg-slate-700 dark:text-slate-200 dark:ring-slate-600"
                     >
                       {t}
                     </span>

@@ -17,7 +17,7 @@ const SERVICES = [
       'Único ponto de entrada externo. Termina o TCP, aplica headers de segurança e distribui o tráfego para frontend ou gateway.',
     pattern: 'Reverse Proxy',
     tech: ['Nginx 1.27', 'Alpine Linux'],
-    borderColor: 'border-gray-300',
+    borderColor: 'border-gray-300 dark:border-slate-600',
   },
   {
     key: 'gateway',
@@ -27,7 +27,7 @@ const SERVICES = [
       'Centraliza autenticação JWT (HS256, 2h TTL), rate limiting (30 req/min), logging colorido e proxy reverso para os backends.',
     pattern: 'Layered SOA',
     tech: ['Node.js 20', 'TypeScript', 'Fastify 4', 'jsonwebtoken', 'axios'],
-    borderColor: 'border-blue-300',
+    borderColor: 'border-blue-300 dark:border-blue-800',
     docsUrl: '/api/health',
   },
   {
@@ -38,7 +38,7 @@ const SERVICES = [
       'Consulta clima atual e previsão via OpenWeather API. Histórico de consultas persistido no Elasticsearch com queries por período e cidade.',
     pattern: 'Hexagonal',
     tech: ['Java 21', 'Spring Boot 3.3', 'WebClient', 'Elasticsearch 8', 'Docker'],
-    borderColor: 'border-orange-300',
+    borderColor: 'border-orange-300 dark:border-orange-800',
     docsUrl: '/api/weather/swagger-ui.html',
   },
   {
@@ -49,7 +49,7 @@ const SERVICES = [
       'Coleta avaliações Net Promoter Score, calcula score e zone (Crítico / Aperfeiçoamento / Qualidade / Excelência). Dados persistidos no PostgreSQL via Prisma.',
     pattern: 'Hexagonal',
     tech: ['Node.js 20', 'TypeScript', 'Fastify 4', 'Prisma 5', 'PostgreSQL 15'],
-    borderColor: 'border-green-300',
+    borderColor: 'border-green-300 dark:border-green-800',
     docsUrl: '/api/nps/documentation',
   },
   {
@@ -60,7 +60,7 @@ const SERVICES = [
       'Dashboard interativo com mapa de clima em tempo real (Leaflet + OpenStreetMap), gráficos (Recharts) e formulário NPS. Esta página que você está lendo.',
     pattern: 'SSR / React',
     tech: ['Next.js 14', 'shadcn/ui', 'Tailwind CSS', 'Recharts', 'Leaflet', 'TanStack Query'],
-    borderColor: 'border-purple-300',
+    borderColor: 'border-purple-300 dark:border-purple-800',
   },
 ] as const
 
@@ -73,10 +73,10 @@ export default function EcosystemPage() {
         {/* Header */}
         <header className="space-y-1">
           <div className="flex items-center gap-2">
-            <Layers size={22} className="text-gray-700" />
-            <h1 className="text-2xl font-bold text-gray-900">Ecossistema BackEnd</h1>
+            <Layers size={22} className="text-gray-700 dark:text-slate-300" />
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Ecossistema BackEnd</h1>
           </div>
-          <p className="text-gray-500">
+          <p className="text-gray-500 dark:text-slate-400">
             Visão geral dos serviços, arquitetura e métricas em tempo real.
           </p>
         </header>
@@ -89,7 +89,7 @@ export default function EcosystemPage() {
 
         {/* Cards dos serviços */}
         <section>
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400 dark:text-slate-500">
             Serviços
           </h2>
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -111,7 +111,7 @@ export default function EcosystemPage() {
 
         {/* Métricas live */}
         <section>
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400">
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400 dark:text-slate-500">
             Métricas em tempo real
           </h2>
           <LiveMetrics />

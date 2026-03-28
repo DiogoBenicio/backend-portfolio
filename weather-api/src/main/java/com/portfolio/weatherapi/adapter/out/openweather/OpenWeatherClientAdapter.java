@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -70,6 +71,56 @@ public class OpenWeatherClientAdapter implements WeatherProviderClient {
                 .block();
 
         return mapToForecast(response, days);
+    }
+
+    @Override
+    public List<Weather> fetchHourlySnapshots(String city) {
+        log.debug("Fetching hourly snapshots for: {}", city);
+
+        OpenWeatherForecastResponse response = webClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/forecast")
+                        .queryParam("q", city)
+                        .queryParam("appid", properties.getApiKey())
+                        .queryParam("units", properties.getUnits())
+                        .queryParam("lang", properties.getLang())
+                        .queryParam("cnt", 40) // máximo: 5 dias × 8 slots de 3h
+                        .build())
+                .retrieve()
+                .bodyToMono(OpenWeatherForecastResponse.class)
+                .block();
+
+        if (response == null || response.list() == null) return List.of();
+
+        String cityName = response.city().name();
+        String country  = response.city().country();
+        double lat = response.city().coord() != null ? response.city().coord().lat() : 0.0;
+        double lon = response.city().coord() != null ? response.city().coord().lon() : 0.0;
+
+        return response.list().stream()
+                .map(item -> {
+                    String desc = item.weather() != null && !item.weather().isEmpty()
+                            ? item.weather().get(0).description() : "";
+                    String icon = item.weather() != null && !item.weather().isEmpty()
+                            ? item.weather().get(0).icon() : "";
+                    double rainfall = item.rain() != null && item.rain().threeHour() != null
+                            ? item.rain().threeHour() : 0.0;
+                    double windSpeed = item.wind() != null ? item.wind().speed() * 3.6 : 0.0;
+                    String windDir   = item.wind() != null ? degToCompass(item.wind().deg()) : "N";
+
+                    return new Weather(
+                            cityName, country,
+                            lat, lon,
+                            item.main().temp(), item.main().feelsLike(),
+                            item.main().humidity(), item.main().pressure(),
+                            windSpeed, windDir,
+                            desc, icon,
+                            0, rainfall,
+                            0.0, 0.0,
+                            Instant.ofEpochSecond(item.dt())
+                    );
+                })
+                .toList();
     }
 
     private Weather mapToWeather(OpenWeatherCurrentResponse r) {

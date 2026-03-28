@@ -1,9 +1,6 @@
 package com.portfolio.weatherapi.adapter.in.web.mapper;
 
-import com.portfolio.weatherapi.application.dto.CurrentWeatherResponse;
-import com.portfolio.weatherapi.application.dto.ForecastDayResponse;
-import com.portfolio.weatherapi.application.dto.ForecastResponse;
-import com.portfolio.weatherapi.application.dto.WeatherHistoryResponse;
+import com.portfolio.weatherapi.application.dto.*;
 import com.portfolio.weatherapi.domain.model.Forecast;
 import com.portfolio.weatherapi.domain.model.Weather;
 import org.springframework.data.domain.Page;
@@ -60,5 +57,28 @@ public class WeatherMapper {
                 page.getTotalElements(),
                 page.getTotalPages()
         );
+    }
+
+    public SensorDataResponse toSensorDataResponse(String city, List<Weather> data) {
+        List<SensorPointResponse> points = data.stream()
+                .map(w -> new SensorPointResponse(
+                        w.timestamp(),
+                        w.temperature(),
+                        w.feelsLike(),
+                        w.humidity(),
+                        w.pressure(),
+                        w.windSpeed(),
+                        w.rainfall(),
+                        w.uvIndex(),
+                        w.dewPoint(),
+                        w.radiation()
+                ))
+                .toList();
+        return new SensorDataResponse(city, points);
+    }
+
+    public CalendarResponse toCalendarResponse(String city, int year, int month,
+                                               List<String> daysWithData) {
+        return new CalendarResponse(city, year, month, daysWithData);
     }
 }

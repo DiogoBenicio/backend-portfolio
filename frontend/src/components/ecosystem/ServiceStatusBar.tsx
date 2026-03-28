@@ -63,7 +63,7 @@ export function ServiceStatusBar({ statuses }: Props) {
   const allOnline = SERVICES.every((s) => statuses[s.key] === 'online')
 
   return (
-    <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border border-white/50 bg-white/70 px-5 py-4 shadow-md backdrop-blur-sm">
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border border-white/50 bg-white/70 px-5 py-4 shadow-md backdrop-blur-sm dark:border-white/10 dark:bg-gray-800/60">
       <div className="flex items-center gap-2">
         <span
           className={cn(
@@ -71,7 +71,7 @@ export function ServiceStatusBar({ statuses }: Props) {
             allOnline ? 'bg-green-500' : 'bg-yellow-400'
           )}
         />
-        <span className="text-xs font-semibold uppercase tracking-wider text-gray-500">
+        <span className="text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400">
           Status dos serviços
         </span>
       </div>
@@ -80,8 +80,8 @@ export function ServiceStatusBar({ statuses }: Props) {
         {SERVICES.map(({ key, label }) => (
           <div key={key} className="flex items-center gap-1.5">
             <StatusDot status={statuses[key] ?? 'checking'} />
-            <span className="text-sm text-gray-700">{label}</span>
-            <span className="text-xs text-gray-400">
+            <span className="text-sm text-gray-700 dark:text-gray-200">{label}</span>
+            <span className="text-xs text-gray-400 dark:text-gray-500">
               ({statusLabel(statuses[key] ?? 'checking')})
             </span>
           </div>

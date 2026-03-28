@@ -2,6 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { useState } from 'react'
+import { ThemeProvider } from 'next-themes'
 import { RateLimitProvider } from '@/context/RateLimitContext'
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -18,8 +19,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   )
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <RateLimitProvider>{children}</RateLimitProvider>
-    </QueryClientProvider>
+    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+      <QueryClientProvider client={queryClient}>
+        <RateLimitProvider>{children}</RateLimitProvider>
+      </QueryClientProvider>
+    </ThemeProvider>
   )
 }

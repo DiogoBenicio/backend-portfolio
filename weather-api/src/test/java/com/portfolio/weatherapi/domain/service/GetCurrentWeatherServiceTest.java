@@ -37,7 +37,7 @@ class GetCurrentWeatherServiceTest {
     void shouldFetchSaveAndReturn() {
         Weather expected = new Weather("Uberlândia", "BR", -18.9, -48.3,
                 28.5, 30.1, 60, 1012, 15.0, "NE",
-                "céu limpo", "01d", 7, 0.0, Instant.now());
+                "céu limpo", "01d", 7, 0.0, 0.0, 0.0, Instant.now());
 
         when(providerClient.fetchCurrentWeather("Uberlândia", "BR")).thenReturn(expected);
 
@@ -52,7 +52,7 @@ class GetCurrentWeatherServiceTest {
     void shouldPassNullCountryToProvider() {
         Weather weather = new Weather("São Paulo", null, -23.5, -46.6,
                 22.0, 23.0, 70, 1015, 10.0, "S",
-                "nublado", "04d", 3, 0.5, Instant.now());
+                "nublado", "04d", 3, 0.5, 0.0, 0.0, Instant.now());
         when(providerClient.fetchCurrentWeather("São Paulo", null)).thenReturn(weather);
 
         service.execute("São Paulo", null);

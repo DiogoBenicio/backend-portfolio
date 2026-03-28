@@ -1,5 +1,11 @@
 import axios, { AxiosError } from 'axios'
-import type { CurrentWeather, ForecastResponse, WeatherHistory } from '@/types/weather'
+import type {
+  CurrentWeather,
+  ForecastResponse,
+  WeatherHistory,
+  SensorDataResponse,
+  CalendarResponse,
+} from '@/types/weather'
 
 const weatherClient = axios.create({
   baseURL: process.env.NEXT_PUBLIC_WEATHER_API_URL ?? 'http://localhost:8080',
@@ -7,11 +13,21 @@ const weatherClient = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
+function isRateLimitError(error: AxiosError): boolean {
+  if (error.response?.status === 429) return true
+  // Gateway pode retornar 500 com mensagem de rate limit antes do fix ser deployado
+  if (error.response?.status === 500) {
+    const data = error.response.data as { message?: string } | undefined
+    return typeof data?.message === 'string' && data.message.includes('Muitas requisições')
+  }
+  return false
+}
+
 weatherClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    if (error.response?.status === 429) {
-      const retryAfter = error.response.headers['retry-after'] as string | undefined
+    if (isRateLimitError(error)) {
+      const retryAfter = error.response?.headers['retry-after'] as string | undefined
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('rate-limit', { detail: { retryAfter } }))
       }
@@ -37,4 +53,13 @@ export const weatherApi = {
     weatherClient.get('/history', { params: { city, from, to, page, size } }).then((r) => r.data),
 
   getCities: (): Promise<string[]> => weatherClient.get('/cities').then((r) => r.data),
+
+  getSensors: (city: string, from: string, to: string): Promise<SensorDataResponse> =>
+    weatherClient.get('/sensors', { params: { city, from, to } }).then((r) => r.data),
+
+  getCalendar: (city: string, year: number, month: number): Promise<CalendarResponse> =>
+    weatherClient.get('/calendar', { params: { city, year, month } }).then((r) => r.data),
+
+  populate: (city: string, date: string): Promise<CurrentWeather> =>
+    weatherClient.post('/populate', null, { params: { city, date } }).then((r) => r.data),
 }

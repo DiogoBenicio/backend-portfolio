@@ -7,10 +7,10 @@ import { Badge } from '@/components/ui/badge'
 import type { ServiceStatus } from '@/hooks/useServiceHealth'
 
 const PATTERN_COLORS: Record<string, string> = {
-  Hexagonal: 'bg-orange-100 text-orange-700',
-  'Layered SOA': 'bg-blue-100 text-blue-700',
-  'Reverse Proxy': 'bg-gray-100 text-gray-700',
-  'SSR / React': 'bg-indigo-100 text-indigo-700',
+  Hexagonal: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300',
+  'Layered SOA': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+  'Reverse Proxy': 'bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300',
+  'SSR / React': 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300',
 }
 
 interface Props {
@@ -44,15 +44,15 @@ export function ServiceCard({
       `}</style>
       <div
         className={cn(
-          'flex flex-col gap-3 rounded-xl border-2 bg-white/70 p-5 shadow-md backdrop-blur-sm',
+          'flex flex-col gap-3 rounded-xl border-2 bg-white/70 p-5 shadow-md backdrop-blur-sm dark:bg-gray-800/60',
           borderColor
         )}
       >
         {/* Header */}
         <div className="flex items-start justify-between gap-2">
           <div className="flex items-center gap-2">
-            <Icon size={18} className="shrink-0 text-gray-600" />
-            <span className="font-semibold text-gray-900">{name}</span>
+            <Icon size={18} className="shrink-0 text-gray-600 dark:text-gray-300" />
+            <span className="font-semibold text-gray-900 dark:text-gray-100">{name}</span>
             {status && (
               <span
                 className={cn(
@@ -102,7 +102,7 @@ export function ServiceCard({
         </span>
 
         {/* Descrição */}
-        <p className="text-sm text-gray-500">{description}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{description}</p>
 
         {/* Tech badges */}
         <div className="flex flex-wrap gap-1.5">

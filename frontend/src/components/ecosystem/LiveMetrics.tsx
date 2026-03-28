@@ -51,11 +51,11 @@ function WeatherWidget() {
       />
       <div>
         <div className="flex items-baseline gap-1">
-          <span className="text-3xl font-bold text-gray-900">{Math.round(data.temperature)}</span>
-          <span className="text-lg text-gray-500">°C</span>
+          <span className="text-3xl font-bold text-gray-900 dark:text-slate-100">{Math.round(data.temperature)}</span>
+          <span className="text-lg text-gray-500 dark:text-slate-400">°C</span>
         </div>
-        <p className="text-sm capitalize text-gray-500">{data.description}</p>
-        <p className="text-xs text-gray-400">
+        <p className="text-sm capitalize text-gray-500 dark:text-slate-400">{data.description}</p>
+        <p className="text-xs text-gray-400 dark:text-slate-500">
           {data.city}, {data.country} · Umidade {data.humidity}%
         </p>
       </div>
@@ -103,7 +103,7 @@ function NpsWidget() {
         </span>
       </div>
 
-      <p className="text-xs text-gray-400">{total} avaliações coletadas</p>
+      <p className="text-xs text-gray-400 dark:text-slate-500">{total} avaliações coletadas</p>
 
       {/* Barra de composição */}
       <div className="flex h-2 w-full overflow-hidden rounded-full">
@@ -112,7 +112,7 @@ function NpsWidget() {
         <div className="bg-red-400" style={{ width: `${detractorPct}%` }} />
       </div>
 
-      <div className="flex gap-4 text-xs text-gray-500">
+      <div className="flex gap-4 text-xs text-gray-500 dark:text-slate-400">
         <span className="flex items-center gap-1">
           <span className="h-2 w-2 rounded-full bg-green-400" />
           Promotores {promoterPct}%
@@ -134,19 +134,19 @@ export function LiveMetrics() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {/* Weather live */}
-      <div className="rounded-xl border border-orange-200/60 bg-white/70 p-5 shadow-md backdrop-blur-sm">
+      <div className="rounded-xl border border-orange-200/60 bg-white/70 p-5 shadow-md backdrop-blur-sm dark:border-orange-700/30 dark:bg-slate-800/60">
         <SectionTitle icon={Cloud} label="Clima em São Paulo" />
         <WeatherWidget />
-        <p className="mt-3 text-[10px] text-gray-400">
+        <p className="mt-3 text-[10px] text-gray-400 dark:text-slate-500">
           via Weather-API → Nginx → Gateway → OpenWeather
         </p>
       </div>
 
       {/* NPS live */}
-      <div className="rounded-xl border border-indigo-200/60 bg-white/70 p-5 shadow-md backdrop-blur-sm">
+      <div className="rounded-xl border border-indigo-200/60 bg-white/70 p-5 shadow-md backdrop-blur-sm dark:border-indigo-700/30 dark:bg-slate-800/60">
         <SectionTitle icon={Star} label="NPS Global do Portfólio" />
         <NpsWidget />
-        <p className="mt-3 text-[10px] text-gray-400">via NPS-API → Nginx → Gateway → PostgreSQL</p>
+        <p className="mt-3 text-[10px] text-gray-400 dark:text-slate-500">via NPS-API → Nginx → Gateway → PostgreSQL</p>
       </div>
     </div>
   )

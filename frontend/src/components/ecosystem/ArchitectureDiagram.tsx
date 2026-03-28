@@ -78,11 +78,10 @@ function StatusDot({ status }: { status?: ServiceStatus }) {
         )}
         style={
           status === 'online'
-            ? {
-                animation: 'blinkPulse 3.2s ease-in-out infinite',
-                willChange: 'opacity',
-              }
-            : undefined
+            ? { animation: 'blinkPulse 3.2s ease-in-out infinite', willChange: 'opacity' }
+            : status === 'offline'
+              ? { animation: 'blinkPulse 1.0s ease-in-out infinite', willChange: 'opacity' }
+              : undefined
         }
       />
     </>
@@ -113,8 +112,8 @@ function DiagramNode({ nodeKey, icon, label, sublabel, border, bg, status }: Nod
         {icon}
         {status !== undefined && <StatusDot status={status} />}
       </div>
-      <span className="text-[11px] font-semibold leading-tight text-gray-800">{label}</span>
-      {sublabel && <span className="text-[9px] leading-tight text-gray-400">{sublabel}</span>}
+      <span className="text-[11px] font-semibold leading-tight text-gray-800 dark:text-slate-200">{label}</span>
+      {sublabel && <span className="text-[9px] leading-tight text-gray-400 dark:text-slate-500">{sublabel}</span>}
     </div>
   )
 }
@@ -142,10 +141,10 @@ interface Props {
 
 export function ArchitectureDiagram({ statuses }: Props) {
   return (
-    <div className="rounded-xl border border-white/50 bg-white/70 p-6 shadow-md backdrop-blur-sm">
+    <div className="rounded-xl border border-white/30 bg-white/70 p-6 shadow-md backdrop-blur-sm dark:border-white/10 dark:bg-gray-800/50">
       <div className="mb-5 flex items-center gap-2">
-        <Layers size={16} className="text-gray-500" />
-        <h2 className="text-sm font-semibold text-gray-700">Diagrama Arquitetural</h2>
+        <Layers size={16} className="text-gray-500 dark:text-slate-400" />
+        <h2 className="text-sm font-semibold text-gray-700 dark:text-slate-300">Diagrama Arquitetural</h2>
       </div>
 
       {/* Responsive diagram container */}
@@ -212,16 +211,16 @@ export function ArchitectureDiagram({ statuses }: Props) {
           icon={<Monitor size={13} className="text-gray-500" />}
           label="Browser / Cliente"
           sublabel="HTTP"
-          border="border-gray-200"
-          bg="bg-gray-50"
+          border="border-gray-200 dark:border-slate-600"
+          bg="bg-gray-50 dark:bg-slate-800/60"
         />
         <DiagramNode
           nodeKey="nginx"
-          icon={<Shield size={13} className="text-gray-600" />}
+          icon={<Shield size={13} className="text-gray-600 dark:text-slate-300" />}
           label="Nginx"
           sublabel="Reverse Proxy · :80"
-          border="border-gray-300"
-          bg="bg-gray-100"
+          border="border-gray-300 dark:border-slate-500"
+          bg="bg-gray-100 dark:bg-slate-700/60"
           status={statuses.nginx}
         />
         <DiagramNode
@@ -229,16 +228,16 @@ export function ArchitectureDiagram({ statuses }: Props) {
           icon={<Monitor size={13} className="text-indigo-500" />}
           label="Frontend"
           sublabel="Next.js 14"
-          border="border-indigo-200"
-          bg="bg-indigo-50"
+          border="border-indigo-200 dark:border-indigo-700"
+          bg="bg-indigo-50 dark:bg-indigo-900/30"
         />
         <DiagramNode
           nodeKey="gateway"
-          icon={<Lock size={13} className="text-blue-500" />}
+          icon={<Lock size={13} className="text-blue-500 dark:text-blue-400" />}
           label="Gateway-API"
           sublabel="JWT · Rate Limit"
-          border="border-blue-200"
-          bg="bg-blue-50"
+          border="border-blue-200 dark:border-blue-700"
+          bg="bg-blue-50 dark:bg-blue-900/30"
           status={statuses.gateway}
         />
         <DiagramNode
@@ -246,8 +245,8 @@ export function ArchitectureDiagram({ statuses }: Props) {
           icon={<Cloud size={13} className="text-orange-500" />}
           label="Weather-API"
           sublabel="Spring Boot 3"
-          border="border-orange-200"
-          bg="bg-orange-50"
+          border="border-orange-200 dark:border-orange-700"
+          bg="bg-orange-50 dark:bg-orange-900/30"
           status={statuses.weather}
         />
         <DiagramNode
@@ -255,28 +254,28 @@ export function ArchitectureDiagram({ statuses }: Props) {
           icon={<Star size={13} className="text-indigo-500" />}
           label="NPS-API"
           sublabel="Fastify 4 + Prisma"
-          border="border-indigo-200"
-          bg="bg-indigo-50"
+          border="border-indigo-200 dark:border-indigo-700"
+          bg="bg-indigo-50 dark:bg-indigo-900/30"
           status={statuses.nps}
         />
         <DiagramNode
           nodeKey="elastic"
-          icon={<Database size={12} className="text-orange-400" />}
+          icon={<Database size={12} className="text-orange-400 dark:text-orange-300" />}
           label="Elasticsearch"
-          border="border-orange-300"
-          bg="bg-orange-50/60"
+          border="border-orange-300 dark:border-orange-700"
+          bg="bg-orange-50/60 dark:bg-orange-900/20"
         />
         <DiagramNode
           nodeKey="postgres"
-          icon={<Database size={12} className="text-indigo-400" />}
+          icon={<Database size={12} className="text-indigo-400 dark:text-indigo-300" />}
           label="PostgreSQL"
-          border="border-indigo-300"
-          bg="bg-indigo-50/60"
+          border="border-indigo-300 dark:border-indigo-700"
+          bg="bg-indigo-50/60 dark:bg-indigo-900/20"
         />
       </div>
 
       {/* Legend */}
-      <div className="mt-4 flex flex-wrap gap-3 border-t border-gray-100 pt-3 text-[10px] text-gray-400">
+      <div className="mt-4 flex flex-wrap gap-3 border-t border-gray-100 pt-3 text-[10px] text-gray-400 dark:border-slate-700 dark:text-slate-500">
         <span className="flex items-center gap-1">
           <span className="h-1.5 w-1.5 rounded-full bg-green-500" /> online
         </span>

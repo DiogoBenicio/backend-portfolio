@@ -2,7 +2,9 @@
 const nextConfig = {
   output: 'standalone',
   images: {
-    domains: ['openweathermap.org'],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'openweathermap.org' },
+    ],
   },
   async rewrites() {
     const gatewayUrl = process.env.GATEWAY_URL ?? 'http://localhost:4000'

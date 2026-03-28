@@ -25,7 +25,7 @@ async function buildServer() {
 
   await server.register(rateLimit, {
     global: true,
-    max: 30,
+    max: 100,      // 100 req/min por IP
     timeWindow: '1 minute',
     keyGenerator: (request) => request.ip,
     addHeaders: {

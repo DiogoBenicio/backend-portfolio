@@ -33,7 +33,7 @@ class GetWeatherHistoryServiceTest {
     private static Weather weather(String city) {
         return new Weather(city, "BR", -15.0, -47.0,
                 25.0, 26.0, 65, 1013, 10.0, "N",
-                "ensolarado", "01d", 5, 0.0, Instant.now());
+                "ensolarado", "01d", 5, 0.0, 0.0, 0.0, Instant.now());
     }
 
     @BeforeEach

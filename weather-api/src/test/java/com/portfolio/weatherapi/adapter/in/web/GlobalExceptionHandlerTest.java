@@ -108,7 +108,7 @@ class GlobalExceptionHandlerTest {
                 new RuntimeException("connection timeout"),
                 org.springframework.http.HttpMethod.GET,
                 URI.create("http://api.openweathermap.org"),
-                null);
+                new org.springframework.http.HttpHeaders());
 
         ResponseEntity<ErrorResponse> response = handler.handleWebClientRequestError(ex, request);
 

@@ -14,10 +14,10 @@ export function CurrentWeatherCard({ weather }: CurrentWeatherCardProps) {
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
               {weather.city}, {weather.country}
             </h2>
-            <p className="mt-1 text-sm capitalize text-gray-500">{weather.description}</p>
+            <p className="mt-1 text-sm capitalize text-gray-500 dark:text-slate-400">{weather.description}</p>
           </div>
           {weather.icon && (
             <Image
@@ -31,11 +31,11 @@ export function CurrentWeatherCard({ weather }: CurrentWeatherCardProps) {
         </div>
 
         <div className="mt-4 flex items-end gap-3">
-          <span className="text-6xl font-light text-gray-900">
+          <span className="text-6xl font-light text-gray-900 dark:text-slate-100">
             {Math.round(weather.temperature)}
           </span>
-          <span className="mb-2 text-3xl text-gray-400">°C</span>
-          <span className="mb-2 text-sm text-gray-500">
+          <span className="mb-2 text-3xl text-gray-400 dark:text-slate-500">°C</span>
+          <span className="mb-2 text-sm text-gray-500 dark:text-slate-400">
             Sensação {formatTemperature(weather.feelsLike)}
           </span>
         </div>
@@ -61,11 +61,11 @@ export function CurrentWeatherCard({ weather }: CurrentWeatherCardProps) {
 
 function StatItem({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
-    <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-3">
-      <span className="text-blue-500">{icon}</span>
+    <div className="flex items-center gap-2 rounded-lg bg-gray-50 p-3 dark:bg-slate-700/60">
+      <span className="text-blue-500 dark:text-blue-400">{icon}</span>
       <div>
-        <p className="text-xs text-gray-500">{label}</p>
-        <p className="text-sm font-medium text-gray-900">{value}</p>
+        <p className="text-xs text-gray-500 dark:text-slate-400">{label}</p>
+        <p className="text-sm font-medium text-gray-900 dark:text-slate-200">{value}</p>
       </div>
     </div>
   )

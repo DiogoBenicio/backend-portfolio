@@ -10,8 +10,14 @@ const npsClient = axios.create({
 npsClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    if (error.response?.status === 429) {
-      const retryAfter = error.response.headers['retry-after'] as string | undefined
+    const status = error.response?.status
+    const data = error.response?.data as { message?: string } | undefined
+    const isRateLimit =
+      status === 429 ||
+      (status === 500 && typeof data?.message === 'string' && data.message.includes('Muitas requisições'))
+
+    if (isRateLimit) {
+      const retryAfter = error.response?.headers['retry-after'] as string | undefined
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('rate-limit', { detail: { retryAfter } }))
       }

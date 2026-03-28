@@ -12,9 +12,9 @@ export function ForecastCard({ forecast }: ForecastCardProps) {
       {forecast.map((day) => (
         <div
           key={day.date}
-          className="flex min-w-[100px] flex-col items-center rounded-xl border border-gray-200 bg-gray-50 px-3 py-4 text-center"
+          className="flex min-w-[100px] flex-col items-center rounded-xl border border-gray-200 bg-gray-50 px-3 py-4 text-center dark:border-slate-600 dark:bg-slate-700/60"
         >
-          <p className="text-xs font-medium text-gray-500">{formatDate(day.date)}</p>
+          <p className="text-xs font-medium text-gray-500 dark:text-slate-400">{formatDate(day.date)}</p>
           {day.icon && (
             <Image
               src={getWeatherIconUrl(day.icon)}
@@ -24,9 +24,9 @@ export function ForecastCard({ forecast }: ForecastCardProps) {
               className="my-1"
             />
           )}
-          <p className="text-sm font-bold text-gray-900">{Math.round(day.tempMax)}°</p>
-          <p className="text-xs text-gray-400">{Math.round(day.tempMin)}°</p>
-          <p className="mt-1 text-xs capitalize text-gray-500 line-clamp-2">{day.description}</p>
+          <p className="text-sm font-bold text-gray-900 dark:text-slate-200">{Math.round(day.tempMax)}°</p>
+          <p className="text-xs text-gray-400 dark:text-blue-400">{Math.round(day.tempMin)}°</p>
+          <p className="mt-1 text-xs capitalize text-gray-500 dark:text-slate-400 line-clamp-2">{day.description}</p>
         </div>
       ))}
     </div>

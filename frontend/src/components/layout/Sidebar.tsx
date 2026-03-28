@@ -15,6 +15,7 @@ import {
   ChevronRight,
 } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 
 const navItems = [{ href: '/', label: 'Home', icon: Home }]
 
@@ -37,7 +38,7 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
   return (
     <aside
       className={cn(
-        'relative flex h-screen flex-col border-r border-white/20 bg-white/30 shadow-lg backdrop-blur-md transition-all duration-200',
+        'relative flex h-screen flex-col border-r border-white/20 bg-white/30 shadow-lg backdrop-blur-md transition-all duration-200 dark:border-white/10 dark:bg-gray-900/50',
         collapsed ? 'w-16' : 'w-60'
       )}
     >
@@ -45,7 +46,7 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
       <button
         onClick={onToggle}
         title={collapsed ? 'Expandir menu' : 'Recolher menu'}
-        className="absolute -right-3 top-1/2 z-50 hidden h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-white/50 text-gray-400 shadow-md backdrop-blur-sm transition-colors hover:border-blue-300 hover:text-blue-600 md:flex"
+        className="absolute -right-3 top-1/2 z-50 hidden h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-white/50 text-gray-400 shadow-md backdrop-blur-sm transition-colors hover:border-blue-300 hover:text-blue-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-blue-500 dark:hover:text-blue-400 md:flex"
       >
         {collapsed ? <ChevronRight size={13} /> : <ChevronLeft size={13} />}
       </button>
@@ -62,8 +63,8 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
         </div>
         {!collapsed && (
           <div>
-            <p className="text-sm font-semibold text-gray-900">Portfolio</p>
-            <p className="text-xs text-gray-500">Diogo Benício</p>
+            <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">Portfolio</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Diogo Benício</p>
           </div>
         )}
       </div>
@@ -81,8 +82,8 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
                   'flex items-center rounded-lg px-3 py-2 text-sm transition-colors',
                   collapsed ? 'justify-center' : 'gap-3',
                   pathname === href
-                    ? 'bg-blue-50 font-medium text-blue-700'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                    ? 'bg-blue-50 font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100'
                 )}
               >
                 <Icon size={16} className="shrink-0" />
@@ -94,7 +95,7 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
 
         <div className="mt-4">
           {!collapsed && (
-            <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+            <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
               Dashboard
             </p>
           )}
@@ -109,8 +110,8 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
                     'flex items-center rounded-lg px-3 py-2 text-sm transition-colors',
                     collapsed ? 'justify-center' : 'gap-3',
                     pathname === href
-                      ? 'bg-blue-50 font-medium text-blue-700'
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                      ? 'bg-blue-50 font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
+                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100'
                   )}
                 >
                   <Icon size={16} className="shrink-0" />
@@ -122,7 +123,7 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
         </div>
       </nav>
 
-      {/* Links externos */}
+      {/* Links externos + tema */}
       <div className="border-t border-white/40 p-2">
         <div
           className={cn('flex', collapsed ? 'flex-col items-center gap-1' : 'items-center gap-1')}
@@ -133,7 +134,7 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
             rel="noopener noreferrer"
             title="GitHub"
             className={cn(
-              'flex items-center rounded-lg px-2 py-2 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-900',
+              'flex items-center rounded-lg px-2 py-2 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100',
               collapsed ? 'justify-center' : 'gap-2'
             )}
           >
@@ -146,13 +147,14 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
             rel="noopener noreferrer"
             title="LinkedIn"
             className={cn(
-              'flex items-center rounded-lg px-2 py-2 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-900',
+              'flex items-center rounded-lg px-2 py-2 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100',
               collapsed ? 'justify-center' : 'gap-2'
             )}
           >
             <Linkedin size={16} />
             {!collapsed && 'LinkedIn'}
           </a>
+          <ThemeToggle />
         </div>
       </div>
     </aside>

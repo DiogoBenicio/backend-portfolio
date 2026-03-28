@@ -26,10 +26,10 @@ async function checkEndpoint(url: string, degradeOn4xx = false): Promise<Service
 }
 
 const CHECKS = [
-  { key: 'nginx', url: '/nginx-health', degrade: false },
-  { key: 'gateway', url: '/api/health', degrade: false },
-  { key: 'weather', url: '/api/weather/current?city=S%C3%A3o%20Paulo', degrade: true },
-  { key: 'nps', url: '/api/nps/summary', degrade: false },
+  { key: 'nginx',   url: '/nginx-health',                              degrade: false },
+  { key: 'gateway', url: '/api/health',                                degrade: false },
+  { key: 'weather', url: '/api/weather/current?city=S%C3%A3o%20Paulo', degrade: false },
+  { key: 'nps',     url: '/api/nps/summary',                           degrade: false },
 ] as const
 
 export function useServiceHealth(): ServiceHealthResult {
@@ -37,8 +37,9 @@ export function useServiceHealth(): ServiceHealthResult {
     queries: CHECKS.map(({ key, url, degrade }) => ({
       queryKey: ['service-health', key],
       queryFn: () => checkEndpoint(url, degrade),
-      staleTime: 0,
-      refetchInterval: 30_000,
+      staleTime: 25_000,          // não refetch se dado tem menos de 25s
+      refetchInterval: 30_000,    // poll a cada 30s
+      refetchOnWindowFocus: false, // não refetch ao trocar de aba
       retry: 0,
     })),
   })

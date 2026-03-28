@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import { useTheme } from 'next-themes'
 import { useCurrentWeather } from '@/hooks/useCurrentWeather'
 import { useWindField } from '@/hooks/useWindField'
 import { formatTemperature, formatWindSpeed } from '@/lib/utils/weatherUtils'
@@ -237,26 +238,56 @@ function CityMarker({ city, highlighted = false }: { city: CityPin; highlighted?
         <div className="min-w-[190px] p-1">
           <div className="flex items-center gap-1.5">
             {highlighted && <span className="inline-block h-2 w-2 rounded-full bg-red-500" />}
-            <p className="font-semibold text-gray-900">{city.name}</p>
+            <p className="font-semibold text-gray-900 dark:text-slate-100">{city.name}</p>
           </div>
           {highlighted && (
             <p className="text-[10px] text-red-500 mb-1">cidade selecionada no dashboard</p>
           )}
-          {isLoading && <p className="text-sm text-gray-500">Carregando...</p>}
+          {isLoading && <p className="text-sm text-gray-500 dark:text-slate-400">Carregando...</p>}
           {weather && (
             <div className="mt-2 space-y-1 text-sm">
-              <p className="text-2xl font-bold text-blue-600">
+              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                 {formatTemperature(weather.temperature)}
               </p>
-              <p className="capitalize text-gray-600">{weather.description}</p>
-              <p className="text-gray-500">Umidade: {weather.humidity}%</p>
-              <p className="text-gray-500">Vento: {formatWindSpeed(weather.windSpeed)}</p>
+              <p className="capitalize text-gray-600 dark:text-slate-300">{weather.description}</p>
+              <p className="text-gray-500 dark:text-slate-400">Umidade: {weather.humidity}%</p>
+              <p className="text-gray-500 dark:text-slate-400">Vento: {formatWindSpeed(weather.windSpeed)}</p>
             </div>
           )}
         </div>
       </Popup>
     </Marker>
   )
+}
+
+// ── Invalida tamanho quando o container redimensiona ─────────────────────────
+
+function MapAutoResize() {
+  const map = useMap()
+  useEffect(() => {
+    const container = map.getContainer()
+    const observer = new ResizeObserver(() => map.invalidateSize())
+    observer.observe(container)
+    return () => observer.disconnect()
+  }, [map])
+  return null
+}
+
+// ── Zoom máximo dinâmico (RainViewer suporta até zoom 6) ─────────────────────
+
+const RAIN_MAX_ZOOM = 6
+
+function RainZoomGuard({ rainActive }: { rainActive: boolean }) {
+  const map = useMap()
+  useEffect(() => {
+    if (rainActive) {
+      map.setMaxZoom(RAIN_MAX_ZOOM)
+      if (map.getZoom() > RAIN_MAX_ZOOM) map.setZoom(RAIN_MAX_ZOOM)
+    } else {
+      map.setMaxZoom(18)
+    }
+  }, [map, rainActive])
+  return null
 }
 
 // ── Voa para cidade selecionada ──────────────────────────────────────────────
@@ -284,8 +315,8 @@ function LayerControls({
       onMouseDown={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}
     >
-      <div className="rounded-xl bg-white/97 shadow-xl backdrop-blur-sm border border-gray-100 p-2 flex flex-col gap-1.5 min-w-[115px]">
-        <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-widest px-1">
+      <div className="rounded-xl bg-white/97 shadow-xl backdrop-blur-sm border border-gray-100 p-2 flex flex-col gap-1.5 min-w-[115px] dark:bg-slate-900/95 dark:border-slate-700">
+        <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-widest px-1 dark:text-slate-500">
           Camadas
         </p>
         {(Object.entries(LAYER_CONFIGS) as [LayerId, (typeof LAYER_CONFIGS)[LayerId]][]).map(
@@ -295,7 +326,7 @@ function LayerControls({
               onClick={() => toggle(id)}
               className={cn(
                 'flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all',
-                active.has(id) ? cfg.activeClass : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                active.has(id) ? cfg.activeClass : 'bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
               )}
             >
               <span>{cfg.emoji}</span>
@@ -322,10 +353,10 @@ function MapLegend({ active }: { active: Set<LayerId> }) {
       onMouseDown={(e) => e.stopPropagation()}
       onClick={(e) => e.stopPropagation()}
     >
-      <div className="rounded-xl bg-white/97 shadow-xl backdrop-blur-sm border border-gray-100 p-3 flex flex-col gap-3 min-w-[168px]">
+      <div className="rounded-xl bg-white/97 shadow-xl backdrop-blur-sm border border-gray-100 p-3 flex flex-col gap-3 min-w-[168px] dark:bg-slate-900/95 dark:border-slate-700">
         {activeLayers.map(([id, cfg]) => (
           <div key={id}>
-            <p className="text-[9px] font-semibold text-gray-500 uppercase tracking-widest mb-1.5">
+            <p className="text-[9px] font-semibold text-gray-500 uppercase tracking-widest mb-1.5 dark:text-slate-400">
               {cfg.emoji} {cfg.label}
             </p>
 
@@ -338,12 +369,12 @@ function MapLegend({ active }: { active: Set<LayerId> }) {
             />
             <div className="flex justify-between">
               {cfg.legend.labels.map((l, i) => (
-                <span key={i} className="text-[9px] text-gray-400">
+                <span key={i} className="text-[9px] text-gray-400 dark:text-slate-500">
                   {l}
                 </span>
               ))}
             </div>
-            <p className="text-[9px] text-gray-400 mt-0.5 text-right">{cfg.legend.unit}</p>
+            <p className="text-[9px] text-gray-400 mt-0.5 text-right dark:text-slate-500">{cfg.legend.unit}</p>
           </div>
         ))}
       </div>
@@ -403,6 +434,15 @@ export function WeatherMap() {
   const [selectedCity, setSelectedCity] = useState<CityPin | null>(null)
   const [active, setActive] = useState<Set<LayerId>>(new Set())
   const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY ?? ''
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme === 'dark'
+
+  const tileUrl = isDark
+    ? 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
+  const tileAttribution = isDark
+    ? '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 
   useEffect(() => {
     const stored = localStorage.getItem('selectedMapCity')
@@ -444,6 +484,23 @@ export function WeatherMap() {
         .wm-temp-tile {
           filter: saturate(3) contrast(1.6) brightness(1.1) !important;
         }
+        ${isDark ? `
+        .leaflet-popup-content-wrapper {
+          background: #1e293b;
+          color: #e2e8f0;
+          border: 1px solid rgba(255,255,255,0.1);
+          box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+        .leaflet-popup-tip {
+          background: #1e293b;
+        }
+        .leaflet-popup-close-button {
+          color: #94a3b8 !important;
+        }
+        .leaflet-popup-close-button:hover {
+          color: #e2e8f0 !important;
+        }
+        ` : ''}
       `}</style>
 
       <MapContainer
@@ -452,10 +509,13 @@ export function WeatherMap() {
         style={{ height: '100%', width: '100%', borderRadius: '0.75rem' }}
       >
         <CustomPanes />
+        <MapAutoResize />
+        <RainZoomGuard rainActive={active.has('precipitation_new')} />
 
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          key={tileUrl}
+          attribution={tileAttribution}
+          url={tileUrl}
         />
 
         {apiKey && <WeatherLayers active={active} apiKey={apiKey} />}

@@ -10,5 +10,7 @@ import java.util.List;
 public interface WeatherDataRepository {
     void save(Weather weather);
     Page<Weather> findByCity(String city, Instant from, Instant to, Pageable pageable);
+    List<Weather> findSensorData(String city, Instant from, Instant to);
+    List<String> findDaysWithData(String city, int year, int month);
     List<String> findDistinctCities();
 }

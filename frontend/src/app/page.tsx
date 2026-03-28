@@ -4,40 +4,40 @@ import { ArrowDown, Layers, Plug, Globe } from 'lucide-react'
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-white dark:bg-gray-950">
       <HeroSection />
       <TechStackSection />
 
       {/* Arquitetura */}
-      <section className="border-t border-gray-100 bg-gray-50 px-6 py-16 md:px-16">
+      <section className="border-t border-gray-100 bg-gray-50 px-6 py-16 dark:border-gray-800 dark:bg-gray-900 md:px-16">
         <div className="mx-auto max-w-5xl">
-          <h2 className="mb-2 text-2xl font-bold text-gray-900">Padrões Arquiteturais</h2>
-          <p className="mb-10 text-gray-500">
+          <h2 className="mb-2 text-2xl font-bold text-gray-900 dark:text-gray-100">Padrões Arquiteturais</h2>
+          <p className="mb-10 text-gray-500 dark:text-gray-400">
             Cada serviço adota o padrão que melhor se encaixa em sua responsabilidade.
           </p>
 
           <div className="grid gap-6 md:grid-cols-2">
             {/* Card Hexagonal */}
-            <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-6">
+            <div className="rounded-2xl border border-indigo-200 bg-indigo-50 p-6 dark:border-indigo-900/50 dark:bg-indigo-950/30">
               <div className="mb-5 flex items-center gap-2">
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-100">
                   <Layers size={15} className="text-indigo-600" />
                 </span>
                 <div>
-                  <h3 className="text-sm font-semibold text-indigo-800">Arquitetura Hexagonal</h3>
-                  <p className="text-xs text-indigo-500">Weather-API · NPS-API</p>
+                  <h3 className="text-sm font-semibold text-indigo-800 dark:text-indigo-200">Arquitetura Hexagonal</h3>
+                  <p className="text-xs text-indigo-500 dark:text-indigo-400">Weather-API · NPS-API</p>
                 </div>
               </div>
 
               {/* Camadas */}
               <div className="flex flex-col gap-0">
                 {/* Adapter IN */}
-                <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3">
+                <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 dark:border-blue-900/50 dark:bg-blue-950/40">
                   <div className="flex items-center gap-2">
                     <Globe size={13} className="text-blue-500" />
-                    <span className="text-xs font-semibold text-blue-700">Adapter IN</span>
+                    <span className="text-xs font-semibold text-blue-700 dark:text-blue-300">Adapter IN</span>
                   </div>
-                  <p className="mt-1 text-[11px] text-blue-500">
+                  <p className="mt-1 text-[11px] text-blue-500 dark:text-blue-400">
                     Controllers REST · Spring @RestController · Fastify Routes
                   </p>
                 </div>
@@ -49,12 +49,12 @@ export default function HomePage() {
                 </div>
 
                 {/* Domain */}
-                <div className="rounded-xl border border-purple-200 bg-white px-4 py-3">
+                <div className="rounded-xl border border-purple-200 bg-white px-4 py-3 dark:border-purple-900/50 dark:bg-slate-800/60">
                   <div className="flex items-center gap-2">
                     <Layers size={13} className="text-indigo-500" />
-                    <span className="text-xs font-semibold text-indigo-700">Domain</span>
+                    <span className="text-xs font-semibold text-indigo-700 dark:text-indigo-300">Domain</span>
                   </div>
-                  <p className="mt-1 text-[11px] text-indigo-400">
+                  <p className="mt-1 text-[11px] text-indigo-400 dark:text-indigo-300">
                     Service · Port/in · Port/out · Model — zero dependência de framework
                   </p>
                 </div>
@@ -66,12 +66,12 @@ export default function HomePage() {
                 </div>
 
                 {/* Adapter OUT */}
-                <div className="rounded-xl border border-orange-200 bg-orange-50 px-4 py-3">
+                <div className="rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 dark:border-orange-900/50 dark:bg-orange-950/30">
                   <div className="flex items-center gap-2">
                     <Plug size={13} className="text-orange-500" />
-                    <span className="text-xs font-semibold text-orange-700">Adapter OUT</span>
+                    <span className="text-xs font-semibold text-orange-700 dark:text-orange-300">Adapter OUT</span>
                   </div>
-                  <p className="mt-1 text-[11px] text-orange-500">
+                  <p className="mt-1 text-[11px] text-orange-500 dark:text-orange-400">
                     Elasticsearch · Prisma / PostgreSQL · OpenWeather WebClient
                   </p>
                 </div>
@@ -79,18 +79,18 @@ export default function HomePage() {
             </div>
 
             {/* Card Gateway */}
-            <div className="flex flex-col gap-4 rounded-2xl border border-blue-200 bg-blue-50 p-6">
+            <div className="flex flex-col gap-4 rounded-2xl border border-blue-200 bg-blue-50 p-6 dark:border-blue-900/50 dark:bg-blue-950/30">
               <div className="flex items-center gap-2">
                 <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-100">
                   <Plug size={15} className="text-blue-600" />
                 </span>
                 <div>
-                  <h3 className="text-sm font-semibold text-blue-800">Proxy + Middleware</h3>
-                  <p className="text-xs text-blue-400">Gateway-API</p>
+                  <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-200">Proxy + Middleware</h3>
+                  <p className="text-xs text-blue-400 dark:text-blue-300">Gateway-API</p>
                 </div>
               </div>
 
-              <p className="text-xs text-blue-600">
+              <p className="text-xs text-blue-600 dark:text-blue-300">
                 Único ponto de entrada para os backends. Centraliza cross-cutting concerns sem
                 lógica de negócio.
               </p>
@@ -102,17 +102,17 @@ export default function HomePage() {
                   { label: 'Route Proxy', desc: 'Repassa para Weather-API ou NPS-API' },
                   { label: 'Request Logger', desc: 'Log estruturado de método, path e status' },
                 ].map(({ label, desc }) => (
-                  <div key={label} className="rounded-lg border border-blue-100 bg-white px-3 py-2">
-                    <span className="text-xs font-semibold text-blue-700">{label}</span>
-                    <p className="text-[11px] text-gray-400">{desc}</p>
+                  <div key={label} className="rounded-lg border border-blue-100 bg-white px-3 py-2 dark:border-slate-700/50 dark:bg-slate-800/60">
+                    <span className="text-xs font-semibold text-blue-700 dark:text-blue-300">{label}</span>
+                    <p className="text-[11px] text-gray-400 dark:text-slate-500">{desc}</p>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-auto rounded-lg border border-blue-100 bg-white px-3 py-2">
-                <p className="text-[11px] text-gray-400">
+              <div className="mt-auto rounded-lg border border-blue-100 bg-white px-3 py-2 dark:border-slate-700/50 dark:bg-slate-800/60">
+                <p className="text-[11px] text-gray-400 dark:text-slate-500">
                   Stack:{' '}
-                  <span className="font-medium text-gray-600">Node.js · Fastify · TypeScript</span>
+                  <span className="font-medium text-gray-600 dark:text-slate-300">Node.js · Fastify · TypeScript</span>
                 </p>
               </div>
             </div>
@@ -121,25 +121,25 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-gray-200 bg-white px-6 py-10">
-        <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 text-sm text-gray-500 md:flex-row">
+      <footer className="border-t border-gray-200 bg-white px-6 py-10 dark:border-gray-800 dark:bg-gray-900">
+        <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-4 text-sm text-gray-500 dark:text-gray-400 md:flex-row">
           <div className="text-center md:text-left">
-            <p className="font-semibold text-gray-700">Diogo Silveira Benício</p>
-            <p className="mt-0.5 text-xs">Full Stack Engineer · Uberlândia/MG</p>
+            <p className="font-semibold text-gray-700 dark:text-slate-200">Diogo Silveira Benício</p>
+            <p className="mt-0.5 text-xs dark:text-slate-400">Full Stack Engineer · Uberlândia/MG</p>
           </div>
           <div className="flex items-center gap-5 text-xs">
             <a
               href="mailto:diogobenicio@hotmail.com"
-              className="flex items-center gap-1.5 hover:text-blue-600"
+              className="flex items-center gap-1.5 hover:text-blue-600 dark:hover:text-blue-400"
             >
               diogobenicio@hotmail.com
             </a>
-            <span className="text-gray-200">|</span>
+            <span className="text-gray-200 dark:text-gray-700">|</span>
             <a
               href="https://linkedin.com/in/diogosbenicio"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1.5 hover:text-blue-600"
+              className="flex items-center gap-1.5 hover:text-blue-600 dark:hover:text-blue-400"
             >
               LinkedIn
             </a>

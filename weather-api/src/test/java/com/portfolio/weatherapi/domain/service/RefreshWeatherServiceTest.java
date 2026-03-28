@@ -31,7 +31,7 @@ class RefreshWeatherServiceTest {
     private static Weather weather(String city) {
         return new Weather(city, null, -15.0, -47.0,
                 27.0, 28.0, 55, 1010, 12.0, "E",
-                "parcialmente nublado", "02d", 6, 0.0, Instant.now());
+                "parcialmente nublado", "02d", 6, 0.0, 0.0, 0.0, Instant.now());
     }
 
     @BeforeEach

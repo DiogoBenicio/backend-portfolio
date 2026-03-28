@@ -20,8 +20,8 @@ export default function NpsPage() {
     <PageContainer>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Avalie o Portfólio</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Avalie o Portfólio</h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
             Net Promoter Score — ajude a melhorar este portfólio com sua avaliação
           </p>
         </div>
@@ -51,7 +51,7 @@ export default function NpsPage() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600">NPS Score</p>
+                        <p className="text-sm font-medium text-gray-600 dark:text-slate-400">NPS Score</p>
                         <p className={`text-5xl font-bold ${getNpsZoneColor(summary.zone)}`}>
                           {summary.npsScore}
                         </p>
@@ -60,23 +60,23 @@ export default function NpsPage() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs text-gray-500">Total de respostas</p>
-                        <p className="text-2xl font-bold text-gray-900">{summary.totalResponses}</p>
+                        <p className="text-xs text-gray-500 dark:text-slate-400">Total de respostas</p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-slate-100">{summary.totalResponses}</p>
                       </div>
                     </div>
 
                     <div className="mt-4 grid grid-cols-3 gap-3 text-center">
-                      <div className="rounded-lg bg-green-100 p-2">
-                        <p className="text-lg font-bold text-green-700">{summary.promoters}</p>
-                        <p className="text-xs text-green-600">Promotores</p>
+                      <div className="rounded-lg bg-green-100 p-2 dark:bg-green-900/40">
+                        <p className="text-lg font-bold text-green-700 dark:text-green-300">{summary.promoters}</p>
+                        <p className="text-xs text-green-600 dark:text-green-400">Promotores</p>
                       </div>
-                      <div className="rounded-lg bg-yellow-100 p-2">
-                        <p className="text-lg font-bold text-yellow-700">{summary.passives}</p>
-                        <p className="text-xs text-yellow-600">Passivos</p>
+                      <div className="rounded-lg bg-yellow-100 p-2 dark:bg-yellow-900/40">
+                        <p className="text-lg font-bold text-yellow-700 dark:text-yellow-300">{summary.passives}</p>
+                        <p className="text-xs text-yellow-600 dark:text-yellow-400">Passivos</p>
                       </div>
-                      <div className="rounded-lg bg-red-100 p-2">
-                        <p className="text-lg font-bold text-red-700">{summary.detractors}</p>
-                        <p className="text-xs text-red-600">Detratores</p>
+                      <div className="rounded-lg bg-red-100 p-2 dark:bg-red-900/40">
+                        <p className="text-lg font-bold text-red-700 dark:text-red-300">{summary.detractors}</p>
+                        <p className="text-xs text-red-600 dark:text-red-400">Detratores</p>
                       </div>
                     </div>
                   </CardContent>
@@ -119,21 +119,25 @@ export default function NpsPage() {
         {/* Avaliações recentes */}
         {responses && responses.data.length > 0 && (
           <div>
-            <h2 className="mb-3 text-sm font-semibold text-gray-700">Avaliações recentes</h2>
+            <h2 className="mb-3 text-sm font-semibold text-gray-700 dark:text-slate-200">Avaliações recentes</h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {responses.data.map((item) => {
                 const scoreColor =
                   item.score >= 9
-                    ? 'text-green-600 bg-green-50 border-green-200'
+                    ? 'text-green-600 bg-green-50 border-green-200 dark:text-green-300 dark:bg-green-900/30 dark:border-green-700'
                     : item.score >= 7
-                      ? 'text-yellow-600 bg-yellow-50 border-yellow-200'
-                      : 'text-red-600 bg-red-50 border-red-200'
+                      ? 'text-yellow-600 bg-yellow-50 border-yellow-200 dark:text-yellow-300 dark:bg-yellow-900/30 dark:border-yellow-700'
+                      : 'text-red-600 bg-red-50 border-red-200 dark:text-red-300 dark:bg-red-900/30 dark:border-red-700'
                 const scoreBg =
-                  item.score >= 9 ? 'bg-green-50' : item.score >= 7 ? 'bg-yellow-50' : 'bg-red-50'
+                  item.score >= 9
+                    ? 'bg-green-50 dark:bg-green-900/10'
+                    : item.score >= 7
+                      ? 'bg-yellow-50 dark:bg-yellow-900/10'
+                      : 'bg-red-50 dark:bg-red-900/10'
                 return (
                   <div
                     key={item.id}
-                    className={`flex flex-col gap-4 rounded-2xl border border-white/50 bg-white/70 p-6 shadow-md backdrop-blur-sm ${scoreBg}`}
+                    className={`flex flex-col gap-4 rounded-2xl border border-white/50 bg-white/70 p-6 shadow-md backdrop-blur-sm dark:border-slate-700/50 dark:bg-slate-800/60 ${scoreBg}`}
                   >
                     {/* Topo: avatar + nome + data + apagar */}
                     <div className="flex items-center gap-4">
@@ -144,12 +148,12 @@ export default function NpsPage() {
                       </div>
                       <div className="flex-1">
                         <div className="flex items-center gap-1.5">
-                          <User size={13} className="text-gray-400" />
-                          <span className="text-sm font-semibold text-gray-800">
+                          <User size={13} className="text-gray-400 dark:text-slate-500" />
+                          <span className="text-sm font-semibold text-gray-800 dark:text-slate-200">
                             {item.name ?? 'Anônimo'}
                           </span>
                         </div>
-                        <p className="mt-0.5 text-xs text-gray-400">
+                        <p className="mt-0.5 text-xs text-gray-400 dark:text-slate-500">
                           {new Date(item.createdAt).toLocaleDateString('pt-BR', {
                             day: '2-digit',
                             month: 'long',
@@ -160,7 +164,7 @@ export default function NpsPage() {
                       <button
                         onClick={() => deleteResponse(item.id)}
                         disabled={isDeleting}
-                        className="shrink-0 rounded-lg p-1.5 text-gray-400 transition hover:bg-red-50 hover:text-red-500 disabled:opacity-40"
+                        className="shrink-0 rounded-lg p-1.5 text-gray-400 transition hover:bg-red-50 hover:text-red-500 disabled:opacity-40 dark:text-slate-500 dark:hover:bg-red-900/30 dark:hover:text-red-400"
                         title="Apagar avaliação"
                       >
                         <Trash2 size={15} />
@@ -169,7 +173,7 @@ export default function NpsPage() {
 
                     {/* Comentário */}
                     {item.comment && (
-                      <p className="text-sm leading-relaxed text-gray-600">{item.comment}</p>
+                      <p className="text-sm leading-relaxed text-gray-600 dark:text-slate-400">{item.comment}</p>
                     )}
                   </div>
                 )

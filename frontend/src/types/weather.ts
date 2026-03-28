@@ -32,6 +32,31 @@ export interface ForecastResponse {
   forecast: ForecastDay[]
 }
 
+export interface SensorPoint {
+  timestamp: string
+  temperature: number
+  feelsLike: number
+  humidity: number
+  pressure: number
+  windSpeed: number
+  rainfall: number
+  uvIndex: number
+  dewPoint: number
+  radiation: number
+}
+
+export interface SensorDataResponse {
+  city: string
+  data: SensorPoint[]
+}
+
+export interface CalendarResponse {
+  city: string
+  year: number
+  month: number
+  daysWithData: string[]
+}
+
 export interface WeatherHistoryItem {
   id: string
   city: string

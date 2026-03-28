@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { MobileTopBar } from '@/components/layout/MobileTopBar'
 import { DashboardTexture } from '@/components/layout/DashboardTexture'
+import { SidebarContext } from '@/components/layout/SidebarContext'
 import { cn } from '@/lib/utils/cn'
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -11,7 +12,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [mobileOpen, setMobileOpen] = useState(false)
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <SidebarContext.Provider value={{ collapsed }}>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       {/* Textura de fundo — fixed cobre o viewport inteiro, atrás de tudo */}
       <DashboardTexture />
 
@@ -48,11 +50,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <main
         className={cn(
           'relative z-10 pt-14 transition-all duration-200 md:pt-0',
-          collapsed ? 'md:pl-16 xl:pr-16' : 'md:pl-60 xl:pr-60'
+          collapsed ? 'md:pl-16 md:pr-16' : 'md:pl-60 md:pr-60'
         )}
       >
         {children}
       </main>
     </div>
+    </SidebarContext.Provider>
   )
 }
