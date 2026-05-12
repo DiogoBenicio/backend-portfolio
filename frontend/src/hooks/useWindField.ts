@@ -1,22 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
-// Cidades usadas para campo de vento e zonas de chuva
-const WIND_CITIES = [
-  'Uberlândia,BR',
-  'Sao Paulo,BR',
-  'Rio de Janeiro,BR',
-  'Brasilia,BR',
-  'Belo Horizonte,BR',
-  'Salvador,BR',
-  'Fortaleza,BR',
-  'Manaus,BR',
-  'Porto Alegre,BR',
-  'Recife,BR',
-  'Curitiba,BR',
-  'Goiania,BR',
-]
-
-const GRID = { la1: 6, la2: -36, lo1: -74, lo2: -28, nx: 24, ny: 22 } as const
+const GRID = { la1: 90, la2: -90, lo1: -180, lo2: 180, nx: 180, ny: 91 } as const
 
 interface CityWind {
   lat: number
@@ -77,63 +61,26 @@ function buildVelocityData(cities: CityWind[]) {
   ]
 }
 
-type OWMItem = {
-  name: string
-  coord: { lat: number; lon: number }
-  wind?: { speed: number; deg: number }
-  rain?: { '1h'?: number; '3h'?: number }
+interface WindFieldApiResponse {
+  cities: CityWind[]
+  rainZones: RainZone[]
 }
 
-export function useWindField(apiKey: string) {
+export function useWindField() {
   return useQuery({
     queryKey: ['windField'],
     queryFn: async () => {
-      const results = await Promise.allSettled(
-        WIND_CITIES.map((city) =>
-          fetch(
-            `https://api.openweathermap.org/data/2.5/weather?q=${encodeURIComponent(city)}&appid=${apiKey}&units=metric`
-          ).then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
-        )
-      )
+      const res = await fetch('/api/weather/windfield')
+      if (!res.ok) throw new Error(`windfield error: ${res.status}`)
+      const data: WindFieldApiResponse = await res.json()
 
-      const items: OWMItem[] = results
-        .filter((r): r is PromiseFulfilledResult<OWMItem> => r.status === 'fulfilled')
-        .map((r) => r.value)
+      if (data.cities.length < 3) throw new Error('Dados insuficientes')
 
-      // Campo de vento (IDW)
-      const windCities: CityWind[] = items
-        .filter((item) => item.wind?.speed != null)
-        .map((item) => {
-          const rad = (item.wind!.deg * Math.PI) / 180
-          return {
-            lat: item.coord.lat,
-            lng: item.coord.lon,
-            u: -item.wind!.speed * Math.sin(rad),
-            v: -item.wind!.speed * Math.cos(rad),
-          }
-        })
-
-      // Zonas de chuva por intensidade
-      const rainZones: RainZone[] = items
-        .map((item) => {
-          const mm = item.rain?.['1h'] ?? item.rain?.['3h'] ?? 0
-          if (mm < 0.1) return null
-          return {
-            lat: item.coord.lat,
-            lng: item.coord.lon,
-            name: item.name,
-            rainMmPerHour: mm,
-            intensity:
-              mm < 2.5 ? ('fraca' as const) : mm < 7.5 ? ('moderada' as const) : ('forte' as const),
-          }
-        })
-        .filter((z): z is RainZone => z !== null)
-
-      if (windCities.length < 3) throw new Error('Dados insuficientes')
-
-      return { velocityData: buildVelocityData(windCities), rainZones }
+      return {
+        velocityData: buildVelocityData(data.cities),
+        rainZones: data.rainZones,
+      }
     },
-    enabled: !!apiKey,
     staleTime: 10 * 60 * 1000,
     refetchInterval: 15 * 60 * 1000,
   })

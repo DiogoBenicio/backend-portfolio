@@ -39,7 +39,9 @@ export function NpsForm() {
       </div>
 
       <div>
-        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">Seu nome (opcional)</label>
+        <label className="mb-2 block text-sm font-medium text-gray-700 dark:text-slate-300">
+          Seu nome (opcional)
+        </label>
         <input
           type="text"
           value={name}

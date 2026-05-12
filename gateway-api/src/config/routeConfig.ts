@@ -6,7 +6,9 @@ export const UPSTREAMS = {
 } as const;
 
 // Regras de reescrita de path: /api/weather/* → /api/v1/weather/*
+// IMPORTANTE: regras mais específicas devem vir antes das gerais
 export const PATH_REWRITES: Array<{ from: RegExp; to: string }> = [
+  { from: /^\/api\/weather\/health$/, to: '/actuator/health' }, // health sem chamar OpenWeather
   { from: /^\/api\/weather\/(.*)/, to: '/api/v1/weather/$1' },
   { from: /^\/api\/nps\/(.*)/, to: '/api/v1/nps/$1' },
 ];
@@ -14,10 +16,12 @@ export const PATH_REWRITES: Array<{ from: RegExp; to: string }> = [
 // Rotas públicas — não exigem JWT
 export const PUBLIC_ROUTES: Array<{ method: string; pattern: RegExp }> = [
   { method: 'POST', pattern: /^\/api\/auth\/login$/ },
+  { method: 'GET',  pattern: /^\/api\/weather\/health$/ },
   { method: 'GET',  pattern: /^\/api\/weather\/current/ },
   { method: 'GET',  pattern: /^\/api\/weather\/forecast/ },
   { method: 'GET',  pattern: /^\/api\/weather\/sensors/ },
   { method: 'GET',  pattern: /^\/api\/weather\/calendar/ },
+  { method: 'GET',  pattern: /^\/api\/weather\/windfield/ },
   { method: 'POST', pattern: /^\/api\/weather\/populate/ },
   { method: 'POST',   pattern: /^\/api\/nps\/responses$/ },
   { method: 'GET',    pattern: /^\/api\/nps\/responses/ },

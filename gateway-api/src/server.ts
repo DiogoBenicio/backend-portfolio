@@ -17,7 +17,7 @@ async function buildServer() {
   // ── Plugins ────────────────────────────────────────────────
   await server.register(cors, {
     // Gateway aceita apenas origens internas (Nginx repassa)
-    origin: ['http://localhost', 'http://nginx', 'http://portfolio-frontend:3000'],
+    origin: ['http://localhost', 'http://localhost:3000', 'http://nginx', 'http://portfolio-frontend:3000'],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
@@ -50,11 +50,13 @@ async function buildServer() {
   server.addHook('onRequest', authMiddleware);
 
   // ── Health check (público, sem auth) ───────────────────────
-  server.get('/health', async () => ({
+  const healthResponse = async () => ({
     status: 'ok',
     service: 'gateway-api',
     timestamp: new Date().toISOString(),
-  }));
+  });
+  server.get('/health', healthResponse);
+  server.get('/api/health', healthResponse); // acessível via Nginx /api/*
 
   server.get('/api/v1/health', async () => {
     const npsOk = await fetch(`${env.npsApiUrl}/api/v1/health`).then((r) => r.ok).catch(() => false);

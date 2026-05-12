@@ -60,10 +60,10 @@ interface Props {
 }
 
 export function ServiceStatusBar({ statuses }: Props) {
-  const allOnline = SERVICES.every((s) => statuses[s.key] === 'online')
+  const allOnline = SERVICES.every((s) => statuses[s.key].status === 'online')
 
   return (
-    <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border border-white/50 bg-white/70 px-5 py-4 shadow-md backdrop-blur-sm dark:border-white/10 dark:bg-gray-800/60">
+    <div className="flex flex-wrap items-center gap-x-6 gap-y-3 rounded-xl border border-gray-200 bg-white/70 px-5 py-4 shadow-md backdrop-blur-sm dark:border-slate-700 dark:bg-gray-800/60">
       <div className="flex items-center gap-2">
         <span
           className={cn(
@@ -79,10 +79,10 @@ export function ServiceStatusBar({ statuses }: Props) {
       <div className="flex flex-wrap items-center gap-4">
         {SERVICES.map(({ key, label }) => (
           <div key={key} className="flex items-center gap-1.5">
-            <StatusDot status={statuses[key] ?? 'checking'} />
+            <StatusDot status={statuses[key].status ?? 'checking'} />
             <span className="text-sm text-gray-700 dark:text-gray-200">{label}</span>
             <span className="text-xs text-gray-400 dark:text-gray-500">
-              ({statusLabel(statuses[key] ?? 'checking')})
+              ({statusLabel(statuses[key].status ?? 'checking')})
             </span>
           </div>
         ))}

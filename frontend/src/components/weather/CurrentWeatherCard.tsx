@@ -17,7 +17,9 @@ export function CurrentWeatherCard({ weather }: CurrentWeatherCardProps) {
             <h2 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
               {weather.city}, {weather.country}
             </h2>
-            <p className="mt-1 text-sm capitalize text-gray-500 dark:text-slate-400">{weather.description}</p>
+            <p className="mt-1 text-sm capitalize text-gray-500 dark:text-slate-400">
+              {weather.description}
+            </p>
           </div>
           {weather.icon && (
             <Image

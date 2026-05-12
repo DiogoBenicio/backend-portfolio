@@ -53,21 +53,24 @@ const CSS = `
 
 const rand = (min: number, max: number) => Math.random() * (max - min) + min
 
-function createItem(id: number, isDark: boolean) {
+function createItem(id: number, isDark: boolean, initial = false) {
   const icon = STACK[Math.floor(Math.random() * STACK.length)]
   const size = Math.round(rand(28, 80))
   const color = resolveColor(icon.hex, isDark)
-  // Injetar fill no SVG inline
   const svg = icon.svg.replace('<svg ', `<svg fill="#${color}" `)
+  const left = initial ? rand(0, 95) : rand(-16, -6)
+  // Ícones iniciais têm duração proporcional à distância restante até sair da tela
+  const baseDuration = rand(30, 55)
+  const duration = initial ? baseDuration * ((100 - left + 30) / 130) : baseDuration
   return {
     id,
     svg,
     alt: icon.title,
     top: rand(4, 94),
-    left: rand(-16, -6),
+    left,
     size,
-    duration: rand(30, 55),
-    delay: `${rand(0, 2).toFixed(1)}s`,
+    duration,
+    delay: initial ? '0s' : `${rand(0, 2).toFixed(1)}s`,
   }
 }
 
@@ -88,7 +91,7 @@ export function StackIconTexture({
   initialCount = 8,
   spawnInterval = 900,
   maxIcons = 40,
-  opacity = 0.10,
+  opacity = 0.1,
 }: Props) {
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
@@ -100,7 +103,7 @@ export function StackIconTexture({
 
   useEffect(() => {
     const initial = Array.from({ length: initialCount }, (_, i) =>
-      createItem(i + 1, isDarkRef.current)
+      createItem(i + 1, isDarkRef.current, true)
     )
     setItems(initial)
     nextId.current = initial.length + 1

@@ -3,51 +3,76 @@ import axios from 'axios'
 
 export type ServiceStatus = 'checking' | 'online' | 'degraded' | 'offline'
 
-export interface ServiceHealthResult {
-  nginx: ServiceStatus
-  gateway: ServiceStatus
-  weather: ServiceStatus
-  nps: ServiceStatus
+export interface ServiceHealthEntry {
+  status: ServiceStatus
+  latencyMs: number | null
+  checkedAt: Date | null
 }
 
-async function checkEndpoint(url: string, degradeOn4xx = false): Promise<ServiceStatus> {
+export interface ServiceHealthResult {
+  nginx: ServiceHealthEntry
+  gateway: ServiceHealthEntry
+  weather: ServiceHealthEntry
+  nps: ServiceHealthEntry
+}
+
+async function checkEndpoint(
+  url: string,
+  degradeOn4xx = false
+): Promise<{ status: ServiceStatus; latencyMs: number }> {
+  const start = Date.now()
   try {
     const response = await axios.get(url, {
       timeout: 4000,
-      validateStatus: () => true, // nunca lança para status HTTP
+      validateStatus: () => true,
     })
-    if (response.status < 300) return 'online'
-    if (response.status < 500 && degradeOn4xx) return 'degraded'
-    if (response.status < 500) return 'online' // 4xx = serviço respondeu
-    return 'offline'
+    const latencyMs = Date.now() - start
+    if (response.status < 300) return { status: 'online', latencyMs }
+    if (response.status < 500 && degradeOn4xx) return { status: 'degraded', latencyMs }
+    if (response.status < 500) return { status: 'online', latencyMs }
+    return { status: 'offline', latencyMs }
   } catch {
-    return 'offline'
+    return { status: 'offline', latencyMs: Date.now() - start }
   }
 }
 
 const CHECKS = [
-  { key: 'nginx',   url: '/nginx-health',                              degrade: false },
-  { key: 'gateway', url: '/api/health',                                degrade: false },
-  { key: 'weather', url: '/api/weather/current?city=S%C3%A3o%20Paulo', degrade: false },
-  { key: 'nps',     url: '/api/nps/summary',                           degrade: false },
+  { key: 'nginx', url: '/nginx-health', degrade: false },
+  { key: 'gateway', url: '/api/health', degrade: false },
+  { key: 'weather', url: '/api/weather/health', degrade: false },
+  { key: 'nps', url: '/api/nps/summary', degrade: false },
 ] as const
+
+const LOADING_ENTRY: ServiceHealthEntry = { status: 'checking', latencyMs: null, checkedAt: null }
+const OFFLINE_ENTRY: ServiceHealthEntry = { status: 'offline', latencyMs: null, checkedAt: null }
 
 export function useServiceHealth(): ServiceHealthResult {
   const results = useQueries({
     queries: CHECKS.map(({ key, url, degrade }) => ({
       queryKey: ['service-health', key],
       queryFn: () => checkEndpoint(url, degrade),
-      staleTime: 25_000,          // não refetch se dado tem menos de 25s
-      refetchInterval: 30_000,    // poll a cada 30s
-      refetchOnWindowFocus: false, // não refetch ao trocar de aba
+      staleTime: 25_000,
+      refetchInterval: 30_000,
+      refetchOnWindowFocus: false,
       retry: 0,
     })),
   })
 
+  function toEntry(i: number): ServiceHealthEntry {
+    const r = results[i]
+    if (r.isLoading) return LOADING_ENTRY
+    if (!r.data) return OFFLINE_ENTRY
+    return {
+      status: r.data.status,
+      latencyMs: r.data.latencyMs,
+      checkedAt: r.dataUpdatedAt ? new Date(r.dataUpdatedAt) : null,
+    }
+  }
+
   return {
-    nginx: (results[0].isLoading ? 'checking' : results[0].data) ?? 'offline',
-    gateway: (results[1].isLoading ? 'checking' : results[1].data) ?? 'offline',
-    weather: (results[2].isLoading ? 'checking' : results[2].data) ?? 'offline',
-    nps: (results[3].isLoading ? 'checking' : results[3].data) ?? 'offline',
+    nginx: toEntry(0),
+    gateway: toEntry(1),
+    weather: toEntry(2),
+    nps: toEntry(3),
   }
 }

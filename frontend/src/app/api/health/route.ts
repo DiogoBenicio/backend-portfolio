@@ -6,7 +6,8 @@ import { NextResponse } from 'next/server'
  */
 export async function GET() {
   try {
-    const res = await fetch('http://gateway-api:3001/health', {
+    const gatewayUrl = process.env.GATEWAY_URL ?? 'http://localhost:4000'
+    const res = await fetch(`${gatewayUrl}/health`, {
       signal: AbortSignal.timeout(3000),
     })
     const body = await res.json().catch(() => ({ status: 'ok' }))

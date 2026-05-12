@@ -59,4 +59,9 @@ public class UseCaseConfig {
             WeatherProviderClient client, WeatherDataRepository repository) {
         return new PopulateWeatherService(client, repository);
     }
+
+    @Bean
+    public GetWindFieldUseCase getWindFieldUseCase(WeatherProviderClient client) {
+        return new GetWindFieldService(client);
+    }
 }

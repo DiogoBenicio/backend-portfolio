@@ -51,7 +51,9 @@ function WeatherWidget() {
       />
       <div>
         <div className="flex items-baseline gap-1">
-          <span className="text-3xl font-bold text-gray-900 dark:text-slate-100">{Math.round(data.temperature)}</span>
+          <span className="text-3xl font-bold text-gray-900 dark:text-slate-100">
+            {Math.round(data.temperature)}
+          </span>
           <span className="text-lg text-gray-500 dark:text-slate-400">°C</span>
         </div>
         <p className="text-sm capitalize text-gray-500 dark:text-slate-400">{data.description}</p>
@@ -143,10 +145,12 @@ export function LiveMetrics() {
       </div>
 
       {/* NPS live */}
-      <div className="rounded-xl border border-indigo-200/60 bg-white/70 p-5 shadow-md backdrop-blur-sm dark:border-indigo-700/30 dark:bg-slate-800/60">
+      <div className="rounded-xl border border-blue-200/60 bg-white/70 p-5 shadow-md backdrop-blur-sm dark:border-blue-700/30 dark:bg-slate-800/60">
         <SectionTitle icon={Star} label="NPS Global do Portfólio" />
         <NpsWidget />
-        <p className="mt-3 text-[10px] text-gray-400 dark:text-slate-500">via NPS-API → Nginx → Gateway → PostgreSQL</p>
+        <p className="mt-3 text-[10px] text-gray-400 dark:text-slate-500">
+          via NPS-API → Nginx → Gateway → PostgreSQL
+        </p>
       </div>
     </div>
   )

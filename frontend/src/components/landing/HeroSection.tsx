@@ -24,6 +24,7 @@ export function HeroSection() {
                 src="/images/Diogo.jpg"
                 alt="Diogo Silveira Benício"
                 fill
+                sizes="(max-width: 768px) 144px, 176px"
                 className="object-cover object-[center_25%]"
                 priority
               />
@@ -71,20 +72,20 @@ export function HeroSection() {
               <Link href="/dashboard/weather">
                 <Button className="gap-2">
                   <Cloud size={16} />
-                  Dashboard de Clima
+                  Painel de Clima
                   <ArrowRight size={14} />
                 </Button>
               </Link>
               <Link href="/dashboard/map">
                 <Button variant="outline" className="gap-2">
                   <MapPin size={16} />
-                  Mapa Interativo
+                  Mapa de Clima
                 </Button>
               </Link>
               <Link href="/dashboard/nps">
                 <Button variant="ghost" className="gap-2">
                   <Star size={16} />
-                  Avaliar Portfólio
+                  Avaliação NPS
                 </Button>
               </Link>
             </div>

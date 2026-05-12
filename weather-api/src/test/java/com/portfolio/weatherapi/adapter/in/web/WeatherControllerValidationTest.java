@@ -49,7 +49,7 @@ class WeatherControllerValidationTest {
         controller = new WeatherController(
                 getCurrentWeather, getForecast, getWeatherHistory,
                 refreshWeather, getWeatherSensors, getWeatherCalendar,
-                populateWeather, mapper
+                populateWeather, null, mapper
         );
     }
 

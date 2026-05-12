@@ -2,16 +2,19 @@
 
 import { NpsForm } from '@/components/nps/NpsForm'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { LoadingSpinner } from '@/components/ui/loadingspinner'
+import { PageLoader } from '@/components/ui/PageLoader'
 import { useNpsSummary } from '@/hooks/useNpsSummary'
 import { useNpsResponses } from '@/hooks/useNpsResponses'
 import { getNpsZoneColor, getNpsZoneBg } from '@/lib/utils/npsUtils'
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts'
+import { useTheme } from 'next-themes'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { User, Trash2 } from 'lucide-react'
 import { useDeleteNpsResponse } from '@/hooks/useDeleteNpsResponse'
 
 export default function NpsPage() {
+  const { resolvedTheme } = useTheme()
+  const dark = resolvedTheme === 'dark'
   const { data: summary, isLoading } = useNpsSummary('portfolio')
   const { data: responses } = useNpsResponses('portfolio', 20)
   const { mutate: deleteResponse, isPending: isDeleting } = useDeleteNpsResponse()
@@ -20,7 +23,9 @@ export default function NpsPage() {
     <PageContainer>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Avalie o Portfólio</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
+            Avaliação NPS
+          </h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
             Net Promoter Score — ajude a melhorar este portfólio com sua avaliação
           </p>
@@ -43,7 +48,7 @@ export default function NpsPage() {
           {/* Painel de resultados */}
           <div className="space-y-4">
             {isLoading ? (
-              <LoadingSpinner label="Carregando resultados NPS..." />
+              <PageLoader label="Carregando resultados NPS" />
             ) : summary ? (
               <>
                 {/* Score principal */}
@@ -51,7 +56,9 @@ export default function NpsPage() {
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm font-medium text-gray-600 dark:text-slate-400">NPS Score</p>
+                        <p className="text-sm font-medium text-gray-600 dark:text-slate-400">
+                          NPS Score
+                        </p>
                         <p className={`text-5xl font-bold ${getNpsZoneColor(summary.zone)}`}>
                           {summary.npsScore}
                         </p>
@@ -60,22 +67,32 @@ export default function NpsPage() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-xs text-gray-500 dark:text-slate-400">Total de respostas</p>
-                        <p className="text-2xl font-bold text-gray-900 dark:text-slate-100">{summary.totalResponses}</p>
+                        <p className="text-xs text-gray-500 dark:text-slate-400">
+                          Total de respostas
+                        </p>
+                        <p className="text-2xl font-bold text-gray-900 dark:text-slate-100">
+                          {summary.totalResponses}
+                        </p>
                       </div>
                     </div>
 
                     <div className="mt-4 grid grid-cols-3 gap-3 text-center">
                       <div className="rounded-lg bg-green-100 p-2 dark:bg-green-900/40">
-                        <p className="text-lg font-bold text-green-700 dark:text-green-300">{summary.promoters}</p>
+                        <p className="text-lg font-bold text-green-700 dark:text-green-300">
+                          {summary.promoters}
+                        </p>
                         <p className="text-xs text-green-600 dark:text-green-400">Promotores</p>
                       </div>
                       <div className="rounded-lg bg-yellow-100 p-2 dark:bg-yellow-900/40">
-                        <p className="text-lg font-bold text-yellow-700 dark:text-yellow-300">{summary.passives}</p>
+                        <p className="text-lg font-bold text-yellow-700 dark:text-yellow-300">
+                          {summary.passives}
+                        </p>
                         <p className="text-xs text-yellow-600 dark:text-yellow-400">Passivos</p>
                       </div>
                       <div className="rounded-lg bg-red-100 p-2 dark:bg-red-900/40">
-                        <p className="text-lg font-bold text-red-700 dark:text-red-300">{summary.detractors}</p>
+                        <p className="text-lg font-bold text-red-700 dark:text-red-300">
+                          {summary.detractors}
+                        </p>
                         <p className="text-xs text-red-600 dark:text-red-400">Detratores</p>
                       </div>
                     </div>
@@ -99,7 +116,18 @@ export default function NpsPage() {
                         >
                           <XAxis dataKey="score" tick={{ fontSize: 11 }} />
                           <YAxis tick={{ fontSize: 11 }} />
-                          <Tooltip contentStyle={{ fontSize: 12, borderRadius: 8 }} />
+                          <Tooltip
+                            contentStyle={{
+                              fontSize: 12,
+                              borderRadius: 8,
+                              border: `1px solid ${dark ? '#334155' : '#e5e7eb'}`,
+                              background: dark ? '#1e293b' : '#fff',
+                              color: dark ? '#e2e8f0' : '#111827',
+                            }}
+                            cursor={{ fill: dark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }}
+                            labelStyle={{ color: dark ? '#e2e8f0' : '#111827', fontWeight: 600 }}
+                            itemStyle={{ color: dark ? '#94a3b8' : '#6b7280' }}
+                          />
                           <Bar dataKey="count" name="Respostas" radius={[3, 3, 0, 0]}>
                             {Object.keys(summary.distribution).map((score) => {
                               const s = Number(score)
@@ -119,7 +147,9 @@ export default function NpsPage() {
         {/* Avaliações recentes */}
         {responses && responses.data.length > 0 && (
           <div>
-            <h2 className="mb-3 text-sm font-semibold text-gray-700 dark:text-slate-200">Avaliações recentes</h2>
+            <h2 className="mb-3 text-sm font-semibold text-gray-700 dark:text-slate-200">
+              Avaliações recentes
+            </h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {responses.data.map((item) => {
                 const scoreColor =
@@ -137,7 +167,7 @@ export default function NpsPage() {
                 return (
                   <div
                     key={item.id}
-                    className={`flex flex-col gap-4 rounded-2xl border border-white/50 bg-white/70 p-6 shadow-md backdrop-blur-sm dark:border-slate-700/50 dark:bg-slate-800/60 ${scoreBg}`}
+                    className={`flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white/70 p-6 shadow-md backdrop-blur-sm dark:border-slate-700 dark:bg-slate-800/60 ${scoreBg}`}
                   >
                     {/* Topo: avatar + nome + data + apagar */}
                     <div className="flex items-center gap-4">
@@ -173,7 +203,9 @@ export default function NpsPage() {
 
                     {/* Comentário */}
                     {item.comment && (
-                      <p className="text-sm leading-relaxed text-gray-600 dark:text-slate-400">{item.comment}</p>
+                      <p className="text-sm leading-relaxed text-gray-600 dark:text-slate-400">
+                        {item.comment}
+                      </p>
                     )}
                   </div>
                 )

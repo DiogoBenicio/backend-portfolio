@@ -1,6 +1,6 @@
 'use client'
 
-import { Monitor, Shield, Lock, Cloud, Star, Database, Layers } from 'lucide-react'
+import { Monitor, Shield, Lock, Cloud, Star, Database } from 'lucide-react'
 import { cn } from '@/lib/utils/cn'
 import type { ServiceHealthResult, ServiceStatus } from '@/hooks/useServiceHealth'
 
@@ -112,8 +112,14 @@ function DiagramNode({ nodeKey, icon, label, sublabel, border, bg, status }: Nod
         {icon}
         {status !== undefined && <StatusDot status={status} />}
       </div>
-      <span className="text-[11px] font-semibold leading-tight text-gray-800 dark:text-slate-200">{label}</span>
-      {sublabel && <span className="text-[9px] leading-tight text-gray-400 dark:text-slate-500">{sublabel}</span>}
+      <span className="text-[11px] font-semibold leading-tight text-gray-800 dark:text-slate-200">
+        {label}
+      </span>
+      {sublabel && (
+        <span className="text-[9px] leading-tight text-gray-400 dark:text-slate-500">
+          {sublabel}
+        </span>
+      )}
     </div>
   )
 }
@@ -141,14 +147,10 @@ interface Props {
 
 export function ArchitectureDiagram({ statuses }: Props) {
   return (
-    <div className="rounded-xl border border-white/30 bg-white/70 p-6 shadow-md backdrop-blur-sm dark:border-white/10 dark:bg-gray-800/50">
-      <div className="mb-5 flex items-center gap-2">
-        <Layers size={16} className="text-gray-500 dark:text-slate-400" />
-        <h2 className="text-sm font-semibold text-gray-700 dark:text-slate-300">Diagrama Arquitetural</h2>
-      </div>
-
+    <div className="rounded-xl border border-gray-200 bg-white/70 p-6 shadow-md backdrop-blur-sm dark:border-slate-700 dark:bg-gray-800/50">
       {/* Responsive diagram container */}
-      <div className="relative mx-auto w-full" style={{ aspectRatio: `${VB_W} / ${VB_H}` }}>
+      <div className="overflow-x-auto">
+      <div className="relative mx-auto w-full min-w-[580px]" style={{ aspectRatio: `${VB_W} / ${VB_H}` }}>
         {/* SVG overlay — connections only */}
         <svg
           viewBox={`0 0 ${VB_W} ${VB_H}`}
@@ -221,15 +223,15 @@ export function ArchitectureDiagram({ statuses }: Props) {
           sublabel="Reverse Proxy · :80"
           border="border-gray-300 dark:border-slate-500"
           bg="bg-gray-100 dark:bg-slate-700/60"
-          status={statuses.nginx}
+          status={statuses.nginx.status}
         />
         <DiagramNode
           nodeKey="frontend"
-          icon={<Monitor size={13} className="text-indigo-500" />}
+          icon={<Monitor size={13} className="text-blue-500" />}
           label="Frontend"
           sublabel="Next.js 14"
-          border="border-indigo-200 dark:border-indigo-700"
-          bg="bg-indigo-50 dark:bg-indigo-900/30"
+          border="border-blue-200 dark:border-blue-700"
+          bg="bg-blue-50 dark:bg-blue-900/30"
         />
         <DiagramNode
           nodeKey="gateway"
@@ -238,7 +240,7 @@ export function ArchitectureDiagram({ statuses }: Props) {
           sublabel="JWT · Rate Limit"
           border="border-blue-200 dark:border-blue-700"
           bg="bg-blue-50 dark:bg-blue-900/30"
-          status={statuses.gateway}
+          status={statuses.gateway.status}
         />
         <DiagramNode
           nodeKey="weather"
@@ -247,16 +249,16 @@ export function ArchitectureDiagram({ statuses }: Props) {
           sublabel="Spring Boot 3"
           border="border-orange-200 dark:border-orange-700"
           bg="bg-orange-50 dark:bg-orange-900/30"
-          status={statuses.weather}
+          status={statuses.weather.status}
         />
         <DiagramNode
           nodeKey="nps"
-          icon={<Star size={13} className="text-indigo-500" />}
+          icon={<Star size={13} className="text-blue-500" />}
           label="NPS-API"
           sublabel="Fastify 4 + Prisma"
-          border="border-indigo-200 dark:border-indigo-700"
-          bg="bg-indigo-50 dark:bg-indigo-900/30"
-          status={statuses.nps}
+          border="border-blue-200 dark:border-blue-700"
+          bg="bg-blue-50 dark:bg-blue-900/30"
+          status={statuses.nps.status}
         />
         <DiagramNode
           nodeKey="elastic"
@@ -267,11 +269,12 @@ export function ArchitectureDiagram({ statuses }: Props) {
         />
         <DiagramNode
           nodeKey="postgres"
-          icon={<Database size={12} className="text-indigo-400 dark:text-indigo-300" />}
+          icon={<Database size={12} className="text-blue-400 dark:text-blue-300" />}
           label="PostgreSQL"
-          border="border-indigo-300 dark:border-indigo-700"
-          bg="bg-indigo-50/60 dark:bg-indigo-900/20"
+          border="border-blue-300 dark:border-blue-700"
+          bg="bg-blue-50/60 dark:bg-blue-900/20"
         />
+      </div>
       </div>
 
       {/* Legend */}

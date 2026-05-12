@@ -32,6 +32,7 @@ public class WeatherController {
     private final GetWeatherSensorsUseCase getWeatherSensors;
     private final GetWeatherCalendarUseCase getWeatherCalendar;
     private final PopulateWeatherUseCase populateWeather;
+    private final GetWindFieldUseCase getWindField;
     private final WeatherMapper mapper;
 
     public WeatherController(
@@ -42,6 +43,7 @@ public class WeatherController {
             GetWeatherSensorsUseCase getWeatherSensors,
             GetWeatherCalendarUseCase getWeatherCalendar,
             PopulateWeatherUseCase populateWeather,
+            GetWindFieldUseCase getWindField,
             WeatherMapper mapper
     ) {
         this.getCurrentWeather = getCurrentWeather;
@@ -51,6 +53,7 @@ public class WeatherController {
         this.getWeatherSensors = getWeatherSensors;
         this.getWeatherCalendar = getWeatherCalendar;
         this.populateWeather = populateWeather;
+        this.getWindField = getWindField;
         this.mapper = mapper;
     }
 
@@ -140,6 +143,13 @@ public class WeatherController {
     ) {
         var days = getWeatherCalendar.execute(city.trim(), year, month);
         return ResponseEntity.ok(mapper.toCalendarResponse(city.trim(), year, month, days));
+    }
+
+    @GetMapping("/windfield")
+    @Operation(summary = "Campo de vento e zonas de chuva",
+               description = "Retorna vetores de vento (u, v) e zonas de chuva para as principais cidades brasileiras.")
+    public ResponseEntity<WindFieldResponse> getWindField() {
+        return ResponseEntity.ok(mapper.toWindFieldResponse(getWindField.execute()));
     }
 
     @PostMapping("/populate")

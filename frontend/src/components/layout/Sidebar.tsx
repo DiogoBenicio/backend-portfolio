@@ -20,10 +20,10 @@ import { ThemeToggle } from '@/components/ui/ThemeToggle'
 const navItems = [{ href: '/', label: 'Home', icon: Home }]
 
 const dashboardItems = [
-  { href: '/dashboard/weather', label: 'Clima', icon: Cloud },
-  { href: '/dashboard/map', label: 'Mapa', icon: Map },
-  { href: '/dashboard/nps', label: 'NPS', icon: Star },
-  { href: '/dashboard/ecosystem', label: 'Ecossistema BackEnd', icon: Layers },
+  { href: '/dashboard/weather', label: 'Painel de Clima', icon: Cloud },
+  { href: '/dashboard/map', label: 'Mapa de Clima', icon: Map },
+  { href: '/dashboard/nps', label: 'Avaliação NPS', icon: Star },
+  { href: '/dashboard/ecosystem', label: 'Observabilidade', icon: Layers },
 ]
 
 interface Props {
@@ -38,7 +38,7 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
   return (
     <aside
       className={cn(
-        'relative flex h-screen flex-col border-r border-white/20 bg-white/30 shadow-lg backdrop-blur-md transition-all duration-200 dark:border-white/10 dark:bg-gray-900/50',
+        'relative flex h-screen flex-col border-r border-gray-200 bg-white/30 shadow-lg backdrop-blur-md transition-all duration-200 dark:border-slate-700 dark:bg-gray-900/50',
         collapsed ? 'w-16' : 'w-60'
       )}
     >
@@ -46,7 +46,7 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
       <button
         onClick={onToggle}
         title={collapsed ? 'Expandir menu' : 'Recolher menu'}
-        className="absolute -right-3 top-1/2 z-50 hidden h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-white/30 bg-white/50 text-gray-400 shadow-md backdrop-blur-sm transition-colors hover:border-blue-300 hover:text-blue-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-blue-500 dark:hover:text-blue-400 md:flex"
+        className="absolute -right-3 top-1/2 z-50 hidden h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white/50 text-gray-400 shadow-md backdrop-blur-sm transition-colors hover:border-blue-300 hover:text-blue-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-blue-500 dark:hover:text-blue-400 md:flex"
       >
         {collapsed ? <ChevronRight size={13} /> : <ChevronLeft size={13} />}
       </button>
@@ -54,7 +54,7 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
       {/* Logo */}
       <div
         className={cn(
-          'flex items-center border-b border-white/40 py-5',
+          'flex items-center border-b border-gray-200 py-5 dark:border-slate-700',
           collapsed ? 'justify-center px-3' : 'gap-3 px-5'
         )}
       >
@@ -96,7 +96,7 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
         <div className="mt-4">
           {!collapsed && (
             <p className="mb-2 px-3 text-xs font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500">
-              Dashboard
+              Projetos
             </p>
           )}
           <ul className="space-y-1">
@@ -124,7 +124,7 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
       </nav>
 
       {/* Links externos + tema */}
-      <div className="border-t border-white/40 p-2">
+      <div className="border-t border-gray-200 p-2 dark:border-slate-700">
         <div
           className={cn('flex', collapsed ? 'flex-col items-center gap-1' : 'items-center gap-1')}
         >

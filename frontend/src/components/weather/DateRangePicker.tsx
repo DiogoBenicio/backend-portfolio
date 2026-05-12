@@ -29,14 +29,12 @@ export function DateRangePicker({ value, onChange }: Props) {
   const [from, setFrom] = useState(value.from)
   const [to, setTo] = useState(value.to)
 
-  const yesterday  = toLocalDateString(new Date(Date.now() - 1 * 86_400_000))
-  const minDate    = toLocalDateString(new Date(Date.now() - 5 * 86_400_000))
-  const maxDate    = yesterday
+  const yesterday = toLocalDateString(new Date(Date.now() - 1 * 86_400_000))
+  const minDate = toLocalDateString(new Date(Date.now() - 5 * 86_400_000))
+  const maxDate = yesterday
 
   const diffDays =
-    from && to
-      ? Math.ceil((new Date(to).getTime() - new Date(from).getTime()) / 86_400_000)
-      : 0
+    from && to ? Math.ceil((new Date(to).getTime() - new Date(from).getTime()) / 86_400_000) : 0
 
   const invalid = diffDays > MAX_DAYS || diffDays < 0
 
@@ -49,13 +47,16 @@ export function DateRangePicker({ value, onChange }: Props) {
   return (
     <div className="flex flex-wrap items-end gap-3">
       <div className="flex flex-col gap-1">
-        <label className="text-xs font-medium text-gray-500 dark:text-slate-400">Data inicial</label>
+        <label className="text-xs font-medium text-gray-500 dark:text-slate-400">
+          Data inicial
+        </label>
         <Input
           type="date"
           value={from}
           min={minDate}
           max={maxDate}
           onChange={(e) => setFrom(e.target.value)}
+          onKeyDown={(e) => e.preventDefault()}
           className="w-40 text-sm"
         />
       </div>
@@ -68,17 +69,14 @@ export function DateRangePicker({ value, onChange }: Props) {
           min={from || minDate}
           max={maxDate}
           onChange={(e) => setTo(e.target.value)}
+          onKeyDown={(e) => e.preventDefault()}
           className="w-40 text-sm"
         />
       </div>
 
       <div className="flex flex-col gap-1">
         <span className={cn('text-xs', invalid ? 'text-red-500' : 'text-transparent select-none')}>
-          {invalid
-            ? diffDays < 0
-              ? 'Data inicial após final'
-              : `Máx. ${MAX_DAYS} dias`
-            : '·'}
+          {invalid ? (diffDays < 0 ? 'Data inicial após final' : `Máx. ${MAX_DAYS} dias`) : '·'}
         </span>
         <Button onClick={handleApply} disabled={invalid || !from || !to} size="sm">
           Aplicar

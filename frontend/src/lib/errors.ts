@@ -6,5 +6,4 @@ export class RateLimitError extends Error {
   }
 }
 
-export const isRateLimitError = (e: unknown): e is RateLimitError =>
-  e instanceof RateLimitError
+export const isRateLimitError = (e: unknown): e is RateLimitError => e instanceof RateLimitError

@@ -42,8 +42,8 @@ export const weatherApi = {
   getCurrent: (city: string, country?: string): Promise<CurrentWeather> =>
     weatherClient.get('/current', { params: { city, country } }).then((r) => r.data),
 
-  getForecast: (city: string, days = 5): Promise<ForecastResponse> =>
-    weatherClient.get('/forecast', { params: { city, days } }).then((r) => r.data),
+  getForecast: (city: string, days = 5, country?: string): Promise<ForecastResponse> =>
+    weatherClient.get('/forecast', { params: { city, days, country } }).then((r) => r.data),
 
   getHistory: (
     city: string,

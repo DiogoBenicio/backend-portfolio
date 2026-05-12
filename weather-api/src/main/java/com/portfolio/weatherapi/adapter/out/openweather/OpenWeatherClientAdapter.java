@@ -2,6 +2,7 @@ package com.portfolio.weatherapi.adapter.out.openweather;
 
 import com.portfolio.weatherapi.adapter.out.openweather.dto.OpenWeatherCurrentResponse;
 import com.portfolio.weatherapi.adapter.out.openweather.dto.OpenWeatherForecastResponse;
+import com.portfolio.weatherapi.domain.model.CityWindData;
 import com.portfolio.weatherapi.domain.model.Forecast;
 import com.portfolio.weatherapi.domain.model.ForecastDay;
 import com.portfolio.weatherapi.domain.model.Weather;
@@ -10,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -181,6 +184,39 @@ public class OpenWeatherClientAdapter implements WeatherProviderClient {
                 .toList();
 
         return new Forecast(r.city().name(), r.city().country(), forecastDays);
+    }
+
+    @Override
+    public List<CityWindData> fetchWindFieldData(List<String> cities) {
+        log.debug("Fetching wind field data for {} cities in parallel", cities.size());
+
+        return Flux.fromIterable(cities)
+                .flatMap(city -> webClient.get()
+                        .uri(uriBuilder -> uriBuilder
+                                .path("/weather")
+                                .queryParam("q", city)
+                                .queryParam("appid", properties.getApiKey())
+                                .queryParam("units", properties.getUnits())
+                                .build())
+                        .retrieve()
+                        .bodyToMono(OpenWeatherCurrentResponse.class)
+                        .filter(r -> r.wind() != null && r.coord() != null)
+                        .map(r -> {
+                            double speedMs = r.wind().speed();
+                            int deg = r.wind().deg();
+                            double rad = (deg * Math.PI) / 180.0;
+                            double u = -speedMs * Math.sin(rad);
+                            double v = -speedMs * Math.cos(rad);
+                            double rain = r.rain() != null && r.rain().oneHour() != null
+                                    ? r.rain().oneHour() : 0.0;
+                            return new CityWindData(r.name(), r.coord().lat(), r.coord().lon(), u, v, rain);
+                        })
+                        .onErrorResume(ex -> {
+                            log.warn("Failed to fetch wind data for city '{}': {}", city, ex.getMessage());
+                            return Mono.empty();
+                        }))
+                .collectList()
+                .block();
     }
 
     private String degToCompass(int deg) {

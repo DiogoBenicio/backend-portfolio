@@ -11,6 +11,7 @@ import { DateRangePicker, type DateRange } from '@/components/weather/DateRangeP
 import { CalendarHeatmap } from '@/components/weather/CalendarHeatmap'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { LoadingSpinner } from '@/components/ui/loadingspinner'
+import { PageLoader } from '@/components/ui/PageLoader'
 import { ErrorMessage } from '@/components/ui/errormessage'
 import { useCurrentWeather } from '@/hooks/useCurrentWeather'
 import { useForecast } from '@/hooks/useForecast'
@@ -41,50 +42,75 @@ function todayMinus(days: number): string {
 }
 
 function toISOParam(dateStr: string, end = false): string {
-  return end ? `${dateStr}T23:59:59Z` : `${dateStr}T00:00:00Z`
+  const d = new Date(end ? `${dateStr}T23:59:59` : `${dateStr}T00:00:00`)
+  return d.toISOString()
 }
 
 export default function WeatherPage() {
-  const [city, setCity] = useState('Uberlândia')
+  const [city, setCity] = useState('São Paulo')
+  const [country, setCountry] = useState<string | undefined>('BR')
 
   const now = new Date()
   const [range, setRange] = useState<DateRange>({
     from: todayMinus(5),
     to: todayMinus(1),
   })
-  const [appliedRange, setAppliedRange] = useState<DateRange | null>(null)
+  const [appliedRange, setAppliedRange] = useState<DateRange>({
+    from: todayMinus(5),
+    to: todayMinus(1),
+  })
 
-  const { data: current, isLoading: loadingCurrent, error: errorCurrent } = useCurrentWeather(city)
-  const { data: forecast, isLoading: loadingForecast } = useForecast(city)
+  const {
+    data: current,
+    isLoading: loadingCurrent,
+    error: errorCurrent,
+  } = useCurrentWeather(city, country)
+  const { data: forecast, isLoading: loadingForecast } = useForecast(city, country)
   const { data: sensorData, isLoading: loadingSensors } = useWeatherSensors(
     city,
     appliedRange ? toISOParam(appliedRange.from) : '',
-    appliedRange ? toISOParam(appliedRange.to, true) : '',
+    appliedRange ? toISOParam(appliedRange.to, true) : ''
   )
 
   useEffect(() => {
     if (current) {
       localStorage.setItem(
         'selectedMapCity',
-        JSON.stringify({ name: current.city, lat: current.latitude, lng: current.longitude })
+        JSON.stringify({
+          name: current.city,
+          country,
+          lat: current.latitude,
+          lng: current.longitude,
+        })
       )
     }
-  }, [current])
+  }, [current, country])
 
   return (
     <PageContainer>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Dashboard de Clima</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
+            Painel de Clima
+          </h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
             Dados em tempo real via OpenWeather API · Histórico por sensor no Elasticsearch
           </p>
+          <p className="mt-1 text-xs text-blue-500 dark:text-blue-400">
+            💡 A cidade selecionada aqui será destacada automaticamente no Mapa de Clima.
+          </p>
         </div>
 
-        <CitySearch onSearch={setCity} defaultCity={city} />
+        <CitySearch
+          onSearch={(c, ct) => {
+            setCity(c)
+            setCountry(ct)
+          }}
+          defaultCity={city}
+        />
 
         {loadingCurrent ? (
-          <LoadingSpinner label="Buscando dados do clima..." />
+          <PageLoader label="Buscando dados do clima" />
         ) : errorCurrent && !isRateLimitError(errorCurrent) ? (
           <ErrorMessage message="Cidade não encontrada ou erro na API. Verifique o nome e tente novamente." />
         ) : current ? (
@@ -135,16 +161,15 @@ export default function WeatherPage() {
                   </div>
                   <DateRangePicker
                     value={range}
-                    onChange={(r) => { setRange(r); setAppliedRange(r) }}
+                    onChange={(r) => {
+                      setRange(r)
+                      setAppliedRange(r)
+                    }}
                   />
                 </div>
               </CardHeader>
               <CardContent>
-                {!appliedRange ? (
-                  <p className="py-8 text-center text-sm text-gray-400 dark:text-slate-500">
-                    Selecione um período e clique em Aplicar para carregar os sensores.
-                  </p>
-                ) : loadingSensors ? (
+                {loadingSensors ? (
                   <LoadingSpinner size={20} label="Buscando dados do período..." />
                 ) : (
                   <SensorChart

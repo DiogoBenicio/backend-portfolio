@@ -9,7 +9,7 @@ interface Props {
 
 export function MobileTopBar({ onMenuOpen }: Props) {
   return (
-    <header className="fixed inset-x-0 top-0 z-30 flex h-14 items-center gap-3 border-b border-white/40 bg-white/60 px-4 shadow-sm backdrop-blur-md dark:border-white/10 dark:bg-gray-900/70 md:hidden">
+    <header className="fixed inset-x-0 top-0 z-30 flex h-14 items-center gap-3 border-b border-gray-200 bg-white/60 px-4 shadow-sm backdrop-blur-md dark:border-slate-700 dark:bg-gray-900/70 md:hidden">
       <button
         onClick={onMenuOpen}
         className="flex h-8 w-8 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"

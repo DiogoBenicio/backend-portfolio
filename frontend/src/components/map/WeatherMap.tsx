@@ -1,12 +1,22 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
+import { useEffect, useRef, useState } from 'react'
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  Popup,
+  useMap,
+  useMapEvents,
+  GeoJSON,
+} from 'react-leaflet'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { useTheme } from 'next-themes'
 import { useCurrentWeather } from '@/hooks/useCurrentWeather'
 import { useWindField } from '@/hooks/useWindField'
+import { useInmetAlerts, type InmetAlert } from '@/hooks/useInmetAlerts'
+import { useIbgeStates } from '@/hooks/useIbgeStates'
 import { formatTemperature, formatWindSpeed } from '@/lib/utils/weatherUtils'
 import { cn } from '@/lib/utils/cn'
 
@@ -24,14 +34,31 @@ const velocityReady =
     ? import('leaflet-velocity').catch(() => null)
     : Promise.resolve(null)
 
+// ── Tipos ─────────────────────────────────────────────────────────────────────
+
+interface MapMarker {
+  id: string
+  lat: number
+  lon: number
+  label: string
+  city?: string
+  country?: string
+}
+
+interface WeatherMapProps {
+  initialLat?: number
+  initialLon?: number
+  initialZoom?: number
+  pendingMarker?: { name: string; country: string; lat: number; lon: number } | null
+  onPendingMarkerConsumed?: () => void
+}
+
 // ── Configuração das camadas ──────────────────────────────────────────────────
 
-// Fundo sólido para o pane de chuva (preenche pixels transparentes do tile)
 const PANE_BACKGROUNDS: Record<string, string> = {
   precipPane: '#050e24',
 }
 
-// Filtro CSS aplicado ao tile via className (não afeta o fundo do pane)
 const TILE_FILTER_CLASS: Partial<Record<string, string>> = {
   precipitation_new: 'wm-rain-tile',
   temp_new: 'wm-temp-tile',
@@ -46,7 +73,6 @@ const LAYER_CONFIGS = {
     renderType: 'tile' as const,
     tileOpacity: 1,
     legend: {
-      // Cores reais do RainViewer colorScheme 4 (Meteored)
       colors: ['#9ecae1', '#3d9bff', '#1a5ccc', '#f5e642', '#ff5200'],
       labels: ['Leve', '', 'Mod.', '', 'Forte'],
       unit: 'mm/h',
@@ -55,7 +81,7 @@ const LAYER_CONFIGS = {
   wind_new: {
     label: 'Vento',
     emoji: '💨',
-    activeClass: 'bg-indigo-600 text-white',
+    activeClass: 'bg-blue-600 text-white',
     paneName: 'windPane',
     renderType: 'tile' as const,
     tileOpacity: 0.22,
@@ -81,7 +107,7 @@ const LAYER_CONFIGS = {
   pressure_new: {
     label: 'Pressão',
     emoji: '🔵',
-    activeClass: 'bg-indigo-600 text-white',
+    activeClass: 'bg-blue-600 text-white',
     paneName: 'pressPane',
     renderType: 'tile' as const,
     tileOpacity: 0.82,
@@ -91,18 +117,22 @@ const LAYER_CONFIGS = {
       unit: 'hPa',
     },
   },
+  alerts_inmet: {
+    label: 'Alertas',
+    emoji: '⚠',
+    activeClass: 'bg-red-600 text-white',
+    paneName: 'alertsPane',
+    renderType: 'geojson' as const,
+    tileOpacity: 0,
+    legend: {
+      colors: ['#eab308', '#f97316', '#ef4444'],
+      labels: ['Atenção', 'Perigo P.', 'Perigo'],
+      unit: 'INMET',
+    },
+  },
 } as const
 
 type LayerId = keyof typeof LAYER_CONFIGS
-type CityPin = { name: string; lat: number; lng: number }
-
-const DEFAULT_CITIES: CityPin[] = [
-  { name: 'Uberlândia', lat: -18.9186, lng: -48.2772 },
-  { name: 'São Paulo', lat: -23.5505, lng: -46.6333 },
-  { name: 'Rio de Janeiro', lat: -22.9068, lng: -43.1729 },
-  { name: 'Brasília', lat: -15.7942, lng: -47.8825 },
-  { name: 'Belo Horizonte', lat: -19.9167, lng: -43.9345 },
-]
 
 // ── Setup de panes ────────────────────────────────────────────────────────────
 
@@ -113,7 +143,6 @@ function CustomPanes() {
       if (!map.getPane(cfg.paneName)) {
         const pane = map.createPane(cfg.paneName)
         pane.style.zIndex = String(400 + Object.keys(LAYER_CONFIGS).indexOf(id))
-        // Fundo sólido: preenche as áreas sem dados do tile OWM (pixels transparentes)
         const bg = PANE_BACKGROUNDS[cfg.paneName]
         if (bg) pane.style.backgroundColor = bg
       }
@@ -122,7 +151,7 @@ function CustomPanes() {
   return null
 }
 
-// ── RainViewer — radar real (sem API key, gratuito) ──────────────────────────
+// ── RainViewer — radar real ──────────────────────────────────────────────────
 
 function RainViewerLayer({ pane }: { pane: string }) {
   const [tileUrl, setTileUrl] = useState<string | null>(null)
@@ -133,7 +162,6 @@ function RainViewerLayer({ pane }: { pane: string }) {
       .then((data) => {
         const latest: string | undefined = data.radar?.past?.at(-1)?.path
         if (latest) {
-          // colorScheme 4 = verde→amarelo→laranja→vermelho (padrão radar)
           setTileUrl(`https://tilecache.rainviewer.com${latest}/512/{z}/{x}/{y}/4/1_1.png`)
         }
       })
@@ -209,57 +237,6 @@ function VelocityLayer({ data, apiKey }: { data: unknown; apiKey: string }) {
   return null
 }
 
-// ── Marcador de cidade ───────────────────────────────────────────────────────
-
-function CityMarker({ city, highlighted = false }: { city: CityPin; highlighted?: boolean }) {
-  const { data: weather, isLoading } = useCurrentWeather(city.name, 'BR')
-
-  const icon = useMemo(() => {
-    if (!highlighted) return new L.Icon.Default()
-    return L.divIcon({
-      className: '',
-      html: `<div style="
-        width:22px;height:22px;
-        background:#ef4444;
-        border:3px solid #fff;
-        border-radius:50%;
-        box-shadow:0 0 0 3px #ef4444,0 2px 8px rgba(0,0,0,0.5);
-        animation:pulse-pin 1.6s ease-in-out infinite;
-      "></div>`,
-      iconSize: [22, 22],
-      iconAnchor: [11, 11],
-      popupAnchor: [0, -16],
-    })
-  }, [highlighted])
-
-  return (
-    <Marker position={[city.lat, city.lng]} icon={icon}>
-      <Popup>
-        <div className="min-w-[190px] p-1">
-          <div className="flex items-center gap-1.5">
-            {highlighted && <span className="inline-block h-2 w-2 rounded-full bg-red-500" />}
-            <p className="font-semibold text-gray-900 dark:text-slate-100">{city.name}</p>
-          </div>
-          {highlighted && (
-            <p className="text-[10px] text-red-500 mb-1">cidade selecionada no dashboard</p>
-          )}
-          {isLoading && <p className="text-sm text-gray-500 dark:text-slate-400">Carregando...</p>}
-          {weather && (
-            <div className="mt-2 space-y-1 text-sm">
-              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                {formatTemperature(weather.temperature)}
-              </p>
-              <p className="capitalize text-gray-600 dark:text-slate-300">{weather.description}</p>
-              <p className="text-gray-500 dark:text-slate-400">Umidade: {weather.humidity}%</p>
-              <p className="text-gray-500 dark:text-slate-400">Vento: {formatWindSpeed(weather.windSpeed)}</p>
-            </div>
-          )}
-        </div>
-      </Popup>
-    </Marker>
-  )
-}
-
 // ── Invalida tamanho quando o container redimensiona ─────────────────────────
 
 function MapAutoResize() {
@@ -273,7 +250,7 @@ function MapAutoResize() {
   return null
 }
 
-// ── Zoom máximo dinâmico (RainViewer suporta até zoom 6) ─────────────────────
+// ── Zoom máximo dinâmico ─────────────────────────────────────────────────────
 
 const RAIN_MAX_ZOOM = 6
 
@@ -290,14 +267,173 @@ function RainZoomGuard({ rainActive }: { rainActive: boolean }) {
   return null
 }
 
-// ── Voa para cidade selecionada ──────────────────────────────────────────────
+// ── Fly para coordenadas ─────────────────────────────────────────────────────
 
-function FlyToCity({ city }: { city: CityPin }) {
+function PanToCoords({ lat, lon }: { lat: number; lon: number }) {
   const map = useMap()
   useEffect(() => {
-    map.flyTo([city.lat, city.lng], 8, { duration: 1.5 })
-  }, [map, city.lat, city.lng])
+    map.panTo([lat, lon], { animate: true, duration: 1 })
+  }, [map, lat, lon])
   return null
+}
+
+// ── Marcador da cidade selecionada no Dashboard de Clima ─────────────────────
+
+function SelectedCityMarker() {
+  const [selected, setSelected] = useState<{
+    name: string
+    country?: string
+    lat: number
+    lng: number
+  } | null>(null)
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('selectedMapCity')
+      if (raw) setSelected(JSON.parse(raw))
+    } catch {}
+  }, [])
+
+  if (!selected) return null
+
+  const icon = L.divIcon({
+    className: '',
+    html: `<div style="
+      width:32px;height:32px;position:relative;
+      display:flex;align-items:center;justify-content:center;
+    ">
+      <div style="
+        position:absolute;width:32px;height:32px;border-radius:50%;
+        border:3px solid #ef4444;animation:pulse-pin 1.8s ease-in-out infinite;
+      "></div>
+      <div style="width:10px;height:10px;border-radius:50%;background:#ef4444;"></div>
+    </div>`,
+    iconSize: [32, 32],
+    iconAnchor: [16, 16],
+  })
+
+  const fakeMarker: MapMarker = {
+    id: '__selected__',
+    lat: selected.lat,
+    lon: selected.lng,
+    label: selected.name,
+    city: selected.name,
+    country: selected.country,
+  }
+
+  return (
+    <Marker position={[selected.lat, selected.lng]} icon={icon} zIndexOffset={1000}>
+      <Popup>
+        <MarkerPopupContent marker={fakeMarker} onRemove={() => {}} hideRemove />
+      </Popup>
+    </Marker>
+  )
+}
+
+// ── Clique no mapa → novo marcador ───────────────────────────────────────────
+
+function MapClickHandler({
+  onAdd,
+  apiKey,
+}: {
+  onAdd: (lat: number, lon: number, label: string, city?: string, country?: string) => void
+  apiKey: string
+}) {
+  useMapEvents({
+    click(e) {
+      const target = e.originalEvent.target as HTMLElement
+      if (
+        target instanceof SVGElement ||
+        target instanceof SVGPathElement ||
+        target.closest('.leaflet-marker-icon') ||
+        target.closest('.leaflet-marker-shadow') ||
+        target.closest('.leaflet-popup') ||
+        target.closest('.leaflet-popup-content-wrapper') ||
+        target.closest('.leaflet-popup-tip-container')
+      ) {
+        return
+      }
+      const { lat, lng } = e.latlng
+      const coords = `${lat.toFixed(4)}, ${lng.toFixed(4)}`
+
+      if (!apiKey) {
+        onAdd(lat, lng, coords)
+        return
+      }
+
+      fetch(
+        `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lng}&limit=1&appid=${apiKey}`
+      )
+        .then((r) => r.json())
+        .then((data) => {
+          const nearest = Array.isArray(data) && data[0]
+          onAdd(lat, lng, coords, nearest?.name, nearest?.country)
+        })
+        .catch(() => onAdd(lat, lng, coords))
+    },
+  })
+  return null
+}
+
+// ── Popup com clima do marcador ──────────────────────────────────────────────
+
+function MarkerPopupContent({
+  marker,
+  onRemove,
+  hideRemove = false,
+}: {
+  marker: MapMarker
+  onRemove: (id: string) => void
+  hideRemove?: boolean
+}) {
+  const { data: weather, isLoading, isError } = useCurrentWeather(marker.city ?? '', marker.country, { throwOnError: false })
+
+  return (
+    <div className="min-w-[200px] p-1">
+      <p className="font-semibold text-gray-900 dark:text-slate-100 mb-2">{marker.label}</p>
+
+      {marker.city ? (
+        <>
+          {marker.city !== marker.label && (
+            <p className="text-xs text-gray-400 dark:text-slate-500 mb-2">Dados de {marker.city}</p>
+          )}
+          {isLoading && <p className="text-sm text-gray-500 dark:text-slate-400">Carregando...</p>}
+          {isError && <p className="text-xs text-gray-400 dark:text-slate-500">Sem dados de clima disponíveis</p>}
+          {weather && (
+            <div className="space-y-1 text-sm">
+              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                {formatTemperature(weather.temperature)}
+              </p>
+              <p className="capitalize text-gray-600 dark:text-slate-300">{weather.description}</p>
+              <p className="text-gray-500 dark:text-slate-400">
+                Sensação: {formatTemperature(weather.feelsLike)}
+              </p>
+              <p className="text-gray-500 dark:text-slate-400">Umidade: {weather.humidity}%</p>
+              <p className="text-gray-500 dark:text-slate-400">
+                Vento: {formatWindSpeed(weather.windSpeed)}
+                {weather.windDirection ? ` · ${weather.windDirection}` : ''}
+              </p>
+            </div>
+          )}
+        </>
+      ) : (
+        <p className="text-xs text-gray-400 dark:text-slate-500">Sem dados de clima disponíveis</p>
+      )}
+
+      {!hideRemove && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            e.nativeEvent.stopImmediatePropagation()
+            onRemove(marker.id)
+          }}
+          className="mt-3 w-full rounded-md bg-red-50 px-2 py-2.5 text-xs font-medium text-red-600 hover:bg-red-100 dark:bg-red-950/40 dark:text-red-400 dark:hover:bg-red-900/50 transition-colors min-h-[44px]"
+        >
+          Remover marcador
+        </button>
+      )}
+    </div>
+  )
 }
 
 // ── Painel de controle de camadas ────────────────────────────────────────────
@@ -326,7 +462,9 @@ function LayerControls({
               onClick={() => toggle(id)}
               className={cn(
                 'flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-medium transition-all',
-                active.has(id) ? cfg.activeClass : 'bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+                active.has(id)
+                  ? cfg.activeClass
+                  : 'bg-gray-50 text-gray-600 hover:bg-gray-100 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
               )}
             >
               <span>{cfg.emoji}</span>
@@ -359,8 +497,6 @@ function MapLegend({ active }: { active: Set<LayerId> }) {
             <p className="text-[9px] font-semibold text-gray-500 uppercase tracking-widest mb-1.5 dark:text-slate-400">
               {cfg.emoji} {cfg.label}
             </p>
-
-            {/* Barra de gradiente para todas as camadas */}
             <div
               className="h-2.5 rounded-full mb-1"
               style={{
@@ -374,7 +510,9 @@ function MapLegend({ active }: { active: Set<LayerId> }) {
                 </span>
               ))}
             </div>
-            <p className="text-[9px] text-gray-400 mt-0.5 text-right dark:text-slate-500">{cfg.legend.unit}</p>
+            <p className="text-[9px] text-gray-400 mt-0.5 text-right dark:text-slate-500">
+              {cfg.legend.unit}
+            </p>
           </div>
         ))}
       </div>
@@ -382,18 +520,116 @@ function MapLegend({ active }: { active: Set<LayerId> }) {
   )
 }
 
+// ── Alertas INMET ────────────────────────────────────────────────────────────
+
+function normalizeStr(s: string) {
+  return s
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim()
+}
+
+const SEVERITY_COLOR: Record<string, string> = {
+  perigo: '#ef4444',
+  perigo_potencial: '#f97316',
+  atencao: '#eab308',
+}
+
+const SEVERITY_OPACITY: Record<string, number> = {
+  perigo: 0.55,
+  perigo_potencial: 0.45,
+  atencao: 0.35,
+}
+
+const SEVERITY_LABEL: Record<string, string> = {
+  perigo: 'Perigo',
+  perigo_potencial: 'Perigo Potencial',
+  atencao: 'Atencao',
+}
+
+function worstSeverity(list: InmetAlert[]): string {
+  if (list.some((a) => a.severity === 'perigo')) return 'perigo'
+  if (list.some((a) => a.severity === 'perigo_potencial')) return 'perigo_potencial'
+  return 'atencao'
+}
+
+function InmetAlertsLayer() {
+  const { data: alerts = [] } = useInmetAlerts()
+  const { geoJson, mesoToUf, isLoading } = useIbgeStates()
+
+  if (isLoading || !geoJson || alerts.length === 0) return null
+
+  // Mapear UF → lista de alertas
+  const ufAlerts: Record<string, InmetAlert[]> = {}
+  for (const alert of alerts) {
+    const ufs: string[] = []
+    for (const area of alert.areas) {
+      const uf = mesoToUf[normalizeStr(area)]
+      if (uf && !ufs.includes(uf)) ufs.push(uf)
+    }
+    for (const uf of ufs) {
+      if (!ufAlerts[uf]) ufAlerts[uf] = []
+      ufAlerts[uf].push(alert)
+    }
+  }
+
+  return (
+    <GeoJSON
+      key={alerts.map((a) => a.id).join(',')}
+      data={geoJson}
+      style={(feature) => {
+        const sigla = feature?.properties?.sigla
+        const list = sigla ? ufAlerts[sigla] : undefined
+        if (!list || list.length === 0) return { fillOpacity: 0, opacity: 0, stroke: false }
+        const severity = worstSeverity(list)
+        return {
+          fillColor: SEVERITY_COLOR[severity],
+          fillOpacity: SEVERITY_OPACITY[severity],
+          color: SEVERITY_COLOR[severity],
+          weight: 1.5,
+          opacity: 0.8,
+        }
+      }}
+      onEachFeature={(feature, layer) => {
+        const sigla = feature?.properties?.sigla
+        const list = sigla ? ufAlerts[sigla] : undefined
+        if (!list || list.length === 0) return
+
+        const severity = worstSeverity(list)
+        const popupHtml = `
+          <div style="min-width:220px;max-width:280px;">
+            <p style="font-weight:600;margin-bottom:8px;">${SEVERITY_LABEL[severity]} — ${sigla}</p>
+            ${list
+              .slice(0, 5)
+              .map(
+                (a) => `
+              <div style="margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid #e2e8f0;">
+                <p style="font-weight:500;font-size:13px;">${a.event}</p>
+                <p style="font-size:11px;color:#64748b;margin:2px 0;">${a.start?.split(' ')[0] ?? ''} &rarr; ${a.end?.split(' ')[0] ?? ''}</p>
+                <p style="font-size:11px;color:#475569;margin-top:4px;">${a.description?.slice(0, 120)}${(a.description?.length ?? 0) > 120 ? '...' : ''}</p>
+              </div>`
+              )
+              .join('')}
+            ${list.length > 5 ? `<p style="font-size:11px;color:#94a3b8;">+ ${list.length - 5} alertas</p>` : ''}
+          </div>`
+
+        layer.bindPopup(popupHtml, { maxWidth: 300 })
+      }}
+    />
+  )
+}
+
 // ── Camadas meteorológicas ───────────────────────────────────────────────────
 
 function WeatherLayers({ active, apiKey }: { active: Set<LayerId>; apiKey: string }) {
-  const { data } = useWindField(apiKey)
+  const { data } = useWindField()
 
   return (
     <>
-      {/* Chuva: radar RainViewer + precipitação acumulada OWM sobrepostos */}
       {active.has('precipitation_new') && (
         <>
           <RainViewerLayer pane={LAYER_CONFIGS.precipitation_new.paneName} />
-          {/* Accumulated precipitation — intensifica zonas de chuva persistente */}
           <TileLayer
             url={`https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=${apiKey}`}
             opacity={0.55}
@@ -403,7 +639,6 @@ function WeatherLayers({ active, apiKey }: { active: Set<LayerId>; apiKey: strin
         </>
       )}
 
-      {/* Vento, temperatura, umidade, pressão: tiles OWM */}
       {(['wind_new', 'temp_new', 'pressure_new'] as LayerId[])
         .filter((id) => active.has(id))
         .map((id) => {
@@ -420,19 +655,33 @@ function WeatherLayers({ active, apiKey }: { active: Set<LayerId>; apiKey: strin
           )
         })}
 
-      {/* Partículas animadas de vento */}
       {active.has('wind_new') && data?.velocityData && (
         <VelocityLayer data={data.velocityData} apiKey={apiKey} />
       )}
+
+      {active.has('alerts_inmet') && <InmetAlertsLayer />}
     </>
   )
 }
 
 // ── Componente principal ─────────────────────────────────────────────────────
 
-export function WeatherMap() {
-  const [selectedCity, setSelectedCity] = useState<CityPin | null>(null)
+export function WeatherMap({
+  initialLat = -14.235,
+  initialLon = -51.925,
+  initialZoom = 4,
+  pendingMarker,
+  onPendingMarkerConsumed,
+}: WeatherMapProps) {
   const [active, setActive] = useState<Set<LayerId>>(new Set())
+  const [markers, setMarkers] = useState<MapMarker[]>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('mapMarkers') || '[]')
+    } catch {
+      return []
+    }
+  })
+  const [flyTo, setFlyTo] = useState<{ lat: number; lon: number } | null>(null)
   const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY ?? ''
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
@@ -444,16 +693,26 @@ export function WeatherMap() {
     ? '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 
+  // Sincronizar marcadores no localStorage
   useEffect(() => {
-    const stored = localStorage.getItem('selectedMapCity')
-    if (stored) {
-      try {
-        setSelectedCity(JSON.parse(stored))
-      } catch {
-        /* ignorar */
-      }
+    localStorage.setItem('mapMarkers', JSON.stringify(markers))
+  }, [markers])
+
+  const addMarker = (lat: number, lon: number, label: string, city?: string, country?: string) => {
+    const newMarker: MapMarker = {
+      id: `${Date.now()}-${Math.random()}`,
+      lat,
+      lon,
+      label,
+      city,
+      country,
     }
-  }, [])
+    setMarkers((prev) => [...prev, newMarker])
+  }
+
+  const removeMarker = (id: string) => {
+    setMarkers((prev) => prev.filter((m) => m.id !== id))
+  }
 
   const toggle = (id: LayerId) =>
     setActive((prev) => {
@@ -466,9 +725,19 @@ export function WeatherMap() {
       return next
     })
 
-  const defaultCities = DEFAULT_CITIES.filter(
-    (c) => c.name.toLowerCase() !== selectedCity?.name.toLowerCase()
-  )
+  // Consome marcador pendente enviado pela página (fora do MapContainer)
+  useEffect(() => {
+    if (!pendingMarker) return
+    addMarker(
+      pendingMarker.lat,
+      pendingMarker.lon,
+      pendingMarker.name,
+      pendingMarker.name,
+      pendingMarker.country
+    )
+    setFlyTo({ lat: pendingMarker.lat, lon: pendingMarker.lon })
+    onPendingMarkerConsumed?.()
+  }, [pendingMarker]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
@@ -477,14 +746,15 @@ export function WeatherMap() {
           0%, 100% { transform: scale(1); opacity: 1; }
           50% { transform: scale(1.35); opacity: 0.75; }
         }
-        /* Filtros por tile — aplicados ao tile, não ao fundo do pane */
         .wm-rain-tile {
           filter: saturate(12) contrast(5) hue-rotate(195deg) brightness(1.4) !important;
         }
         .wm-temp-tile {
           filter: saturate(3) contrast(1.6) brightness(1.1) !important;
         }
-        ${isDark ? `
+        ${
+          isDark
+            ? `
         .leaflet-popup-content-wrapper {
           background: #1e293b;
           color: #e2e8f0;
@@ -500,36 +770,37 @@ export function WeatherMap() {
         .leaflet-popup-close-button:hover {
           color: #e2e8f0 !important;
         }
-        ` : ''}
+        `
+            : ''
+        }
       `}</style>
 
       <MapContainer
-        center={[-15.7801, -47.9292]}
-        zoom={4}
+        center={[initialLat, initialLon]}
+        zoom={initialZoom}
         style={{ height: '100%', width: '100%', borderRadius: '0.75rem' }}
       >
         <CustomPanes />
         <MapAutoResize />
         <RainZoomGuard rainActive={active.has('precipitation_new')} />
 
-        <TileLayer
-          key={tileUrl}
-          attribution={tileAttribution}
-          url={tileUrl}
-        />
+        <TileLayer key={tileUrl} attribution={tileAttribution} url={tileUrl} />
 
         {apiKey && <WeatherLayers active={active} apiKey={apiKey} />}
 
-        {defaultCities.map((city) => (
-          <CityMarker key={city.name} city={city} />
+        <MapClickHandler onAdd={addMarker} apiKey={apiKey} />
+
+        <SelectedCityMarker />
+
+        {markers.map((marker) => (
+          <Marker key={marker.id} position={[marker.lat, marker.lon]}>
+            <Popup>
+              <MarkerPopupContent marker={marker} onRemove={removeMarker} />
+            </Popup>
+          </Marker>
         ))}
 
-        {selectedCity && (
-          <>
-            <CityMarker key={`sel-${selectedCity.name}`} city={selectedCity} highlighted />
-            <FlyToCity city={selectedCity} />
-          </>
-        )}
+        {flyTo && <PanToCoords lat={flyTo.lat} lon={flyTo.lon} />}
 
         {apiKey && (
           <>

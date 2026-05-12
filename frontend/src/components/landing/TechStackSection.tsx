@@ -9,17 +9,17 @@ const projects = [
     color: 'bg-orange-50 border-orange-200 dark:bg-orange-900/20 dark:border-orange-800/50',
     accent: 'text-orange-600 dark:text-orange-400',
     pattern: 'Hexagonal',
-    patternColor: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
+    patternColor: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
   },
   {
     title: 'NPS API',
     description:
       'Sistema de avaliação NPS em Node.js. Fastify 4, TypeScript e PostgreSQL via Prisma ORM.',
     tech: ['Node.js 20', 'TypeScript', 'Fastify 4', 'Prisma', 'PostgreSQL'],
-    color: 'bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800/50',
-    accent: 'text-indigo-600 dark:text-indigo-400',
+    color: 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800/50',
+    accent: 'text-blue-600 dark:text-blue-400',
     pattern: 'Hexagonal',
-    patternColor: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',
+    patternColor: 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
   },
   {
     title: 'Portfolio Frontend',

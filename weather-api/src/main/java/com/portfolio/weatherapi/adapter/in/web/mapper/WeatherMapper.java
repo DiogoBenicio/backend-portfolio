@@ -1,6 +1,7 @@
 package com.portfolio.weatherapi.adapter.in.web.mapper;
 
 import com.portfolio.weatherapi.application.dto.*;
+import com.portfolio.weatherapi.domain.model.CityWindData;
 import com.portfolio.weatherapi.domain.model.Forecast;
 import com.portfolio.weatherapi.domain.model.Weather;
 import org.springframework.data.domain.Page;
@@ -80,5 +81,29 @@ public class WeatherMapper {
     public CalendarResponse toCalendarResponse(String city, int year, int month,
                                                List<String> daysWithData) {
         return new CalendarResponse(city, year, month, daysWithData);
+    }
+
+    public WindFieldResponse toWindFieldResponse(List<CityWindData> data) {
+        List<WindFieldResponse.CityWindDto> cities = data.stream()
+                .map(c -> new WindFieldResponse.CityWindDto(c.lat(), c.lng(), c.u(), c.v()))
+                .toList();
+
+        List<WindFieldResponse.RainZoneDto> rainZones = data.stream()
+                .filter(c -> c.rainMmPerHour() >= 0.1)
+                .map(c -> {
+                    String intensity;
+                    if (c.rainMmPerHour() < 2.5) {
+                        intensity = "fraca";
+                    } else if (c.rainMmPerHour() < 7.5) {
+                        intensity = "moderada";
+                    } else {
+                        intensity = "forte";
+                    }
+                    return new WindFieldResponse.RainZoneDto(
+                            c.lat(), c.lng(), c.name(), c.rainMmPerHour(), intensity);
+                })
+                .toList();
+
+        return new WindFieldResponse(cities, rainZones);
     }
 }

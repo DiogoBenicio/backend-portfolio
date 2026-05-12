@@ -1,17 +1,19 @@
 'use client'
 
-import { Cloud, Lock, Monitor, Shield, Star, Layers } from 'lucide-react'
+import { Cloud, Lock, Monitor, Activity, Star, Layers } from 'lucide-react'
 import { useServiceHealth } from '@/hooks/useServiceHealth'
-import { ServiceStatusBar } from '@/components/ecosystem/ServiceStatusBar'
 import { ArchitectureDiagram } from '@/components/ecosystem/ArchitectureDiagram'
 import { ServiceCard } from '@/components/ecosystem/ServiceCard'
 import { LiveMetrics } from '@/components/ecosystem/LiveMetrics'
+import { SystemMetrics } from '@/components/ecosystem/SystemMetrics'
 import { PageContainer } from '@/components/layout/PageContainer'
+import { PageLoader } from '@/components/ui/PageLoader'
+import type { ServiceHealthEntry, ServiceHealthResult, ServiceStatus } from '@/hooks/useServiceHealth'
 
 const SERVICES = [
   {
     key: 'nginx',
-    icon: Shield,
+    icon: Layers,
     name: 'Nginx',
     description:
       'Único ponto de entrada externo. Termina o TCP, aplica headers de segurança e distribui o tráfego para frontend ou gateway.',
@@ -60,32 +62,147 @@ const SERVICES = [
       'Dashboard interativo com mapa de clima em tempo real (Leaflet + OpenStreetMap), gráficos (Recharts) e formulário NPS. Esta página que você está lendo.',
     pattern: 'SSR / React',
     tech: ['Next.js 14', 'shadcn/ui', 'Tailwind CSS', 'Recharts', 'Leaflet', 'TanStack Query'],
-    borderColor: 'border-purple-300 dark:border-purple-800',
+    borderColor: 'border-blue-300 dark:border-blue-800',
   },
 ] as const
 
+const OBS_SERVICES: Array<{
+  key: keyof ReturnType<typeof useServiceHealth>
+  label: string
+  endpoint: string
+}> = [
+  { key: 'nginx', label: 'Nginx', endpoint: '/nginx-health' },
+  { key: 'gateway', label: 'Gateway-API', endpoint: '/api/health' },
+  { key: 'weather', label: 'Weather-API', endpoint: '/api/weather/health' },
+  { key: 'nps', label: 'NPS-API', endpoint: '/api/nps/summary' },
+]
+
+function statusColor(status: ServiceStatus) {
+  if (status === 'online') return 'text-green-500'
+  if (status === 'degraded') return 'text-yellow-500'
+  if (status === 'offline') return 'text-red-500'
+  return 'text-gray-400'
+}
+
+function latencyColor(ms: number) {
+  if (ms < 200) return 'bg-green-500'
+  if (ms < 600) return 'bg-yellow-400'
+  return 'bg-red-500'
+}
+
+function latencyLabel(ms: number) {
+  if (ms < 200) return 'text-green-500'
+  if (ms < 600) return 'text-yellow-400'
+  return 'text-red-500'
+}
+
+function ObservabilityMetrics({ statuses }: { statuses: ServiceHealthResult }) {
+  return (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {OBS_SERVICES.map(({ key, label, endpoint }) => {
+        const entry: ServiceHealthEntry = statuses[key as keyof ServiceHealthResult]
+        const ms = entry?.latencyMs
+        const checkedAt = entry?.checkedAt
+        const status = entry?.status ?? 'checking'
+        const barWidth = ms != null ? Math.min((ms / 1500) * 100, 100) : 0
+
+        return (
+          <div
+            key={key}
+            className="rounded-xl border border-gray-200 bg-white/60 p-4 shadow-sm backdrop-blur-sm dark:border-slate-700 dark:bg-slate-800/60"
+          >
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-sm font-semibold text-gray-800 dark:text-slate-200">
+                {label}
+              </span>
+              <span className={`text-xs font-medium capitalize ${statusColor(status)}`}>
+                {status === 'checking' ? 'verificando...' : status}
+              </span>
+            </div>
+
+            <p className="mb-1 text-[10px] text-gray-400 dark:text-slate-500">{endpoint}</p>
+
+            {/* Barra de latência */}
+            <div className="mb-1 h-1.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-slate-700">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${ms != null ? latencyColor(ms) : 'bg-gray-300'}`}
+                style={{ width: `${barWidth}%` }}
+              />
+            </div>
+
+            <div className="flex items-end justify-between">
+              {ms != null ? (
+                <span className={`text-lg font-bold tabular-nums ${latencyLabel(ms)}`}>
+                  {ms}
+                  <span className="ml-0.5 text-xs font-normal text-gray-400">ms</span>
+                </span>
+              ) : (
+                <span className="text-sm text-gray-400 dark:text-slate-500">-</span>
+              )}
+              {checkedAt && (
+                <span className="text-[10px] text-gray-400 dark:text-slate-500">
+                  {checkedAt.toLocaleTimeString('pt-BR', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                  })}
+                </span>
+              )}
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 export default function EcosystemPage() {
   const statuses = useServiceHealth()
+  const isChecking = Object.values(statuses).every((s) => s.status === 'checking')
+
+  if (isChecking) {
+    return <PageLoader label="Verificando serviços" />
+  }
 
   return (
     <PageContainer>
-      <div className="mx-auto max-w-5xl space-y-8 px-6 py-8">
+      <div className="space-y-8">
         {/* Header */}
         <header className="space-y-1">
           <div className="flex items-center gap-2">
-            <Layers size={22} className="text-gray-700 dark:text-slate-300" />
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Ecossistema BackEnd</h1>
+            <Activity size={22} className="text-gray-700 dark:text-slate-300" />
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
+              Observabilidade
+            </h1>
           </div>
           <p className="text-gray-500 dark:text-slate-400">
             Visão geral dos serviços, arquitetura e métricas em tempo real.
           </p>
         </header>
 
-        {/* Status bar */}
-        <ServiceStatusBar statuses={statuses} />
+        {/* Infraestrutura do host */}
+        <section>
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400 dark:text-slate-500">
+            Infraestrutura
+          </h2>
+          <SystemMetrics />
+        </section>
+
+        {/* Métricas de observabilidade */}
+        <section>
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400 dark:text-slate-500">
+            Latência por serviço
+          </h2>
+          <ObservabilityMetrics statuses={statuses} />
+        </section>
 
         {/* Diagrama arquitetural */}
-        <ArchitectureDiagram statuses={statuses} />
+        <section>
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wider text-gray-400 dark:text-slate-500">
+            Arquitetura
+          </h2>
+          <ArchitectureDiagram statuses={statuses} />
+        </section>
 
         {/* Cards dos serviços */}
         <section>
@@ -102,7 +219,9 @@ export default function EcosystemPage() {
                 pattern={service.pattern}
                 tech={[...service.tech]}
                 borderColor={service.borderColor}
-                status={service.key ? statuses[service.key as keyof typeof statuses] : undefined}
+                status={
+                  service.key ? statuses[service.key as keyof typeof statuses].status : undefined
+                }
                 docsUrl={'docsUrl' in service ? service.docsUrl : undefined}
               />
             ))}

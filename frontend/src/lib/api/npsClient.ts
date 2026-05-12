@@ -15,7 +15,9 @@ npsClient.interceptors.response.use(
     const data = error.response?.data as { message?: string } | undefined
     const isRateLimit =
       status === 429 ||
-      (status === 500 && typeof data?.message === 'string' && data.message.includes('Muitas requisições'))
+      (status === 500 &&
+        typeof data?.message === 'string' &&
+        data.message.includes('Muitas requisições'))
 
     if (isRateLimit) {
       const retryAfter = error.response?.headers['retry-after'] as string | undefined

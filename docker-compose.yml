@@ -123,7 +123,6 @@ services:
       - gateway-api
     networks:
       - portfolio-network
-    restart: unless-stopped
 
 volumes:
   elasticsearch-data:

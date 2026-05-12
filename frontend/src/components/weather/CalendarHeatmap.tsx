@@ -10,8 +10,18 @@ import { cn } from '@/lib/utils/cn'
 const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
 
 const MONTH_NAMES = [
-  'Janeiro','Fevereiro','Março','Abril','Maio','Junho',
-  'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro',
+  'Janeiro',
+  'Fevereiro',
+  'Março',
+  'Abril',
+  'Maio',
+  'Junho',
+  'Julho',
+  'Agosto',
+  'Setembro',
+  'Outubro',
+  'Novembro',
+  'Dezembro',
 ]
 
 interface Props {
@@ -22,7 +32,7 @@ interface Props {
 
 export function CalendarHeatmap({ city, initialYear, initialMonth }: Props) {
   const now = new Date()
-  const [year, setYear]   = useState(initialYear)
+  const [year, setYear] = useState(initialYear)
   const [month, setMonth] = useState(initialMonth) // 1-12
 
   const { data, isLoading, refetch } = useWeatherCalendar(city, year, month)
@@ -51,8 +61,14 @@ export function CalendarHeatmap({ city, initialYear, initialMonth }: Props) {
   function navigate(delta: number) {
     let m = month + delta
     let y = year
-    if (m > 12) { m = 1; y++ }
-    if (m < 1)  { m = 12; y-- }
+    if (m > 12) {
+      m = 1
+      y++
+    }
+    if (m < 1) {
+      m = 12
+      y--
+    }
     // Don't allow future months
     const target = new Date(y, m - 1, 1)
     if (target > new Date(now.getFullYear(), now.getMonth(), 1)) return
@@ -94,7 +110,7 @@ export function CalendarHeatmap({ city, initialYear, initialMonth }: Props) {
               'rounded p-1 text-gray-500 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-800',
               month === now.getMonth() + 1 && year === now.getFullYear()
                 ? 'cursor-not-allowed opacity-30'
-                : '',
+                : ''
             )}
           >
             ›
@@ -123,7 +139,10 @@ export function CalendarHeatmap({ city, initialYear, initialMonth }: Props) {
             {/* Weekday headers */}
             <div className="mb-1 grid grid-cols-7 gap-1">
               {WEEKDAYS.map((d) => (
-                <div key={d} className="py-1 text-center text-xs font-medium text-gray-400 dark:text-slate-500">
+                <div
+                  key={d}
+                  className="py-1 text-center text-xs font-medium text-gray-400 dark:text-slate-500"
+                >
                   {d}
                 </div>
               ))}
@@ -138,7 +157,7 @@ export function CalendarHeatmap({ city, initialYear, initialMonth }: Props) {
 
                 const ds = dateString(day)
                 const hasData = daysWithData.has(ds)
-                const future  = isFuture(day)
+                const future = isFuture(day)
 
                 return (
                   <button
@@ -146,17 +165,19 @@ export function CalendarHeatmap({ city, initialYear, initialMonth }: Props) {
                     disabled={future || populating}
                     onClick={() => !hasData && !future && populate(ds)}
                     title={
-                      future    ? 'Data futura'
-                      : hasData ? `Dados disponíveis — ${ds}`
-                                : `Clique para buscar dados de ${ds}`
+                      future
+                        ? 'Data futura'
+                        : hasData
+                          ? `Dados disponíveis — ${ds}`
+                          : `Clique para buscar dados de ${ds}`
                     }
                     className={cn(
                       'relative flex h-9 w-full items-center justify-center rounded-md text-xs font-medium transition-all',
                       hasData
                         ? 'bg-blue-500/80 text-white hover:bg-blue-500'
                         : future
-                        ? 'cursor-default bg-gray-100 text-gray-300 dark:bg-slate-800/50 dark:text-slate-600'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700',
+                          ? 'cursor-default bg-gray-100 text-gray-300 dark:bg-slate-800/50 dark:text-slate-600'
+                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700'
                     )}
                   >
                     {day}

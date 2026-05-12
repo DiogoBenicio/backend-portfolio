@@ -53,8 +53,8 @@ export function RateLimitModal() {
     <Dialog open={shouldShow} onOpenChange={() => {}}>
       <DialogContent className="sm:max-w-sm text-center [&>button:last-child]:hidden">
         <DialogHeader className="items-center gap-3">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-pink-50 dark:bg-pink-900/20">
-            <Heart className="h-8 w-8 text-pink-500" fill="currentColor" />
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-orange-50 dark:bg-orange-900/20">
+            <Heart className="h-8 w-8 text-orange-500" fill="currentColor" />
           </div>
 
           <DialogTitle className="text-xl font-bold text-gray-900 dark:text-slate-100">
@@ -63,10 +63,12 @@ export function RateLimitModal() {
 
           <DialogDescription className="text-sm text-gray-500 dark:text-slate-400 leading-relaxed">
             Você explorou bastante o portfólio — incrível! 🎉
-            <br /><br />
-            Para proteger a demonstração, o Clima e o Mapa ficarão pausados por 1 hora.
-            Aproveite para deixar sua avaliação no{' '}
-            <strong className="text-gray-700 dark:text-slate-200">NPS</strong> — seu feedback é muito valioso!
+            <br />
+            <br />
+            Para proteger a demonstração, o Clima e o Mapa ficarão pausados por 1 hora. Aproveite
+            para deixar sua avaliação no{' '}
+            <strong className="text-gray-700 dark:text-slate-200">NPS</strong> — seu feedback é
+            muito valioso!
           </DialogDescription>
         </DialogHeader>
 
@@ -81,7 +83,10 @@ export function RateLimitModal() {
         )}
 
         <DialogFooter className="flex-col gap-2 sm:flex-col">
-          <Button onClick={goToNps} className="w-full gap-2 bg-pink-500 hover:bg-pink-600 text-white">
+          <Button
+            onClick={goToNps}
+            className="w-full gap-2 bg-orange-500 hover:bg-orange-600 text-white"
+          >
             <MessageSquareHeart className="h-4 w-4" />
             Deixar minha avaliação
           </Button>
