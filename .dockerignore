@@ -1,0 +1,25 @@
+# Git
+.git
+.gitignore
+
+# Dependências Node.js (reconstruídas no build)
+**/node_modules
+
+# Artefatos de build que não devem entrar no contexto
+frontend/.next
+frontend/out
+gateway-api/dist
+nps-api/dist
+weather-api/target
+
+# Arquivos de ambiente — nunca enviar para o daemon Docker
+.env
+.env.*
+
+# Logs
+**/*.log
+
+# IDE e sistema operacional
+.vscode
+.idea
+**/.DS_Store

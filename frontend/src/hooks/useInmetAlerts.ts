@@ -13,7 +13,7 @@ export interface InmetAlert {
 export function useInmetAlerts() {
   return useQuery<InmetAlert[]>({
     queryKey: ['inmet-alerts'],
-    queryFn: () => fetch('/inmet-alerts').then((r) => r.json()),
+    queryFn: () => fetch('/api/inmet-alerts').then((r) => r.json()),
     staleTime: 30 * 60 * 1000,
     refetchInterval: 30 * 60 * 1000,
   })

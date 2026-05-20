@@ -5,6 +5,7 @@ import { env } from "./config/env";
 import { authMiddleware } from "./middleware/authMiddleware";
 import { registerRequestLogger } from "./middleware/requestLogger";
 import { registerAuthRoutes } from "./routes/authRoutes";
+import { registerMetricsRoutes } from "./routes/metricsRoutes";
 import { registerProxyRoutes } from "./routes/proxyRoutes";
 import { logger, printBanner } from "./utils/logger";
 
@@ -80,6 +81,7 @@ async function buildServer() {
 
   // ── Rotas ──────────────────────────────────────────────────
   registerAuthRoutes(server);
+  registerMetricsRoutes(server);
   registerProxyRoutes(server);
 
   // ── Error handler ──────────────────────────────────────────

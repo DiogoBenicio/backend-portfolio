@@ -24,6 +24,8 @@ describe("isPublicRoute", () => {
     ["POST", "/api/nps/responses"],
     ["GET", "/api/nps/summary"],
     ["GET", "/api/nps/summary?page=portfolio"],
+    ["GET", "/api/metrics"],
+    ["GET", "/api/inmet-alerts"],
   ])("%s %s deve ser pública", (method, path) => {
     expect(isPublicRoute(method, path)).toBe(true);
   });
@@ -34,6 +36,8 @@ describe("isPublicRoute", () => {
     ["POST", "/api/weather/refresh"],
     ["GET", "/api/auth/login"],
     ["GET", "/dashboard"],
+    ["POST", "/api/metrics"],
+    ["GET", "/api/metrics/extra"],
   ])("%s %s deve ser protegida", (method, path) => {
     expect(isPublicRoute(method, path)).toBe(false);
   });

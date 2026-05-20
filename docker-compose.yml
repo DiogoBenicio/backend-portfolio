@@ -76,26 +76,6 @@ services:
       retries: 6
       start_period: 30s
 
-  # ─── Projeto 3: Frontend ──────────────────────────────────────
-  portfolio-frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        NEXT_PUBLIC_OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY}
-    container_name: portfolio-frontend
-    environment:
-      NEXT_PUBLIC_WEATHER_API_URL: /api/weather
-      NEXT_PUBLIC_NPS_API_URL: /api/nps
-    mem_limit: 128m
-    depends_on:
-      weather-api:
-        condition: service_healthy
-      nps-api:
-        condition: service_healthy
-    networks:
-      - portfolio-network
-
   # ─── Projeto 4: API Gateway ───────────────────────────────────
   gateway-api:
     build:
@@ -132,10 +112,11 @@ services:
   # ─── Nginx — único ponto de entrada ──────────────────────────
   nginx:
     build:
-      context: ./nginx
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: nginx/Dockerfile
       args:
         NGINX_CONF: ${NGINX_CONF:-nginx.dev.conf}
+        NEXT_PUBLIC_OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY}
     container_name: portfolio-nginx
     ports:
       - "80:80"
@@ -144,8 +125,6 @@ services:
       - certbot-certs:/etc/letsencrypt:ro
       - certbot-webroot:/var/www/certbot
     depends_on:
-      portfolio-frontend:
-        condition: service_started
       gateway-api:
         condition: service_healthy
     networks:
