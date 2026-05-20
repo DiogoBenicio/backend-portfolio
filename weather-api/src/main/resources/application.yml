@@ -2,10 +2,20 @@ spring:
   application:
     name: weather-api
 
-  elasticsearch:
-    uris: ${ELASTICSEARCH_URIS:http://localhost:9200}
-    connection-timeout: 5s
-    socket-timeout: 30s
+  datasource:
+    url: jdbc:postgresql://localhost:5432/weather_db
+    username: nps_user
+    password: ${POSTGRES_PASSWORD:nps_secret_2025}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          time_zone: UTC
 
   output:
     ansi:
@@ -42,4 +52,4 @@ logging:
   level:
     com.portfolio.weatherapi: DEBUG
     org.springframework.web: INFO
-    org.springframework.data.elasticsearch: WARN
+    org.hibernate.SQL: WARN

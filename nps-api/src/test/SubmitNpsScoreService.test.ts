@@ -11,6 +11,7 @@ describe('SubmitNpsScoreService', () => {
       create: vi.fn(),
       findMany: vi.fn(),
       findAllByPage: vi.fn(),
+      deleteById: vi.fn(),
     };
     service = new SubmitNpsScoreService(repository);
   });

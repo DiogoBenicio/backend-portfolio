@@ -77,7 +77,7 @@ class GetWeatherSensorsServiceTest {
                 weather("Uberlândia", from.plus(1, ChronoUnit.HOURS)),
                 weather("Uberlândia", to)
         );
-        // Como não há dados no ES, o service busca coordenadas via weatherProvider
+        // Como não há dados no repositório, o service busca coordenadas via weatherProvider
         when(weatherProvider.fetchCurrentWeather("Uberlândia", null))
                 .thenReturn(weather("Uberlândia", Instant.now()));
         when(historicalClient.fetchHistoricalHourly(eq("Uberlândia"), anyDouble(), anyDouble(), any(), any()))
@@ -87,11 +87,11 @@ class GetWeatherSensorsServiceTest {
 
         assertThat(result).hasSize(3);
         verify(historicalClient, times(1)).fetchHistoricalHourly(eq("Uberlândia"), anyDouble(), anyDouble(), any(), any());
-        verify(repository, times(3)).save(any());
+        verify(repository, times(2)).save(any());
     }
 
     @Test
-    @DisplayName("deve retornar lista vazia quando Open-Meteo falha e não há dados no ES")
+    @DisplayName("deve retornar lista vazia quando Open-Meteo falha e não há dados no repositório")
     void shouldReturnEmptyWhenHistoricalClientFails() {
         Instant from = Instant.now().truncatedTo(ChronoUnit.HOURS).minus(1, ChronoUnit.HOURS);
         Instant to   = Instant.now().truncatedTo(ChronoUnit.HOURS);

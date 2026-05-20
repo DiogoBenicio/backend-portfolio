@@ -1,43 +1,30 @@
 services:
   # ─── Infraestrutura ───────────────────────────────────────
-  elasticsearch:
-    image: elasticsearch:8.11.0
-    container_name: portfolio-elasticsearch
-    environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms256m -Xmx256m -XX:+UseG1GC -XX:G1HeapRegionSize=4m
-      - bootstrap.memory_lock=false
-      - indices.memory.index_buffer_size=10%
-      - thread_pool.write.queue_size=100
-    mem_limit: 512m
-    volumes:
-      - elasticsearch-data:/usr/share/elasticsearch/data
-    networks:
-      - portfolio-network
-    healthcheck:
-      test: ["CMD-SHELL", "curl -fs http://localhost:9200/_cluster/health?wait_for_status=yellow || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
-
   postgres:
     image: postgres:15-alpine
     container_name: portfolio-postgres
     environment:
       POSTGRES_DB: nps_db
       POSTGRES_USER: nps_user
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nps_secret_2025}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      - ./postgres/init:/docker-entrypoint-initdb.d
+    mem_limit: 256m
+    command: >
+      postgres
+      -c shared_buffers=64MB
+      -c effective_cache_size=128MB
+      -c work_mem=4MB
+      -c max_connections=30
     networks:
       - portfolio-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U nps_user -d nps_db"]
+      test: ["CMD-SHELL", "pg_isready -U nps_user -d nps_db && pg_isready -U nps_user -d weather_db"]
       interval: 10s
       timeout: 5s
       retries: 5
+      start_period: 30s
 
   # ─── Projeto 1: Weather API (interno — sem porta exposta) ──
   weather-api:
@@ -48,9 +35,11 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
       OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY}
-      ELASTICSEARCH_URIS: http://elasticsearch:9200
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      JAVA_TOOL_OPTIONS: -Xms64m -Xmx96m -XX:+UseSerialGC -XX:MaxMetaspaceSize=96m
+    mem_limit: 192m
     depends_on:
-      elasticsearch:
+      postgres:
         condition: service_healthy
     networks:
       - portfolio-network
@@ -62,10 +51,12 @@ services:
       dockerfile: Dockerfile
     container_name: portfolio-nps-api
     environment:
-      DATABASE_URL: postgresql://nps_user:${POSTGRES_PASSWORD:-nps_secret_2025}@postgres:5432/nps_db
+      DATABASE_URL: postgresql://nps_user:${POSTGRES_PASSWORD}@postgres:5432/nps_db
       PORT: 3001
       NODE_ENV: production
-      CORS_ORIGIN: http://localhost
+      CORS_ORIGIN: http://gateway-api:4000
+      NODE_OPTIONS: --max-old-space-size=64
+    mem_limit: 96m
     depends_on:
       postgres:
         condition: service_healthy
@@ -81,6 +72,7 @@ services:
     environment:
       NEXT_PUBLIC_WEATHER_API_URL: /api/weather
       NEXT_PUBLIC_NPS_API_URL: /api/nps
+    mem_limit: 128m
     depends_on:
       - weather-api
       - nps-api
@@ -94,16 +86,18 @@ services:
       dockerfile: Dockerfile
     container_name: portfolio-api-gateway
     ports:
-      - "4000:4000"
+      - "127.0.0.1:4000:4000"
     environment:
       PORT: 4000
       NODE_ENV: production
-      JWT_SECRET: ${JWT_SECRET:-dev_secret_change_in_production_min_32_chars}
+      JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRES_IN: 2h
-      ADMIN_USER: ${ADMIN_USER:-admin}
-      ADMIN_PASS: ${ADMIN_PASS:-admin2025}
+      ADMIN_USER: ${ADMIN_USER}
+      ADMIN_PASS: ${ADMIN_PASS}
       WEATHER_API_URL: http://weather-api:8080
       NPS_API_URL: http://nps-api:3001
+      NODE_OPTIONS: --max-old-space-size=64
+    mem_limit: 96m
     depends_on:
       - weather-api
       - nps-api
@@ -125,7 +119,6 @@ services:
       - portfolio-network
 
 volumes:
-  elasticsearch-data:
   postgres-data:
 
 networks:

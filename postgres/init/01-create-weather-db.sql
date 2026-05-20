@@ -1,0 +1,2 @@
+CREATE DATABASE weather_db;
+GRANT ALL PRIVILEGES ON DATABASE weather_db TO nps_user;

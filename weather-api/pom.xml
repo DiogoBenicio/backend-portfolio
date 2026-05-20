@@ -15,7 +15,7 @@
     <artifactId>weather-api</artifactId>
     <version>1.0.0</version>
     <name>weather-api</name>
-    <description>Weather API — Hexagonal Architecture | Spring Boot 3 + Elasticsearch 8</description>
+    <description>Weather API — Hexagonal Architecture | Spring Boot 3 + PostgreSQL</description>
 
     <properties>
         <java.version>21</java.version>
@@ -35,10 +35,20 @@
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
 
-        <!-- Elasticsearch -->
+        <!-- JPA + PostgreSQL -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
         </dependency>
 
         <!-- Validação -->

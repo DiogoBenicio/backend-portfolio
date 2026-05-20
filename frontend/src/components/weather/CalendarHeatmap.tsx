@@ -35,14 +35,13 @@ export function CalendarHeatmap({ city, initialYear, initialMonth }: Props) {
   const [year, setYear] = useState(initialYear)
   const [month, setMonth] = useState(initialMonth) // 1-12
 
-  const { data, isLoading, refetch } = useWeatherCalendar(city, year, month)
+  const { data, isLoading } = useWeatherCalendar(city, year, month)
   const queryClient = useQueryClient()
 
   const { mutate: populate, isPending: populating } = useMutation({
     mutationFn: (date: string) => weatherApi.populate(city, date),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['weather', 'calendar', city, year, month] })
-      refetch()
     },
   })
 

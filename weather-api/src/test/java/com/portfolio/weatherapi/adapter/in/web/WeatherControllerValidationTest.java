@@ -34,6 +34,8 @@ class WeatherControllerValidationTest {
     @Mock private GetWeatherSensorsUseCase getWeatherSensors;
     @Mock private GetWeatherCalendarUseCase getWeatherCalendar;
     @Mock private PopulateWeatherUseCase populateWeather;
+    @Mock private GetWindFieldUseCase getWindField;
+    @Mock private GetDistinctCitiesUseCase getDistinctCities;
     @Mock private WeatherMapper mapper;
 
     private WeatherController controller;
@@ -49,7 +51,7 @@ class WeatherControllerValidationTest {
         controller = new WeatherController(
                 getCurrentWeather, getForecast, getWeatherHistory,
                 refreshWeather, getWeatherSensors, getWeatherCalendar,
-                populateWeather, null, mapper
+                populateWeather, getWindField, getDistinctCities, mapper
         );
     }
 

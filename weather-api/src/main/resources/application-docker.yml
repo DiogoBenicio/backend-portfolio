@@ -1,6 +1,21 @@
 spring:
-  elasticsearch:
-    uris: ${ELASTICSEARCH_URIS:http://elasticsearch:9200}
+  datasource:
+    url: jdbc:postgresql://postgres:5432/weather_db
+    username: nps_user
+    password: ${POSTGRES_PASSWORD:nps_secret_2025}
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 2
+      connection-timeout: 30000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          time_zone: UTC
 
 server:
   port: 8080

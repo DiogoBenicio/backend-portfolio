@@ -20,6 +20,7 @@ describe('GetNpsSummaryService', () => {
       create: vi.fn(),
       findMany: vi.fn(),
       findAllByPage: vi.fn(),
+      deleteById: vi.fn(),
     };
     service = new GetNpsSummaryService(repository);
   });

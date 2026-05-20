@@ -30,7 +30,7 @@ public class WebConfig implements WebMvcConfigurer {
         return new OpenAPI()
                 .info(new Info()
                         .title("Weather API")
-                        .description("API para consulta de dados meteorológicos — Arquitetura Hexagonal com Spring Boot 3 + Elasticsearch 8")
+                        .description("API para consulta de dados meteorológicos — Arquitetura Hexagonal com Spring Boot 3 + PostgreSQL")
                         .version("1.0.0")
                         .contact(new Contact()
                                 .name("Diogo Silveira Benício")

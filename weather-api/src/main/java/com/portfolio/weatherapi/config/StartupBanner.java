@@ -26,7 +26,7 @@ public class StartupBanner implements ApplicationListener<ApplicationReadyEvent>
         System.out.println("║  ╚███╔███╔╝███████╗██║  ██║   ██║   ██║  ██║║");
         System.out.println("║   ╚══╝╚══╝ ╚══════╝╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝║");
         System.out.println("║                                              ║");
-        System.out.println("║  WEATHER-API  ·  Spring Boot 3 + ES 8        ║");
+        System.out.println("║  WEATHER-API  ·  Spring Boot 3 + PostgreSQL  ║");
         System.out.println("╚══════════════════════════════════════════════╝");
         System.out.println(reset + bold + "  Porta: " + port + "  |  Profile: "
                 + System.getenv().getOrDefault("SPRING_PROFILES_ACTIVE", "default") + reset);

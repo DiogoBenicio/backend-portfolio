@@ -33,6 +33,7 @@ public class WeatherController {
     private final GetWeatherCalendarUseCase getWeatherCalendar;
     private final PopulateWeatherUseCase populateWeather;
     private final GetWindFieldUseCase getWindField;
+    private final GetDistinctCitiesUseCase getDistinctCities;
     private final WeatherMapper mapper;
 
     public WeatherController(
@@ -44,6 +45,7 @@ public class WeatherController {
             GetWeatherCalendarUseCase getWeatherCalendar,
             PopulateWeatherUseCase populateWeather,
             GetWindFieldUseCase getWindField,
+            GetDistinctCitiesUseCase getDistinctCities,
             WeatherMapper mapper
     ) {
         this.getCurrentWeather = getCurrentWeather;
@@ -54,6 +56,7 @@ public class WeatherController {
         this.getWeatherCalendar = getWeatherCalendar;
         this.populateWeather = populateWeather;
         this.getWindField = getWindField;
+        this.getDistinctCities = getDistinctCities;
         this.mapper = mapper;
     }
 
@@ -101,7 +104,7 @@ public class WeatherController {
     @GetMapping("/cities")
     @Operation(summary = "Cidades com dados")
     public ResponseEntity<List<String>> getCities() {
-        return ResponseEntity.ok(List.of());
+        return ResponseEntity.ok(getDistinctCities.execute());
     }
 
     @PostMapping("/refresh")
@@ -135,7 +138,7 @@ public class WeatherController {
 
     @GetMapping("/calendar")
     @Operation(summary = "Calendário de dados",
-               description = "Retorna quais dias do mês possuem dados no Elasticsearch.")
+               description = "Retorna quais dias do mês possuem dados no banco de dados.")
     public ResponseEntity<CalendarResponse> getCalendar(
             @RequestParam @NotBlank @Size(max = CITY_MAX) @Pattern(regexp = CITY_PATTERN) String city,
             @RequestParam @Min(2020) @Max(2100) int year,

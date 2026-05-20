@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 const mockGet = vi.fn()
 const mockPost = vi.fn()
+const mockDelete = vi.fn()
 const mockInterceptors = {
   response: { use: vi.fn() },
 }
@@ -11,6 +12,7 @@ vi.mock('axios', () => ({
     create: vi.fn(() => ({
       get: mockGet,
       post: mockPost,
+      delete: mockDelete,
       interceptors: mockInterceptors,
     })),
   },

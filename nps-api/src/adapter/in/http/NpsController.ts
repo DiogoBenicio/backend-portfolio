@@ -99,11 +99,14 @@ export function registerNpsRoutes(
         await repository.deleteById(req.params.id);
         return reply.status(204).send();
       } catch (err) {
+        const statusCode = (err as { statusCode?: number }).statusCode ?? 500;
         logger.error('Erro ao apagar resposta NPS', err);
-        return reply.status(500).send({
-          status: 500,
-          error: 'Internal Server Error',
-          message: 'Não foi possível apagar a avaliação.',
+        return reply.status(statusCode).send({
+          status: statusCode,
+          error: statusCode === 404 ? 'Not Found' : 'Internal Server Error',
+          message: statusCode === 404
+            ? (err as Error).message
+            : 'Não foi possível apagar a avaliação.',
         });
       }
     }

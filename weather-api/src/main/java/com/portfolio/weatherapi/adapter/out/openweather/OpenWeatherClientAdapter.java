@@ -53,6 +53,9 @@ public class OpenWeatherClientAdapter implements WeatherProviderClient {
                 .bodyToMono(OpenWeatherCurrentResponse.class)
                 .block();
 
+        if (response == null) {
+            throw new IllegalStateException("OpenWeather retornou resposta vazia para: " + query);
+        }
         return mapToWeather(response);
     }
 
@@ -73,6 +76,9 @@ public class OpenWeatherClientAdapter implements WeatherProviderClient {
                 .bodyToMono(OpenWeatherForecastResponse.class)
                 .block();
 
+        if (response == null) {
+            throw new IllegalStateException("OpenWeather retornou resposta vazia para forecast: " + city);
+        }
         return mapToForecast(response, days);
     }
 
@@ -137,8 +143,8 @@ public class OpenWeatherClientAdapter implements WeatherProviderClient {
         return Weather.of(
                 r.name(),
                 r.sys() != null ? r.sys().country() : "",
-                r.coord().lat(),
-                r.coord().lon(),
+                r.coord() != null ? r.coord().lat() : 0.0,
+                r.coord() != null ? r.coord().lon() : 0.0,
                 r.main().temp(),
                 r.main().feelsLike(),
                 r.main().humidity(),

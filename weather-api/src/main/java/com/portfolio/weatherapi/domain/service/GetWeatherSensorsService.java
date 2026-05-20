@@ -48,7 +48,7 @@ public class GetWeatherSensorsService implements GetWeatherSensorsUseCase {
         Instant end    = to.truncatedTo(ChronoUnit.HOURS);
 
         boolean hasGap = false;
-        while (!cursor.isAfter(end) && !cursor.isAfter(now)) {
+        while (cursor.isBefore(end) && !cursor.isAfter(now)) {
             if (!existingIds.contains(citySlug + "-" + HOUR_FMT.format(cursor))) {
                 hasGap = true;
                 break;
@@ -60,7 +60,7 @@ public class GetWeatherSensorsService implements GetWeatherSensorsUseCase {
             return existing;
         }
 
-        // Obtém coordenadas: usa dados existentes no ES ou busca current weather
+        // Obtém coordenadas: usa dados existentes no repositório ou busca current weather
         double lat = 0, lon = 0;
         if (!existing.isEmpty()) {
             lat = existing.get(0).latitude();
@@ -91,7 +91,7 @@ public class GetWeatherSensorsService implements GetWeatherSensorsUseCase {
             Instant slotHour = point.timestamp().truncatedTo(ChronoUnit.HOURS);
             if (slotHour.isAfter(now)) continue;
             String slotId = citySlug + "-" + HOUR_FMT.format(slotHour);
-            if (!slotHour.isBefore(from) && !slotHour.isAfter(end)
+            if (!slotHour.isBefore(from) && slotHour.isBefore(end)
                     && !existingIds.contains(slotId)) {
                 repository.save(point);
                 existingIds.add(slotId);

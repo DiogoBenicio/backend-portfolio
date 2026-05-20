@@ -7,7 +7,7 @@ export function useDeleteNpsResponse() {
     mutationFn: (id: string) => npsApi.deleteResponse(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['nps-responses'] })
-      queryClient.invalidateQueries({ queryKey: ['nps-summary'] })
+      queryClient.invalidateQueries({ queryKey: ['nps', 'summary'] })
     },
   })
 }

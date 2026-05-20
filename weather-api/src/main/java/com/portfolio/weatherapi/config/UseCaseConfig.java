@@ -5,6 +5,7 @@ import com.portfolio.weatherapi.domain.port.out.HistoricalWeatherClient;
 import com.portfolio.weatherapi.domain.port.out.WeatherDataRepository;
 import com.portfolio.weatherapi.domain.port.out.WeatherProviderClient;
 import com.portfolio.weatherapi.domain.service.*;
+import com.portfolio.weatherapi.domain.service.GetDistinctCitiesService;
 import com.portfolio.weatherapi.domain.service.GetWeatherCalendarService;
 import com.portfolio.weatherapi.domain.service.GetWeatherSensorsService;
 import com.portfolio.weatherapi.domain.service.PopulateWeatherService;
@@ -63,5 +64,10 @@ public class UseCaseConfig {
     @Bean
     public GetWindFieldUseCase getWindFieldUseCase(WeatherProviderClient client) {
         return new GetWindFieldService(client);
+    }
+
+    @Bean
+    public GetDistinctCitiesUseCase getDistinctCitiesUseCase(WeatherDataRepository repository) {
+        return new GetDistinctCitiesService(repository);
     }
 }

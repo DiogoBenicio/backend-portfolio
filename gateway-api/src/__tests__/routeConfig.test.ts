@@ -29,10 +29,13 @@ describe('isPublicRoute', () => {
     ['DELETE', '/api/nps/responses'],
     ['POST', '/api/weather/refresh'],
     ['GET', '/api/auth/login'],
-    ['GET', '/api/nps/responses'],
     ['GET', '/dashboard'],
   ])('%s %s deve ser protegida', (method, path) => {
     expect(isPublicRoute(method, path)).toBe(false);
+  });
+
+  it('GET /api/nps/responses deve ser pública', () => {
+    expect(isPublicRoute('GET', '/api/nps/responses')).toBe(true);
   });
 });
 
@@ -64,17 +67,22 @@ describe('resolveUpstream', () => {
 });
 
 describe('PATH_REWRITES', () => {
-  it('deve ter 2 regras (weather e nps)', () => {
-    expect(PATH_REWRITES).toHaveLength(2);
+  it('deve ter 3 regras (health, weather e nps)', () => {
+    expect(PATH_REWRITES).toHaveLength(3);
+  });
+
+  it('regra health: /api/weather/health → /actuator/health', () => {
+    const rule = PATH_REWRITES[0];
+    expect('/api/weather/health'.replace(rule.from, rule.to)).toBe('/actuator/health');
   });
 
   it('regra weather: /api/weather/forecast → /api/v1/weather/forecast', () => {
-    const rule = PATH_REWRITES[0];
+    const rule = PATH_REWRITES[1];
     expect('/api/weather/forecast'.replace(rule.from, rule.to)).toBe('/api/v1/weather/forecast');
   });
 
   it('regra nps: /api/nps/summary → /api/v1/nps/summary', () => {
-    const rule = PATH_REWRITES[1];
+    const rule = PATH_REWRITES[2];
     expect('/api/nps/summary'.replace(rule.from, rule.to)).toBe('/api/v1/nps/summary');
   });
 });

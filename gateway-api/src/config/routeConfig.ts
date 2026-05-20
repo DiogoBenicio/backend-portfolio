@@ -22,6 +22,7 @@ export const PUBLIC_ROUTES: Array<{ method: string; pattern: RegExp }> = [
   { method: 'GET',  pattern: /^\/api\/weather\/sensors/ },
   { method: 'GET',  pattern: /^\/api\/weather\/calendar/ },
   { method: 'GET',  pattern: /^\/api\/weather\/windfield/ },
+  { method: 'GET',  pattern: /^\/api\/weather\/cities/ },
   { method: 'POST', pattern: /^\/api\/weather\/populate/ },
   { method: 'POST',   pattern: /^\/api\/nps\/responses$/ },
   { method: 'GET',    pattern: /^\/api\/nps\/responses/ },

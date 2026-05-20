@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Prisma } from '@prisma/client';
 import { NpsResponse } from '../../../domain/model/NpsResponse';
 import {
   CreateNpsResponseInput,
@@ -45,6 +45,15 @@ export class PrismaNpsResponseRepository implements NpsResponseRepository {
   }
 
   async deleteById(id: string): Promise<void> {
-    await this.prisma.npsResponse.delete({ where: { id } });
+    try {
+      await this.prisma.npsResponse.delete({ where: { id } });
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+        const notFound = new Error(`Resposta NPS não encontrada: ${id}`);
+        (notFound as Error & { statusCode: number }).statusCode = 404;
+        throw notFound;
+      }
+      throw err;
+    }
   }
 }
