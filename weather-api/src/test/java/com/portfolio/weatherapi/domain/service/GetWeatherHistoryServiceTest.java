@@ -42,6 +42,7 @@ class GetWeatherHistoryServiceTest {
     }
 
     @Test
+    @SuppressWarnings("null")
     @DisplayName("deve delegar ao repositório com city, from, to e pageable corretos")
     void shouldDelegateToRepositoryWithCorrectArgs() {
         Instant from = Instant.parse("2024-01-01T00:00:00Z");

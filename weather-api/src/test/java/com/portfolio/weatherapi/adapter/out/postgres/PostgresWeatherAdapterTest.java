@@ -46,6 +46,7 @@ class PostgresWeatherAdapterTest {
     class SaveTests {
 
         @Test
+        @SuppressWarnings("null")
         @DisplayName("ID deve ser determinístico: city-slug + YYYY-MM-DD-HH")
         void shouldGenerateDeterministicId() {
             Instant ts = Instant.parse("2025-03-15T14:30:00Z");
@@ -57,6 +58,7 @@ class PostgresWeatherAdapterTest {
         }
 
         @Test
+        @SuppressWarnings("null")
         @DisplayName("dois saves na mesma hora geram o mesmo ID (upsert idempotente)")
         void shouldProduceSameIdForSameHour() {
             Instant t1 = Instant.parse("2025-03-15T14:05:00Z");
@@ -72,6 +74,7 @@ class PostgresWeatherAdapterTest {
         }
 
         @Test
+        @SuppressWarnings("null")
         @DisplayName("saves em horas diferentes geram IDs diferentes")
         void shouldProduceDifferentIdsForDifferentHours() {
             Instant t1 = Instant.parse("2025-03-15T13:00:00Z");
@@ -87,6 +90,7 @@ class PostgresWeatherAdapterTest {
         }
 
         @Test
+        @SuppressWarnings("null")
         @DisplayName("deve mapear todos os campos corretamente")
         void shouldMapAllFields() {
             Instant ts = Instant.parse("2025-03-15T10:00:00Z");
@@ -200,10 +204,11 @@ class PostgresWeatherAdapterTest {
     class FindByCityTests {
 
         @Test
+        @SuppressWarnings("null")
         @DisplayName("deve retornar página vazia quando não há dados")
         void shouldReturnEmptyPage() {
             when(repository.findByCityIgnoreCaseAndTimestampGreaterThanEqualAndTimestampLessThan(anyString(), any(), any(), any()))
-                    .thenReturn(new PageImpl<>(List.of()));
+                    .thenReturn(new PageImpl<>(List.<WeatherEntity>of()));
 
             var result = adapter.findByCity("Manaus",
                     Instant.parse("2025-03-01T00:00:00Z"),

@@ -101,8 +101,8 @@ public class OpenWeatherClientAdapter implements WeatherProviderClient {
 
         if (response == null || response.list() == null) return List.of();
 
-        String cityName = response.city().name();
-        String country  = response.city().country();
+        String cityName = response.city().name() != null ? response.city().name() : "";
+        String country  = response.city().country() != null ? response.city().country() : "";
         double lat = response.city().coord() != null ? response.city().coord().lat() : 0.0;
         double lon = response.city().coord() != null ? response.city().coord().lon() : 0.0;
 
@@ -141,7 +141,7 @@ public class OpenWeatherClientAdapter implements WeatherProviderClient {
         double rainfall = r.rain() != null && r.rain().oneHour() != null ? r.rain().oneHour() : 0.0;
 
         return Weather.of(
-                r.name(),
+                r.name() != null ? r.name() : "",
                 r.sys() != null ? r.sys().country() : "",
                 r.coord() != null ? r.coord().lat() : 0.0,
                 r.coord() != null ? r.coord().lon() : 0.0,
@@ -189,7 +189,10 @@ public class OpenWeatherClientAdapter implements WeatherProviderClient {
                 })
                 .toList();
 
-        return new Forecast(r.city().name(), r.city().country(), forecastDays);
+        return new Forecast(
+                r.city().name() != null ? r.city().name() : "",
+                r.city().country() != null ? r.city().country() : "",
+                forecastDays);
     }
 
     @Override
@@ -215,14 +218,15 @@ public class OpenWeatherClientAdapter implements WeatherProviderClient {
                             double v = -speedMs * Math.cos(rad);
                             double rain = r.rain() != null && r.rain().oneHour() != null
                                     ? r.rain().oneHour() : 0.0;
-                            return new CityWindData(r.name(), r.coord().lat(), r.coord().lon(), u, v, rain);
+                            return new CityWindData(r.name() != null ? r.name() : "", r.coord().lat(), r.coord().lon(), u, v, rain);
                         })
                         .onErrorResume(ex -> {
                             log.warn("Failed to fetch wind data for city '{}': {}", city, ex.getMessage());
                             return Mono.empty();
                         }))
                 .collectList()
-                .block();
+                .blockOptional()
+                .orElseGet(List::of);
     }
 
     private String degToCompass(int deg) {

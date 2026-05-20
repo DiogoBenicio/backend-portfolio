@@ -18,6 +18,7 @@ import java.net.URI;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -43,10 +44,11 @@ class GlobalExceptionHandlerTest {
         ConstraintViolationException ex = new ConstraintViolationException(Set.of(violation));
         ResponseEntity<ErrorResponse> response = handler.handleConstraintViolation(ex);
 
+        ErrorResponse body = response.getBody();
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().status()).isEqualTo(400);
-        assertThat(response.getBody().error()).isEqualTo("Validation Error");
+        assertNotNull(body);
+        assertThat(body.status()).isEqualTo(400);
+        assertThat(body.error()).isEqualTo("Validation Error");
     }
 
     @Test
@@ -56,54 +58,59 @@ class GlobalExceptionHandlerTest {
                 new MissingServletRequestParameterException("city", "String");
 
         ResponseEntity<ErrorResponse> response = handler.handleMissingParam(ex, request);
+        ErrorResponse body = response.getBody();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().message()).contains("city");
+        assertNotNull(body);
+        assertThat(body.message()).contains("city");
     }
 
     @Test
     @DisplayName("WebClientResponseException 404 deve retornar 404 City Not Found")
     void shouldReturn404ForWebClientNotFound() {
         WebClientResponseException ex = WebClientResponseException.create(
-                404, "Not Found", null, null, null);
+                404, "Not Found", new org.springframework.http.HttpHeaders(), new byte[0], null);
 
         ResponseEntity<ErrorResponse> response = handler.handleWebClientError(ex, request);
+        ErrorResponse body = response.getBody();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().error()).isEqualTo("City Not Found");
+        assertNotNull(body);
+        assertThat(body.error()).isEqualTo("City Not Found");
     }
 
     @Test
     @DisplayName("WebClientResponseException 401 deve retornar 401 Unauthorized")
     void shouldReturn401ForWebClientUnauthorized() {
         WebClientResponseException ex = WebClientResponseException.create(
-                401, "Unauthorized", null, null, null);
+                401, "Unauthorized", new org.springframework.http.HttpHeaders(), new byte[0], null);
 
         ResponseEntity<ErrorResponse> response = handler.handleWebClientError(ex, request);
+        ErrorResponse body = response.getBody();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNAUTHORIZED);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().error()).isEqualTo("Unauthorized");
+        assertNotNull(body);
+        assertThat(body.error()).isEqualTo("Unauthorized");
     }
 
     @Test
     @DisplayName("WebClientResponseException 500 deve retornar 502 Bad Gateway")
     void shouldReturn502ForWebClientServerError() {
         WebClientResponseException ex = WebClientResponseException.create(
-                500, "Internal Server Error", null, null, null);
+                500, "Internal Server Error", new org.springframework.http.HttpHeaders(), new byte[0], null);
 
         ResponseEntity<ErrorResponse> response = handler.handleWebClientError(ex, request);
+        ErrorResponse body = response.getBody();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_GATEWAY);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().status()).isEqualTo(502);
+        assertNotNull(body);
+        assertThat(body.status()).isEqualTo(502);
     }
 
     @Test
     @DisplayName("WebClientRequestException deve retornar 504 Gateway Timeout")
     void shouldReturn504ForWebClientRequestException() {
+        @SuppressWarnings("null")
         WebClientRequestException ex = new WebClientRequestException(
                 new RuntimeException("connection timeout"),
                 org.springframework.http.HttpMethod.GET,
@@ -111,10 +118,11 @@ class GlobalExceptionHandlerTest {
                 new org.springframework.http.HttpHeaders());
 
         ResponseEntity<ErrorResponse> response = handler.handleWebClientRequestError(ex, request);
+        ErrorResponse body = response.getBody();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.GATEWAY_TIMEOUT);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().status()).isEqualTo(504);
+        assertNotNull(body);
+        assertThat(body.status()).isEqualTo(504);
     }
 
     @Test
@@ -123,10 +131,11 @@ class GlobalExceptionHandlerTest {
         IllegalArgumentException ex = new IllegalArgumentException("Argumento inválido: days must be between 1 and 5");
 
         ResponseEntity<ErrorResponse> response = handler.handleIllegalArgument(ex);
+        ErrorResponse body = response.getBody();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().message()).isEqualTo("Argumento inválido: days must be between 1 and 5");
+        assertNotNull(body);
+        assertThat(body.message()).isEqualTo("Argumento inválido: days must be between 1 and 5");
     }
 
     @Test
@@ -135,10 +144,11 @@ class GlobalExceptionHandlerTest {
         Exception ex = new RuntimeException("erro inesperado");
 
         ResponseEntity<ErrorResponse> response = handler.handleGeneral(ex, request);
+        ErrorResponse body = response.getBody();
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().status()).isEqualTo(500);
-        assertThat(response.getBody().error()).isEqualTo("Internal Server Error");
+        assertNotNull(body);
+        assertThat(body.status()).isEqualTo(500);
+        assertThat(body.error()).isEqualTo("Internal Server Error");
     }
 }

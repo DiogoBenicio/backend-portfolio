@@ -3,6 +3,7 @@ package com.portfolio.weatherapi.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,7 +13,7 @@ public class StartupBanner implements ApplicationListener<ApplicationReadyEvent>
     private String port;
 
     @Override
-    public void onApplicationEvent(ApplicationReadyEvent event) {
+    public void onApplicationEvent(@NonNull ApplicationReadyEvent event) {
         String cyan  = "\033[36m";
         String reset = "\033[0m";
         String bold  = "\033[1m";

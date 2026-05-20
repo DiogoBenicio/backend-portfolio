@@ -90,7 +90,7 @@ class WeatherMapperTest {
         @Test
         @DisplayName("deve retornar lista vazia quando sem dias")
         void shouldHandleEmptyDays() {
-            Forecast forecast = new Forecast("Manaus", "BR", List.of());
+            Forecast forecast = new Forecast("Manaus", "BR", List.<ForecastDay>of());
             ForecastResponse res = mapper.toResponse(forecast);
             assertThat(res.forecast()).isEmpty();
         }
@@ -103,6 +103,7 @@ class WeatherMapperTest {
     class ToHistoryResponse {
 
         @Test
+        @SuppressWarnings("null")
         @DisplayName("deve mapear page com metadados corretos")
         void shouldMapPageMetadata() {
             var page = new PageImpl<>(List.of(weather(), weather()),
@@ -118,9 +119,10 @@ class WeatherMapperTest {
         }
 
         @Test
+        @SuppressWarnings("null")
         @DisplayName("deve retornar conteúdo vazio para page vazia")
         void shouldHandleEmptyPage() {
-            var page = new PageImpl<Weather>(List.of(), PageRequest.of(0, 20), 0);
+            var page = new PageImpl<>(List.<Weather>of(), PageRequest.of(0, 20), 0);
             WeatherHistoryResponse res = mapper.toHistoryResponse(page);
             assertThat(res.content()).isEmpty();
             assertThat(res.totalElements()).isEqualTo(0);
@@ -150,7 +152,7 @@ class WeatherMapperTest {
         @Test
         @DisplayName("deve retornar lista vazia quando sem dados")
         void shouldHandleEmptyData() {
-            SensorDataResponse res = mapper.toSensorDataResponse("Brasília", List.of());
+            SensorDataResponse res = mapper.toSensorDataResponse("Brasília", List.<Weather>of());
             assertThat(res.data()).isEmpty();
         }
     }
