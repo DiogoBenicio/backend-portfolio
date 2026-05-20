@@ -36,8 +36,8 @@ services:
       SPRING_PROFILES_ACTIVE: docker
       OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      JAVA_TOOL_OPTIONS: -Xms64m -Xmx96m -XX:+UseSerialGC -XX:MaxMetaspaceSize=96m
-    mem_limit: 192m
+      JAVA_TOOL_OPTIONS: -Xms64m -Xmx128m -XX:+UseSerialGC -XX:MaxMetaspaceSize=160m
+    mem_limit: 320m
     depends_on:
       postgres:
         condition: service_healthy
