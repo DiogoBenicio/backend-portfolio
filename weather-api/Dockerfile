@@ -13,6 +13,8 @@ RUN mvn clean package -B -q
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 
+RUN apk add --no-cache ca-certificates && update-ca-certificates
+
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 USER appuser
 
