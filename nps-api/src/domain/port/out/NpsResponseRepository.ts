@@ -1,4 +1,4 @@
-import { NpsResponse } from '../../model/NpsResponse';
+import { NpsResponse } from "../../model/NpsResponse";
 
 export interface CreateNpsResponseInput {
   score: number;
@@ -15,7 +15,9 @@ export interface FindManyOptions {
 
 export interface NpsResponseRepository {
   create(input: CreateNpsResponseInput): Promise<NpsResponse>;
-  findMany(options: FindManyOptions): Promise<{ data: NpsResponse[]; total: number }>;
+  findMany(
+    options: FindManyOptions,
+  ): Promise<{ data: NpsResponse[]; total: number }>;
   findAllByPage(page?: string): Promise<NpsResponse[]>;
   deleteById(id: string): Promise<void>;
 }

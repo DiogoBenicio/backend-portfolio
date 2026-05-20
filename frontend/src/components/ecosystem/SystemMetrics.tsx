@@ -76,8 +76,7 @@ function Sparkline({ data, color }: { data: number[]; color: string }) {
 
 function StatusDot({ pct, thresholds }: { pct: number; thresholds: [number, number] }) {
   const [warn, crit] = thresholds
-  const color =
-    pct >= crit ? 'bg-red-500' : pct >= warn ? 'bg-yellow-400' : 'bg-green-500'
+  const color = pct >= crit ? 'bg-red-500' : pct >= warn ? 'bg-yellow-400' : 'bg-green-500'
   return <span className={`inline-block h-2 w-2 rounded-full ${color}`} />
 }
 
@@ -100,10 +99,7 @@ function SkeletonCards() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div
-          key={i}
-          className="h-40 animate-pulse rounded-xl bg-gray-100 dark:bg-slate-700"
-        />
+        <div key={i} className="h-40 animate-pulse rounded-xl bg-gray-100 dark:bg-slate-700" />
       ))}
     </div>
   )
@@ -166,7 +162,8 @@ export function SystemMetrics() {
         </div>
 
         <p className="text-[10px] text-gray-400 dark:text-slate-500">
-          5m: {system.loadAvg5.toFixed(2)} · 15m: {system.loadAvg15.toFixed(2)} · {system.cpuCount} cores
+          5m: {system.loadAvg5.toFixed(2)} · 15m: {system.loadAvg15.toFixed(2)} · {system.cpuCount}{' '}
+          cores
         </p>
       </div>
 
@@ -217,7 +214,9 @@ export function SystemMetrics() {
 
             <ProgressBar
               pct={diskPct}
-              colorClass={diskPct < 70 ? 'bg-orange-500' : diskPct < 85 ? 'bg-yellow-400' : 'bg-red-500'}
+              colorClass={
+                diskPct < 70 ? 'bg-orange-500' : diskPct < 85 ? 'bg-yellow-400' : 'bg-red-500'
+              }
             />
 
             <div className="my-2 h-8 w-full" />
@@ -251,7 +250,9 @@ export function SystemMetrics() {
 
         <ProgressBar
           pct={heapPct}
-          colorClass={heapPct < 70 ? 'bg-orange-500' : heapPct < 85 ? 'bg-yellow-400' : 'bg-red-500'}
+          colorClass={
+            heapPct < 70 ? 'bg-orange-500' : heapPct < 85 ? 'bg-yellow-400' : 'bg-red-500'
+          }
         />
 
         <div className="my-2">
@@ -259,7 +260,8 @@ export function SystemMetrics() {
         </div>
 
         <p className="text-[10px] text-gray-400 dark:text-slate-500">
-          Heap: {formatBytes(proc.heapUsed, 0)} / {formatBytes(proc.heapTotal, 0)} · {proc.nodeVersion}
+          Heap: {formatBytes(proc.heapUsed, 0)} / {formatBytes(proc.heapTotal, 0)} ·{' '}
+          {proc.nodeVersion}
         </p>
         <p className="text-[10px] text-gray-400 dark:text-slate-500">
           Uptime: {formatUptime(proc.uptime)}

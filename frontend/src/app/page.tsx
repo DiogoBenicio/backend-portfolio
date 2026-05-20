@@ -29,9 +29,7 @@ export default function HomePage() {
                   <h3 className="text-sm font-semibold text-blue-800 dark:text-blue-200">
                     Arquitetura Hexagonal
                   </h3>
-                  <p className="text-xs text-blue-500 dark:text-blue-400">
-                    Weather-API · NPS-API
-                  </p>
+                  <p className="text-xs text-blue-500 dark:text-blue-400">Weather-API · NPS-API</p>
                 </div>
               </div>
 

@@ -3,9 +3,9 @@ import {
   calculateNps,
   classifyScore,
   getZone,
-} from '../model/NpsSummary';
-import { GetNpsSummaryUseCase } from '../port/in/GetNpsSummaryUseCase';
-import { NpsResponseRepository } from '../port/out/NpsResponseRepository';
+} from "../model/NpsSummary";
+import { GetNpsSummaryUseCase } from "../port/in/GetNpsSummaryUseCase";
+import { NpsResponseRepository } from "../port/out/NpsResponseRepository";
 
 export class GetNpsSummaryService implements GetNpsSummaryUseCase {
   constructor(private readonly repository: NpsResponseRepository) {}
@@ -24,8 +24,8 @@ export class GetNpsSummaryService implements GetNpsSummaryUseCase {
       distribution[r.score] = (distribution[r.score] ?? 0) + 1;
 
       const category = classifyScore(r.score);
-      if (category === 'promoter') promoters++;
-      else if (category === 'passive') passives++;
+      if (category === "promoter") promoters++;
+      else if (category === "passive") passives++;
       else detractors++;
     }
 
@@ -34,7 +34,7 @@ export class GetNpsSummaryService implements GetNpsSummaryUseCase {
     const zone = getZone(npsScore);
 
     return {
-      page: page ?? 'portfolio',
+      page: page ?? "portfolio",
       totalResponses: total,
       npsScore,
       zone,

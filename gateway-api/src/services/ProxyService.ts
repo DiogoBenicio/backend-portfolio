@@ -1,5 +1,5 @@
-import axios, { AxiosRequestConfig, AxiosError } from 'axios';
-import { randomUUID } from 'crypto';
+import axios, { AxiosRequestConfig, AxiosError } from "axios";
+import { randomUUID } from "crypto";
 
 export interface ProxyRequest {
   baseUrl: string;
@@ -23,21 +23,21 @@ export class ProxyService {
 
     // Limpa e constrói os headers para o upstream
     const forwardHeaders: Record<string, string> = {
-      'x-request-id': requestId,
-      'x-forwarded-for': req.clientIp ?? 'unknown',
-      'x-forwarded-by': 'api-gateway',
+      "x-request-id": requestId,
+      "x-forwarded-for": req.clientIp ?? "unknown",
+      "x-forwarded-by": "api-gateway",
     };
 
     // Repassa Content-Type se presente
-    const contentType = req.headers['content-type'];
-    if (contentType && typeof contentType === 'string') {
-      forwardHeaders['content-type'] = contentType;
+    const contentType = req.headers["content-type"];
+    if (contentType && typeof contentType === "string") {
+      forwardHeaders["content-type"] = contentType;
     }
 
     // Repassa Authorization para o upstream (serviços internos podem ignorar, mas boa prática)
-    const auth = req.headers['authorization'];
-    if (auth && typeof auth === 'string') {
-      forwardHeaders['x-user-token'] = auth;
+    const auth = req.headers["authorization"];
+    if (auth && typeof auth === "string") {
+      forwardHeaders["x-user-token"] = auth;
     }
 
     const config: AxiosRequestConfig = {
@@ -54,8 +54,9 @@ export class ProxyService {
       const response = await axios(config);
 
       const responseHeaders: Record<string, string> = {};
-      const contentTypeRes = response.headers['content-type'];
-      if (contentTypeRes) responseHeaders['content-type'] = String(contentTypeRes);
+      const contentTypeRes = response.headers["content-type"];
+      if (contentTypeRes)
+        responseHeaders["content-type"] = String(contentTypeRes);
 
       return {
         status: response.status,
@@ -64,17 +65,23 @@ export class ProxyService {
       };
     } catch (err) {
       const axiosErr = err as AxiosError;
-      if (axiosErr.code === 'ECONNREFUSED' || axiosErr.code === 'ENOTFOUND') {
+      if (axiosErr.code === "ECONNREFUSED" || axiosErr.code === "ENOTFOUND") {
         return {
           status: 503,
-          data: { error: 'Service Unavailable', message: 'Serviço interno indisponível' },
+          data: {
+            error: "Service Unavailable",
+            message: "Serviço interno indisponível",
+          },
           headers: {},
         };
       }
-      if (axiosErr.code === 'ETIMEDOUT' || axiosErr.code === 'ECONNABORTED') {
+      if (axiosErr.code === "ETIMEDOUT" || axiosErr.code === "ECONNABORTED") {
         return {
           status: 504,
-          data: { error: 'Gateway Timeout', message: 'Timeout ao contatar serviço interno' },
+          data: {
+            error: "Gateway Timeout",
+            message: "Timeout ao contatar serviço interno",
+          },
           headers: {},
         };
       }

@@ -28,12 +28,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         <MobileTopBar onMenuOpen={() => setMobileOpen(true)} />
 
         {/* Overlay invisível — fecha o menu ao clicar fora */}
-        {overlayVisible && (
-          <div
-            className="fixed inset-0 z-40"
-            onClick={closeAll}
-          />
-        )}
+        {overlayVisible && <div className="fixed inset-0 z-40" onClick={closeAll} />}
 
         {/* Sidebar */}
         <div
@@ -53,9 +48,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
 
         {/* Main: só reserva espaço para a icon rail (w-16) no desktop */}
-        <main className="relative z-10 pt-14 md:pl-16 md:pt-0 xl:pl-0">
-          {children}
-        </main>
+        <main className="relative z-10 pt-14 md:pl-16 md:pt-0 xl:pl-0">{children}</main>
       </div>
     </SidebarContext.Provider>
   )

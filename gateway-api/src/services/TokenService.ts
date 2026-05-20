@@ -1,5 +1,5 @@
-import jwt, { JwtPayload, SignOptions } from 'jsonwebtoken';
-import { env } from '../config/env';
+import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
+import { env } from "../config/env";
 
 export interface TokenPayload {
   sub: string;
@@ -16,22 +16,26 @@ export class TokenService {
   }
 
   sign(payload: TokenPayload): string {
-    const options: SignOptions = { expiresIn: this.expiresIn as SignOptions['expiresIn'] };
+    const options: SignOptions = {
+      expiresIn: this.expiresIn as SignOptions["expiresIn"],
+    };
     return jwt.sign(payload, this.secret, options);
   }
 
   verify(token: string): TokenPayload & JwtPayload {
-    return jwt.verify(token, this.secret, { algorithms: ['HS256'] }) as TokenPayload & JwtPayload;
+    return jwt.verify(token, this.secret, {
+      algorithms: ["HS256"],
+    }) as TokenPayload & JwtPayload;
   }
 
   refresh(token: string): string {
     const decoded = this.verify(token);
-    const { iat, exp, ...payload } = decoded;
+    const { iat: _iat, exp: _exp, ...payload } = decoded;
     return this.sign(payload as TokenPayload);
   }
 
   extractFromHeader(authHeader?: string): string | null {
-    if (!authHeader?.startsWith('Bearer ')) return null;
+    if (!authHeader?.startsWith("Bearer ")) return null;
     return authHeader.slice(7);
   }
 }

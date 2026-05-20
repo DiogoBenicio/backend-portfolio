@@ -386,7 +386,11 @@ function MarkerPopupContent({
   onRemove: (id: string) => void
   hideRemove?: boolean
 }) {
-  const { data: weather, isLoading, isError } = useCurrentWeather(marker.city ?? '', marker.country, { throwOnError: false })
+  const {
+    data: weather,
+    isLoading,
+    isError,
+  } = useCurrentWeather(marker.city ?? '', marker.country, { throwOnError: false })
 
   return (
     <div className="min-w-[200px] p-1">
@@ -398,7 +402,11 @@ function MarkerPopupContent({
             <p className="text-xs text-gray-400 dark:text-slate-500 mb-2">Dados de {marker.city}</p>
           )}
           {isLoading && <p className="text-sm text-gray-500 dark:text-slate-400">Carregando...</p>}
-          {isError && <p className="text-xs text-gray-400 dark:text-slate-500">Sem dados de clima disponíveis</p>}
+          {isError && (
+            <p className="text-xs text-gray-400 dark:text-slate-500">
+              Sem dados de clima disponíveis
+            </p>
+          )}
           {weather && (
             <div className="space-y-1 text-sm">
               <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">

@@ -150,131 +150,144 @@ export function ArchitectureDiagram({ statuses }: Props) {
     <div className="rounded-xl border border-gray-200 bg-white/70 p-6 shadow-md backdrop-blur-sm dark:border-slate-700 dark:bg-gray-800/50">
       {/* Responsive diagram container */}
       <div className="overflow-x-auto">
-      <div className="relative mx-auto w-full min-w-[580px]" style={{ aspectRatio: `${VB_W} / ${VB_H}` }}>
-        {/* SVG overlay — connections only */}
-        <svg
-          viewBox={`0 0 ${VB_W} ${VB_H}`}
-          className="pointer-events-none absolute inset-0 h-full w-full"
-          xmlns="http://www.w3.org/2000/svg"
+        <div
+          className="relative mx-auto w-full min-w-[580px]"
+          style={{ aspectRatio: `${VB_W} / ${VB_H}` }}
         >
-          <defs>
-            <marker
-              id="arch-arrow"
-              markerWidth="8"
-              markerHeight="6"
-              refX="7"
-              refY="3"
-              orient="auto"
-            >
-              <polygon points="0 0, 8 3, 0 6" fill="#94a3b8" />
-            </marker>
-          </defs>
+          {/* SVG overlay — connections only */}
+          <svg
+            viewBox={`0 0 ${VB_W} ${VB_H}`}
+            className="pointer-events-none absolute inset-0 h-full w-full"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <marker
+                id="arch-arrow"
+                markerWidth="8"
+                markerHeight="6"
+                refX="7"
+                refY="3"
+                orient="auto"
+              >
+                <polygon points="0 0, 8 3, 0 6" fill="#94a3b8" />
+              </marker>
+            </defs>
 
-          {/* Browser → Nginx */}
-          <Connector x1={cx('browser')} y1={btm('browser')} x2={cx('nginx')} y2={tp('nginx') - 4} />
+            {/* Browser → Nginx */}
+            <Connector
+              x1={cx('browser')}
+              y1={btm('browser')}
+              x2={cx('nginx')}
+              y2={tp('nginx') - 4}
+            />
 
-          {/* Nginx → Frontend */}
-          <Connector
-            x1={cx('nginx')}
-            y1={btm('nginx')}
-            x2={cx('frontend')}
-            y2={tp('frontend') - 4}
+            {/* Nginx → Frontend */}
+            <Connector
+              x1={cx('nginx')}
+              y1={btm('nginx')}
+              x2={cx('frontend')}
+              y2={tp('frontend') - 4}
+            />
+
+            {/* Nginx → Gateway */}
+            <Connector
+              x1={cx('nginx')}
+              y1={btm('nginx')}
+              x2={cx('gateway')}
+              y2={tp('gateway') - 4}
+            />
+
+            {/* Gateway → Weather */}
+            <Connector
+              x1={cx('gateway')}
+              y1={btm('gateway')}
+              x2={cx('weather')}
+              y2={tp('weather') - 4}
+            />
+
+            {/* Gateway → NPS */}
+            <Connector x1={cx('gateway')} y1={btm('gateway')} x2={cx('nps')} y2={tp('nps') - 4} />
+
+            {/* Weather → Elasticsearch */}
+            <Connector
+              x1={cx('weather')}
+              y1={btm('weather')}
+              x2={cx('elastic')}
+              y2={tp('elastic') - 4}
+            />
+
+            {/* NPS → PostgreSQL */}
+            <Connector x1={cx('nps')} y1={btm('nps')} x2={cx('postgres')} y2={tp('postgres') - 4} />
+          </svg>
+
+          {/* Nodes */}
+          <DiagramNode
+            nodeKey="browser"
+            icon={<Monitor size={13} className="text-gray-500" />}
+            label="Browser / Cliente"
+            sublabel="HTTP"
+            border="border-gray-200 dark:border-slate-600"
+            bg="bg-gray-50 dark:bg-slate-800/60"
           />
-
-          {/* Nginx → Gateway */}
-          <Connector x1={cx('nginx')} y1={btm('nginx')} x2={cx('gateway')} y2={tp('gateway') - 4} />
-
-          {/* Gateway → Weather */}
-          <Connector
-            x1={cx('gateway')}
-            y1={btm('gateway')}
-            x2={cx('weather')}
-            y2={tp('weather') - 4}
+          <DiagramNode
+            nodeKey="nginx"
+            icon={<Shield size={13} className="text-gray-600 dark:text-slate-300" />}
+            label="Nginx"
+            sublabel="Reverse Proxy · :80"
+            border="border-gray-300 dark:border-slate-500"
+            bg="bg-gray-100 dark:bg-slate-700/60"
+            status={statuses.nginx.status}
           />
-
-          {/* Gateway → NPS */}
-          <Connector x1={cx('gateway')} y1={btm('gateway')} x2={cx('nps')} y2={tp('nps') - 4} />
-
-          {/* Weather → Elasticsearch */}
-          <Connector
-            x1={cx('weather')}
-            y1={btm('weather')}
-            x2={cx('elastic')}
-            y2={tp('elastic') - 4}
+          <DiagramNode
+            nodeKey="frontend"
+            icon={<Monitor size={13} className="text-blue-500" />}
+            label="Frontend"
+            sublabel="Next.js 14"
+            border="border-blue-200 dark:border-blue-700"
+            bg="bg-blue-50 dark:bg-blue-900/30"
           />
-
-          {/* NPS → PostgreSQL */}
-          <Connector x1={cx('nps')} y1={btm('nps')} x2={cx('postgres')} y2={tp('postgres') - 4} />
-        </svg>
-
-        {/* Nodes */}
-        <DiagramNode
-          nodeKey="browser"
-          icon={<Monitor size={13} className="text-gray-500" />}
-          label="Browser / Cliente"
-          sublabel="HTTP"
-          border="border-gray-200 dark:border-slate-600"
-          bg="bg-gray-50 dark:bg-slate-800/60"
-        />
-        <DiagramNode
-          nodeKey="nginx"
-          icon={<Shield size={13} className="text-gray-600 dark:text-slate-300" />}
-          label="Nginx"
-          sublabel="Reverse Proxy · :80"
-          border="border-gray-300 dark:border-slate-500"
-          bg="bg-gray-100 dark:bg-slate-700/60"
-          status={statuses.nginx.status}
-        />
-        <DiagramNode
-          nodeKey="frontend"
-          icon={<Monitor size={13} className="text-blue-500" />}
-          label="Frontend"
-          sublabel="Next.js 14"
-          border="border-blue-200 dark:border-blue-700"
-          bg="bg-blue-50 dark:bg-blue-900/30"
-        />
-        <DiagramNode
-          nodeKey="gateway"
-          icon={<Lock size={13} className="text-blue-500 dark:text-blue-400" />}
-          label="Gateway-API"
-          sublabel="JWT · Rate Limit"
-          border="border-blue-200 dark:border-blue-700"
-          bg="bg-blue-50 dark:bg-blue-900/30"
-          status={statuses.gateway.status}
-        />
-        <DiagramNode
-          nodeKey="weather"
-          icon={<Cloud size={13} className="text-orange-500" />}
-          label="Weather-API"
-          sublabel="Spring Boot 3"
-          border="border-orange-200 dark:border-orange-700"
-          bg="bg-orange-50 dark:bg-orange-900/30"
-          status={statuses.weather.status}
-        />
-        <DiagramNode
-          nodeKey="nps"
-          icon={<Star size={13} className="text-blue-500" />}
-          label="NPS-API"
-          sublabel="Fastify 4 + Prisma"
-          border="border-blue-200 dark:border-blue-700"
-          bg="bg-blue-50 dark:bg-blue-900/30"
-          status={statuses.nps.status}
-        />
-        <DiagramNode
-          nodeKey="elastic"
-          icon={<Database size={12} className="text-orange-400 dark:text-orange-300" />}
-          label="Elasticsearch"
-          border="border-orange-300 dark:border-orange-700"
-          bg="bg-orange-50/60 dark:bg-orange-900/20"
-        />
-        <DiagramNode
-          nodeKey="postgres"
-          icon={<Database size={12} className="text-blue-400 dark:text-blue-300" />}
-          label="PostgreSQL"
-          border="border-blue-300 dark:border-blue-700"
-          bg="bg-blue-50/60 dark:bg-blue-900/20"
-        />
-      </div>
+          <DiagramNode
+            nodeKey="gateway"
+            icon={<Lock size={13} className="text-blue-500 dark:text-blue-400" />}
+            label="Gateway-API"
+            sublabel="JWT · Rate Limit"
+            border="border-blue-200 dark:border-blue-700"
+            bg="bg-blue-50 dark:bg-blue-900/30"
+            status={statuses.gateway.status}
+          />
+          <DiagramNode
+            nodeKey="weather"
+            icon={<Cloud size={13} className="text-orange-500" />}
+            label="Weather-API"
+            sublabel="Spring Boot 3"
+            border="border-orange-200 dark:border-orange-700"
+            bg="bg-orange-50 dark:bg-orange-900/30"
+            status={statuses.weather.status}
+          />
+          <DiagramNode
+            nodeKey="nps"
+            icon={<Star size={13} className="text-blue-500" />}
+            label="NPS-API"
+            sublabel="Fastify 4 + Prisma"
+            border="border-blue-200 dark:border-blue-700"
+            bg="bg-blue-50 dark:bg-blue-900/30"
+            status={statuses.nps.status}
+          />
+          <DiagramNode
+            nodeKey="elastic"
+            icon={<Database size={12} className="text-orange-400 dark:text-orange-300" />}
+            label="Elasticsearch"
+            border="border-orange-300 dark:border-orange-700"
+            bg="bg-orange-50/60 dark:bg-orange-900/20"
+          />
+          <DiagramNode
+            nodeKey="postgres"
+            icon={<Database size={12} className="text-blue-400 dark:text-blue-300" />}
+            label="PostgreSQL"
+            border="border-blue-300 dark:border-blue-700"
+            bg="bg-blue-50/60 dark:bg-blue-900/20"
+          />
+        </div>
       </div>
 
       {/* Legend */}

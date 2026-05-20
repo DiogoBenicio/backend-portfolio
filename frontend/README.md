@@ -11,12 +11,12 @@ Landing page + dashboard com visualizações de clima e formulário NPS.
 
 ## Rotas
 
-| Rota | Descrição |
-|---|---|
-| `/` | Landing page com hero, stack e diagrama de arquitetura |
-| `/dashboard/weather` | Clima atual, gráficos de sensores, previsão 5 dias e heatmap mensal |
-| `/dashboard/map` | Mapa interativo Leaflet com marcadores e popup de clima em tempo real |
-| `/dashboard/nps` | Formulário NPS (0–10) + painel com score, zonas e distribuição |
+| Rota                   | Descrição                                                                  |
+| ---------------------- | -------------------------------------------------------------------------- |
+| `/`                    | Landing page com hero, stack e diagrama de arquitetura                     |
+| `/dashboard/weather`   | Clima atual, gráficos de sensores, previsão 5 dias e heatmap mensal        |
+| `/dashboard/map`       | Mapa interativo Leaflet com marcadores e popup de clima em tempo real      |
+| `/dashboard/nps`       | Formulário NPS (0–10) + painel com score, zonas e distribuição             |
 | `/dashboard/ecosystem` | Diagrama interativo da arquitetura de microsserviços e status dos serviços |
 
 ## Design
@@ -28,11 +28,11 @@ Landing page + dashboard com visualizações de clima e formulário NPS.
 
 ## Cache (TanStack Query)
 
-| Dado | staleTime |
-|---|---|
-| Clima atual | 5 min |
-| Sensores históricos | 10 min |
-| Previsão | 1 min |
+| Dado                | staleTime |
+| ------------------- | --------- |
+| Clima atual         | 5 min     |
+| Sensores históricos | 10 min    |
+| Previsão            | 1 min     |
 
 ## Executar localmente
 

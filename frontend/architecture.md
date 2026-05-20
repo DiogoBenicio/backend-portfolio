@@ -1,6 +1,7 @@
 # Frontend — Arquitetura
 
 ## Stack
+
 - **Next.js 14** (App Router, React Server Components)
 - **TypeScript**
 - **Tailwind CSS**
@@ -51,10 +52,10 @@ Todas as chamadas passam pelo gateway em `/api/*`. O cliente nunca acessa os ser
 
 ## Componentes chave
 
-| Componente | Responsabilidade |
-|---|---|
-| `SensorChart` | Gráfico de linha multi-eixo com 9 sensores togláveis |
-| `CalendarHeatmap` | Heatmap mensal de disponibilidade de dados no ES |
-| `ArchitectureDiagram` | Diagrama SVG dinâmico com status em tempo real |
-| `RateLimitModal` | Modal de feedback ao atingir rate limit do gateway |
-| `DateRangePicker` | Seletor de período restrito a ontem — 5 dias atrás |
+| Componente            | Responsabilidade                                     |
+| --------------------- | ---------------------------------------------------- |
+| `SensorChart`         | Gráfico de linha multi-eixo com 9 sensores togláveis |
+| `CalendarHeatmap`     | Heatmap mensal de disponibilidade de dados no ES     |
+| `ArchitectureDiagram` | Diagrama SVG dinâmico com status em tempo real       |
+| `RateLimitModal`      | Modal de feedback ao atingir rate limit do gateway   |
+| `DateRangePicker`     | Seletor de período restrito a ontem — 5 dias atrás   |

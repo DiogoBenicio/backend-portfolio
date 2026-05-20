@@ -1,4 +1,8 @@
-export type NpsZone = 'Crítico' | 'Aperfeiçoamento' | 'Qualidade' | 'Excelência';
+export type NpsZone =
+  | "Crítico"
+  | "Aperfeiçoamento"
+  | "Qualidade"
+  | "Excelência";
 
 export interface NpsSummary {
   page: string;
@@ -11,20 +15,26 @@ export interface NpsSummary {
   distribution: Record<number, number>;
 }
 
-export function classifyScore(score: number): 'promoter' | 'passive' | 'detractor' {
-  if (score >= 9) return 'promoter';
-  if (score >= 7) return 'passive';
-  return 'detractor';
+export function classifyScore(
+  score: number,
+): "promoter" | "passive" | "detractor" {
+  if (score >= 9) return "promoter";
+  if (score >= 7) return "passive";
+  return "detractor";
 }
 
-export function calculateNps(promoters: number, detractors: number, total: number): number {
+export function calculateNps(
+  promoters: number,
+  detractors: number,
+  total: number,
+): number {
   if (total === 0) return 0;
   return Math.round(((promoters - detractors) / total) * 100 * 10) / 10;
 }
 
 export function getZone(npsScore: number): NpsZone {
-  if (npsScore <= 0) return 'Crítico';
-  if (npsScore <= 50) return 'Aperfeiçoamento';
-  if (npsScore <= 75) return 'Qualidade';
-  return 'Excelência';
+  if (npsScore <= 0) return "Crítico";
+  if (npsScore <= 50) return "Aperfeiçoamento";
+  if (npsScore <= 75) return "Qualidade";
+  return "Excelência";
 }

@@ -1,19 +1,19 @@
-import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
-import { proxyService } from '../services/ProxyService';
-import { resolveUpstream } from '../config/routeConfig';
-import { logger } from '../utils/logger';
+import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import { proxyService } from "../services/ProxyService";
+import { resolveUpstream } from "../config/routeConfig";
+import { logger } from "../utils/logger";
 
 // Handler compartilhado de proxy — encaminha para o upstream correto
 async function proxyHandler(
   request: FastifyRequest,
   reply: FastifyReply,
 ): Promise<void> {
-  const resolved = resolveUpstream(request.url.split('?')[0]);
+  const resolved = resolveUpstream(request.url.split("?")[0]);
 
   if (!resolved) {
     return reply.status(404).send({
       status: 404,
-      error: 'Not Found',
+      error: "Not Found",
       message: `Rota não encontrada: ${request.method} ${request.url}`,
     });
   }
@@ -43,8 +43,9 @@ async function proxyHandler(
     );
     return reply.status(502).send({
       status: 502,
-      error: 'Bad Gateway',
-      message: 'Falha ao comunicar com o serviço de destino. Tente novamente em instantes.',
+      error: "Bad Gateway",
+      message:
+        "Falha ao comunicar com o serviço de destino. Tente novamente em instantes.",
     });
   }
 }
@@ -54,11 +55,14 @@ const NPS_RATE_LIMIT = {
   config: {
     rateLimit: {
       max: 300,
-      timeWindow: '1 minute',
-      errorResponseBuilder: (_req: unknown, context: { after: string; ttl: number }) => ({
+      timeWindow: "1 minute",
+      errorResponseBuilder: (
+        _req: unknown,
+        context: { after: string; ttl: number },
+      ) => ({
         status: 429,
-        error: 'Too Many Requests',
-        message: 'Muitas requisições. Aguarde antes de tentar novamente.',
+        error: "Too Many Requests",
+        message: "Muitas requisições. Aguarde antes de tentar novamente.",
         retryAfter: context.after,
         retryAfterMs: context.ttl,
       }),
@@ -71,11 +75,14 @@ const HEAVY_RATE_LIMIT = {
   config: {
     rateLimit: {
       max: 60,
-      timeWindow: '1 minute',
-      errorResponseBuilder: (_req: unknown, context: { after: string; ttl: number }) => ({
+      timeWindow: "1 minute",
+      errorResponseBuilder: (
+        _req: unknown,
+        context: { after: string; ttl: number },
+      ) => ({
         status: 429,
-        error: 'Too Many Requests',
-        message: 'Muitas requisições. Aguarde antes de tentar novamente.',
+        error: "Too Many Requests",
+        message: "Muitas requisições. Aguarde antes de tentar novamente.",
         retryAfter: context.after,
         retryAfterMs: context.ttl,
       }),
@@ -85,18 +92,18 @@ const HEAVY_RATE_LIMIT = {
 
 export function registerProxyRoutes(server: FastifyInstance): void {
   // Rotas sensíveis com rate limit próprio (3 req/min)
-  server.get('/api/weather/sensors',  HEAVY_RATE_LIMIT, proxyHandler);
-  server.get('/api/weather/calendar', HEAVY_RATE_LIMIT, proxyHandler);
-  server.post('/api/weather/populate', HEAVY_RATE_LIMIT, proxyHandler);
+  server.get("/api/weather/sensors", HEAVY_RATE_LIMIT, proxyHandler);
+  server.get("/api/weather/calendar", HEAVY_RATE_LIMIT, proxyHandler);
+  server.post("/api/weather/populate", HEAVY_RATE_LIMIT, proxyHandler);
 
   // NPS com rate limit próprio generoso (deve funcionar mesmo após rate limit do restante)
-  server.all('/api/nps/*', NPS_RATE_LIMIT, proxyHandler);
+  server.all("/api/nps/*", NPS_RATE_LIMIT, proxyHandler);
 
   // Captura todas as rotas restantes de /api/weather/*
   server.all(
-    '/api/weather/*',
+    "/api/weather/*",
     async (request: FastifyRequest, reply: FastifyReply) => {
       return proxyHandler(request, reply);
-    }
+    },
   );
 }

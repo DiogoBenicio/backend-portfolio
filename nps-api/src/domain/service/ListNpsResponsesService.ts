@@ -1,5 +1,9 @@
-import { ListNpsResponsesInput, ListNpsResponsesResult, ListNpsResponsesUseCase } from '../port/in/ListNpsResponsesUseCase';
-import { NpsResponseRepository } from '../port/out/NpsResponseRepository';
+import {
+  ListNpsResponsesInput,
+  ListNpsResponsesResult,
+  ListNpsResponsesUseCase,
+} from "../port/in/ListNpsResponsesUseCase";
+import { NpsResponseRepository } from "../port/out/NpsResponseRepository";
 
 export class ListNpsResponsesService implements ListNpsResponsesUseCase {
   constructor(private readonly repository: NpsResponseRepository) {}

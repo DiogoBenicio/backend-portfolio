@@ -8,7 +8,11 @@ import { LiveMetrics } from '@/components/ecosystem/LiveMetrics'
 import { SystemMetrics } from '@/components/ecosystem/SystemMetrics'
 import { PageContainer } from '@/components/layout/PageContainer'
 import { PageLoader } from '@/components/ui/PageLoader'
-import type { ServiceHealthEntry, ServiceHealthResult, ServiceStatus } from '@/hooks/useServiceHealth'
+import type {
+  ServiceHealthEntry,
+  ServiceHealthResult,
+  ServiceStatus,
+} from '@/hooks/useServiceHealth'
 
 const SERVICES = [
   {

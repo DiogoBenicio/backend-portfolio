@@ -1,4 +1,4 @@
-import { NpsResponse } from '../../model/NpsResponse';
+import { NpsResponse } from "../../model/NpsResponse";
 
 export interface SubmitNpsScoreInput {
   score: number;

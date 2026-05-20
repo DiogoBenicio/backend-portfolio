@@ -90,9 +90,7 @@ export default function WeatherPage() {
     <PageContainer>
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">
-            Painel de Clima
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Painel de Clima</h1>
           <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
             Dados em tempo real via OpenWeather API · Histórico por sensor no Elasticsearch
           </p>

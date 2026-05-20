@@ -1,10 +1,10 @@
-import { PrismaClient, Prisma } from '@prisma/client';
-import { NpsResponse } from '../../../domain/model/NpsResponse';
+import { PrismaClient, Prisma } from "@prisma/client";
+import { NpsResponse } from "../../../domain/model/NpsResponse";
 import {
   CreateNpsResponseInput,
   FindManyOptions,
   NpsResponseRepository,
-} from '../../../domain/port/out/NpsResponseRepository';
+} from "../../../domain/port/out/NpsResponseRepository";
 
 export class PrismaNpsResponseRepository implements NpsResponseRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -20,13 +20,15 @@ export class PrismaNpsResponseRepository implements NpsResponseRepository {
     });
   }
 
-  async findMany(options: FindManyOptions): Promise<{ data: NpsResponse[]; total: number }> {
+  async findMany(
+    options: FindManyOptions,
+  ): Promise<{ data: NpsResponse[]; total: number }> {
     const where = options.page ? { page: options.page } : {};
 
     const [data, total] = await Promise.all([
       this.prisma.npsResponse.findMany({
         where,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { createdAt: "desc" },
         take: options.limit,
         skip: options.offset,
       }),
@@ -40,7 +42,7 @@ export class PrismaNpsResponseRepository implements NpsResponseRepository {
     const where = page ? { page } : {};
     return this.prisma.npsResponse.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
     });
   }
 
@@ -48,7 +50,10 @@ export class PrismaNpsResponseRepository implements NpsResponseRepository {
     try {
       await this.prisma.npsResponse.delete({ where: { id } });
     } catch (err) {
-      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
+      if (
+        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err.code === "P2025"
+      ) {
         const notFound = new Error(`Resposta NPS não encontrada: ${id}`);
         (notFound as Error & { statusCode: number }).statusCode = 404;
         throw notFound;
