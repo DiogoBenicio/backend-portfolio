@@ -22,6 +22,7 @@ async function buildServer() {
       "http://localhost:3000",
       "http://nginx",
       "http://portfolio-frontend:3000",
+      "https://diogoportifolio.opiniaolivre.com",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],

@@ -1,5 +1,6 @@
 services:
-  # ─── Infraestrutura ───────────────────────────────────────
+
+  # ─── Infraestrutura ───────────────────────────────────────────
   postgres:
     image: postgres:15-alpine
     container_name: portfolio-postgres
@@ -26,7 +27,7 @@ services:
       retries: 5
       start_period: 30s
 
-  # ─── Projeto 1: Weather API (interno — sem porta exposta) ──
+  # ─── Projeto 1: Weather API ───────────────────────────────────
   weather-api:
     build:
       context: ./weather-api
@@ -43,8 +44,14 @@ services:
         condition: service_healthy
     networks:
       - portfolio-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8080/actuator/health | grep -q UP || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 8
+      start_period: 60s
 
-  # ─── Projeto 2: NPS API (interno — sem porta exposta) ─────
+  # ─── Projeto 2: NPS API ───────────────────────────────────────
   nps-api:
     build:
       context: ./nps-api
@@ -62,24 +69,34 @@ services:
         condition: service_healthy
     networks:
       - portfolio-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3001/api/v1/health 2>/dev/null | grep -q ok || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 30s
 
-  # ─── Projeto 3: Frontend (interno — sem porta exposta) ────
+  # ─── Projeto 3: Frontend ──────────────────────────────────────
   portfolio-frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY}
     container_name: portfolio-frontend
     environment:
       NEXT_PUBLIC_WEATHER_API_URL: /api/weather
       NEXT_PUBLIC_NPS_API_URL: /api/nps
     mem_limit: 128m
     depends_on:
-      - weather-api
-      - nps-api
+      weather-api:
+        condition: service_healthy
+      nps-api:
+        condition: service_healthy
     networks:
       - portfolio-network
 
-  # ─── Projeto 4: API Gateway (interno — sem porta exposta) ─
+  # ─── Projeto 4: API Gateway ───────────────────────────────────
   gateway-api:
     build:
       context: ./gateway-api
@@ -99,27 +116,87 @@ services:
       NODE_OPTIONS: --max-old-space-size=64
     mem_limit: 96m
     depends_on:
-      - weather-api
-      - nps-api
+      weather-api:
+        condition: service_healthy
+      nps-api:
+        condition: service_healthy
     networks:
       - portfolio-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:4000/health 2>/dev/null | grep -q ok || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 20s
 
-  # ─── Projeto 5: Nginx — ÚNICO ponto de entrada ────────────
+  # ─── Nginx — único ponto de entrada ──────────────────────────
   nginx:
     build:
       context: ./nginx
       dockerfile: Dockerfile
+      args:
+        NGINX_CONF: ${NGINX_CONF:-nginx.dev.conf}
     container_name: portfolio-nginx
     ports:
-      - "80:80"   # Única porta exposta ao host
+      - "80:80"
+      - "443:443"
+    volumes:
+      - certbot-certs:/etc/letsencrypt:ro
+      - certbot-webroot:/var/www/certbot
     depends_on:
-      - portfolio-frontend
-      - gateway-api
+      portfolio-frontend:
+        condition: service_started
+      gateway-api:
+        condition: service_healthy
+    networks:
+      - portfolio-network
+
+  # ─── Certbot (somente prod) ───────────────────────────────────
+  certbot:
+    profiles: [prod]
+    image: certbot/certbot
+    container_name: portfolio-certbot
+    volumes:
+      - certbot-certs:/etc/letsencrypt
+      - certbot-webroot:/var/www/certbot
+    entrypoint: >
+      /bin/sh -c "trap exit TERM;
+      while :; do certbot renew --quiet; sleep 12h & wait $${!}; done"
+
+  # ─── Seed weather (idempotente, roda a cada startup) ────────
+  seed:
+    image: curlimages/curl:latest
+    container_name: portfolio-seed
+    depends_on:
+      weather-api:
+        condition: service_healthy
+    volumes:
+      - ./scripts/seed-weather.sh:/seed.sh:ro
+    entrypoint: sh /seed.sh
+    restart: "no"
+    networks:
+      - portfolio-network
+
+  # ─── Seed NPS (idempotente, roda a cada startup) ─────────────
+  seed-nps:
+    image: postgres:15-alpine
+    container_name: portfolio-seed-nps
+    environment:
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      nps-api:
+        condition: service_healthy
+    volumes:
+      - ./postgres/init/02-seed-nps.sql:/seed-nps.sql:ro
+    command: psql -h postgres -U nps_user -d nps_db -f /seed-nps.sql
+    restart: "no"
     networks:
       - portfolio-network
 
 volumes:
   postgres-data:
+  certbot-certs:
+  certbot-webroot:
 
 networks:
   portfolio-network:

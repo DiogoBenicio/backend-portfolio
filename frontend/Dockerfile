@@ -10,6 +10,16 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED 1
+
+# NEXT_PUBLIC_* são inlineadas pelo compilador no bundle; precisam existir aqui,
+# não em runtime. Valores padrão funcionam para dev e prod via nginx.
+ARG NEXT_PUBLIC_WEATHER_API_URL=/api/weather
+ARG NEXT_PUBLIC_NPS_API_URL=/api/nps
+ARG NEXT_PUBLIC_OPENWEATHER_API_KEY=
+ENV NEXT_PUBLIC_WEATHER_API_URL=$NEXT_PUBLIC_WEATHER_API_URL
+ENV NEXT_PUBLIC_NPS_API_URL=$NEXT_PUBLIC_NPS_API_URL
+ENV NEXT_PUBLIC_OPENWEATHER_API_KEY=$NEXT_PUBLIC_OPENWEATHER_API_KEY
+
 RUN npm run build
 
 # ─── Stage 3: Runtime ─────────────────────────────────────

@@ -24,7 +24,11 @@ RUN npm ci --omit=dev
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
 COPY prisma ./prisma
+
+# Recria o symlink do CLI prisma (devDep não instalada pelo npm ci --omit=dev)
+RUN ln -sf ../prisma/build/index.js ./node_modules/.bin/prisma
 
 RUN chown -R appuser:appgroup /app
 
@@ -32,4 +36,4 @@ USER appuser
 
 EXPOSE 3001
 
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/main.js"]
+CMD ["sh", "-c", "./node_modules/.bin/prisma migrate deploy && node dist/main.js"]
