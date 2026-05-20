@@ -16,7 +16,7 @@ prod:
 # Após concluir, rode: make prod
 cert-init:
 	@test -n "$(CERTBOT_EMAIL)" || (echo "Erro: defina CERTBOT_EMAIL no .env ou como variável"; exit 1)
-	NGINX_CONF=nginx.dev.conf docker compose up -d nginx
+	NGINX_CONF=nginx.dev.conf docker compose up -d --no-deps nginx
 	NGINX_CONF=nginx.dev.conf docker compose --profile prod run --rm certbot \
 	  certonly --webroot -w /var/www/certbot \
 	  --email $(CERTBOT_EMAIL) --agree-tos --no-eff-email \

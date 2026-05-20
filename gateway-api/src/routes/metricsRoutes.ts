@@ -1,6 +1,7 @@
 import os from "os";
 import { statfs } from "fs/promises";
 import { FastifyInstance } from "fastify";
+import { logger } from "../utils/logger";
 
 // ── Helpers INMET ──────────────────────────────────────────────────────────
 
@@ -14,17 +15,19 @@ interface InmetAlert {
   areas: string[];
 }
 
-function unescapeHtml(str: string): string {
+export function unescapeHtml(str: string): string {
   return str
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
-    .replace(/&nbsp;/g, " ");
+    .replace(/&nbsp;/g, " ")
+    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(parseInt(code, 10)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCharCode(parseInt(code, 16)));
 }
 
-function extractTableField(html: string, fieldName: string): string {
+export function extractTableField(html: string, fieldName: string): string {
   const re = new RegExp(
     "<th[^>]*>\\s*" + fieldName + "\\s*</th>\\s*<td[^>]*>([\\s\\S]*?)</td>",
     "i",
@@ -34,14 +37,14 @@ function extractTableField(html: string, fieldName: string): string {
   return m[1].replace(/<[^>]+>/g, "").trim();
 }
 
-function parseSeverity(raw: string): InmetAlert["severity"] {
+export function parseSeverity(raw: string): InmetAlert["severity"] {
   const lower = raw.toLowerCase();
   if (lower.includes("perigo potencial")) return "perigo_potencial";
   if (lower.includes("perigo")) return "perigo";
   return "atencao";
 }
 
-function parseInmetRss(xml: string): InmetAlert[] {
+export function parseInmetRss(xml: string): InmetAlert[] {
   const alerts: InmetAlert[] = [];
   const itemRe = /<item>([\s\S]*?)<\/item>/gi;
   let itemMatch: RegExpExecArray | null;
@@ -98,7 +101,8 @@ export function registerMetricsRoutes(server: FastifyInstance): void {
         free: stats.bfree * stats.bsize,
         available: stats.bavail * stats.bsize,
       };
-    } catch {
+    } catch (err) {
+      logger.warn(`statfs indisponível: ${err instanceof Error ? err.message : String(err)}`);
       disk = null;
     }
 
@@ -133,12 +137,16 @@ export function registerMetricsRoutes(server: FastifyInstance): void {
         headers: { "User-Agent": "Mozilla/5.0" },
         signal: AbortSignal.timeout(8000),
       });
-      if (!res.ok) return reply.send([]);
+      if (!res.ok) {
+        logger.warn(`INMET RSS retornou ${res.status} ${res.statusText}`);
+        return reply.send([]);
+      }
       const xml = await res.text();
       return reply
         .header("Cache-Control", "s-maxage=1800, stale-while-revalidate")
         .send(parseInmetRss(xml));
-    } catch {
+    } catch (err) {
+      logger.warn(`INMET RSS erro: ${err instanceof Error ? err.message : String(err)}`);
       return reply.send([]);
     }
   });

@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS "NpsResponse" (
     "name"      TEXT,
     "page"      TEXT          NOT NULL DEFAULT 'portfolio',
     "createdAt" TIMESTAMP(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" TIMESTAMP(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3)  NOT NULL,
     CONSTRAINT "NpsResponse_pkey" PRIMARY KEY ("id")
 );
 
