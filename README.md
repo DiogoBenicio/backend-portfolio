@@ -109,6 +109,30 @@ Nginx :80  ──── único ponto de entrada ──────────�
 
 ---
 
+## Decisão de Arquitetura: PostgreSQL no lugar do Elasticsearch
+
+A Weather API foi projetada originalmente com **Elasticsearch 8** como banco de persistência histórica — uma escolha técnica válida para buscas full-text e agregações em séries temporais. O Elasticsearch aparece nos badges, no diagrama de arquitetura e na documentação dos serviços porque **faz parte do portfólio como escolha de design**.
+
+Na prática, porém, o Elasticsearch consome ~512–700 MB de heap sozinho, inviabilizando o deploy em qualquer instância cloud de free tier (geralmente 1 GB de RAM total). Para que o portfólio pudesse rodar em produção sem custo, o **adapter de saída** foi trocado para PostgreSQL — que já existe na stack para o NPS API.
+
+A troca foi cirúrgica graças à arquitetura hexagonal:
+
+```
+Antes: WeatherProviderClient → [ Use Cases ] → WeatherDataRepository ← ElasticsearchWeatherAdapter
+Depois:                                                               ← PostgresWeatherAdapter
+```
+
+Nenhum use case, porta ou controller foi alterado. O domínio permanece agnóstico à tecnologia de persistência — exatamente o benefício que a arquitetura hexagonal promete.
+
+| | Elasticsearch | PostgreSQL |
+|---|---|---|
+| RAM em idle | ~512–700 MB | ~30–50 MB |
+| Custo cloud (free tier) | Inviável | Viável |
+| Busca full-text nativa | Sim | Não necessário aqui |
+| Séries temporais simples | Sim | Sim (índices + range queries) |
+
+---
+
 ## Como Executar
 
 ### Pré-requisitos
