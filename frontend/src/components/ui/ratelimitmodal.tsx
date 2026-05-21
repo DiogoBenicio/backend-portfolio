@@ -42,14 +42,7 @@ export function RateLimitModal() {
     return () => clearInterval(interval)
   }, [isGatedPage, startUsageTimer])
 
-  useEffect(() => {
-    function handleRateLimit(e: Event) {
-      const detail = (e as CustomEvent<{ retryAfter?: string }>).detail
-      show(detail?.retryAfter)
-    }
-    window.addEventListener('rate-limit', handleRateLimit)
-    return () => window.removeEventListener('rate-limit', handleRateLimit)
-  }, [show])
+  // 429 da API não dispara mais o bloqueio de 1h — apenas o usage gate faz isso
 
   function goToNps() {
     hide()

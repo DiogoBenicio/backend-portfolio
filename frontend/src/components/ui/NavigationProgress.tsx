@@ -23,6 +23,7 @@ export function NavigationProgress() {
       if (!href) return
       if (href.startsWith('http') || href.startsWith('mailto') || href.startsWith('#')) return
       if (anchor.target === '_blank') return
+      if (anchor.hasAttribute('download')) return
       if (href === pathname) return
 
       setLoading(true)

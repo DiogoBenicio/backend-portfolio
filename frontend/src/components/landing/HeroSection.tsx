@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, Cloud, MapPin, Star } from 'lucide-react'
+import { ArrowRight, Cloud, MapPin, Star, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { IconTexture } from './IconTexture'
@@ -68,26 +68,41 @@ export function HeroSection() {
             </div>
 
             {/* CTAs */}
-            <div className="flex flex-wrap gap-3">
-              <Link href="/dashboard/weather">
-                <Button className="gap-2">
-                  <Cloud size={16} />
-                  Painel de Clima
-                  <ArrowRight size={14} />
+            <div className="flex flex-col gap-5">
+              {/* Download CV — ação principal */}
+              <a href="/curriculo-diogo-benicio.pdf" download className="w-full sm:w-fit">
+                <Button className="w-full gap-2 sm:w-fit">
+                  <Download size={16} />
+                  Baixar Currículo PDF
                 </Button>
-              </Link>
-              <Link href="/dashboard/map">
-                <Button variant="outline" className="gap-2">
-                  <MapPin size={16} />
-                  Mapa de Clima
-                </Button>
-              </Link>
-              <Link href="/dashboard/nps">
-                <Button variant="ghost" className="gap-2">
-                  <Star size={16} />
-                  Avaliação NPS
-                </Button>
-              </Link>
+              </a>
+
+              {/* Explorar projetos */}
+              <div className="flex flex-col gap-2">
+                <p className="text-xs font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                  Projetos
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  <Link href="/dashboard/weather">
+                    <Button variant="outline" size="sm" className="gap-1.5">
+                      <Cloud size={14} />
+                      Painel de Clima
+                    </Button>
+                  </Link>
+                  <Link href="/dashboard/map">
+                    <Button variant="outline" size="sm" className="gap-1.5">
+                      <MapPin size={14} />
+                      Mapa de Clima
+                    </Button>
+                  </Link>
+                  <Link href="/dashboard/nps">
+                    <Button variant="outline" size="sm" className="gap-1.5">
+                      <Star size={14} />
+                      Avaliação NPS
+                    </Button>
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>

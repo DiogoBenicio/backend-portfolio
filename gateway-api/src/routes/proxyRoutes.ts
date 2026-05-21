@@ -74,7 +74,7 @@ const NPS_RATE_LIMIT = {
 const HEAVY_RATE_LIMIT = {
   config: {
     rateLimit: {
-      max: 60,
+      max: 300,
       timeWindow: "1 minute",
       errorResponseBuilder: (
         _req: unknown,
