@@ -687,10 +687,10 @@ export function WeatherMap({
   const isDark = resolvedTheme === 'dark'
 
   const tileUrl = isDark
-    ? 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
     : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
   const tileAttribution = isDark
-    ? '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
     : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 
   const onMarkersChangeRef = useRef(onMarkersChange)
