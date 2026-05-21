@@ -4,7 +4,7 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 
 const RL_KEY = 'rl-blocked-until'
 const USAGE_KEY = 'usage-start'
-const USAGE_GATE_MS = 10 * 60 * 1000
+const USAGE_GATE_MS = 30 * 60 * 1000
 
 interface RateLimitState {
   visible: boolean
