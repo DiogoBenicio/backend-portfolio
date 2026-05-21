@@ -1,8 +1,11 @@
 # Backend Portfolio — Diogo Silveira Benício
 
-> Full Stack Engineer | Node.js • React • Java • Elasticsearch | Cloud, IoT & Data Platforms
+> Full Stack Engineer | Node.js • React • Java • PostgreSQL | Cloud & Data Platforms
 
-Portfólio técnico com 5 microsserviços interconectados demonstrando arquitetura hexagonal, SOA, segurança com JWT e infraestrutura containerizada.
+Portfólio técnico com 5 microsserviços interconectados demonstrando arquitetura hexagonal, SOA, segurança com JWT e infraestrutura containerizada. Deploy em produção na Oracle Cloud (OCI) com HTTPS via Let's Encrypt.
+
+[![Version](https://img.shields.io/badge/version-v1.0.0-blue?style=flat-square)](https://github.com/DiogoBenicio/backend-portfolio/releases/tag/v1.0.0)
+[![Live](https://img.shields.io/badge/live-diogoportfolio.opiniaolivre.com-green?style=flat-square)](https://diogoportfolio.opiniaolivre.com)
 
 ---
 
@@ -11,6 +14,8 @@ Portfólio técnico com 5 microsserviços interconectados demonstrando arquitetu
 ### Infraestrutura
 ![Nginx](https://img.shields.io/badge/Nginx-009639?style=for-the-badge&logo=nginx&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
+![Oracle Cloud](https://img.shields.io/badge/Oracle_Cloud-F80000?style=for-the-badge&logo=oracle&logoColor=white)
+![Let's Encrypt](https://img.shields.io/badge/Let's_Encrypt-003A70?style=for-the-badge&logo=letsencrypt&logoColor=white)
 
 ### API Gateway
 ![Node.js](https://img.shields.io/badge/Node.js_20-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
@@ -21,7 +26,7 @@ Portfólio técnico com 5 microsserviços interconectados demonstrando arquitetu
 ### Weather API
 ![Java](https://img.shields.io/badge/Java_21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot_3.3-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
-![Elasticsearch](https://img.shields.io/badge/Elasticsearch_8-005571?style=for-the-badge&logo=elasticsearch&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL_15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 
 ### NPS API
 ![Node.js](https://img.shields.io/badge/Node.js_20-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
@@ -45,9 +50,9 @@ Portfólio técnico com 5 microsserviços interconectados demonstrando arquitetu
 
 | Projeto | Stack | Porta |
 |---|---|---|
-| [nginx](./nginx) | Nginx 1.27 | **:80** (único ponto externo) |
+| [nginx](./nginx) | Nginx 1.27 | **:80 / :443** (único ponto externo) |
 | [gateway-api](./gateway-api) | Node.js 20 + Fastify + JWT | Interno :4000 |
-| [weather-api](./weather-api) | Java 21 + Spring Boot 3.3 + Elasticsearch 8 | Interno :8080 |
+| [weather-api](./weather-api) | Java 21 + Spring Boot 3.3 + PostgreSQL | Interno :8080 |
 | [nps-api](./nps-api) | Node.js 20 + Fastify + Prisma + PostgreSQL 15 | Interno :3001 |
 | [frontend](./frontend) | Next.js 14 + shadcn/ui + Tailwind | Interno :3000 |
 
@@ -58,7 +63,7 @@ Portfólio técnico com 5 microsserviços interconectados demonstrando arquitetu
 ```
 Internet
    ↓
-Nginx :80  ──── único ponto de entrada ────────────────────
+Nginx :443 (HTTPS/TLS) ──── único ponto de entrada ───────────
    │
    ├── /          → Next.js Frontend (interno :3000)
    │
@@ -69,12 +74,12 @@ Nginx :80  ──── único ponto de entrada ──────────�
                        ├── Request logging estruturado
                        │
                        ├── /api/weather/* → Weather API (interno :8080)
-                       │                        └── Elasticsearch (interno :9200)
+                       │                        └── PostgreSQL (interno :5432)
                        └── /api/nps/*    → NPS API (interno :3001)
                                                 └── PostgreSQL (interno :5432)
 ```
 
-**Superfície de ataque:** antes 5 portas expostas → agora **1 porta** (Nginx :80)
+**Superfície de ataque:** antes 5 portas expostas → agora **1 porta** (Nginx :443)
 
 ---
 
@@ -162,7 +167,7 @@ docker compose up --build -d
 ```bash
 curl -X POST http://localhost/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin2025"}'
+  -d '{"username":"admin","password":"<ADMIN_PASS>"}'
 ```
 
 ### Usar token
@@ -171,6 +176,20 @@ curl -X POST http://localhost/api/auth/login \
 curl "http://localhost/api/weather/history?city=Uberlândia" \
   -H "Authorization: Bearer <token>"
 ```
+
+---
+
+## Changelog
+
+### v1.0.0 — 2026-05-21
+- Deploy em produção na Oracle Cloud (OCI) com HTTPS automático via Let's Encrypt
+- Migração Elasticsearch → PostgreSQL na Weather API (arquitetura hexagonal preservada)
+- Dashboard de Clima: gráficos históricos, mapa Leaflet com tiles CartoDB, calendário heatmap
+- Dashboard NPS: formulário de avaliação, gráfico de distribuição, histórico de respostas
+- Painel de Observabilidade: métricas de sistema, status dos serviços, logs em tempo real
+- Usage gate: bloqueio por tempo de navegação com modal e redirecionamento para NPS
+- Sidebar responsivo com animação de colapso e fade de conteúdo
+- Proteção SSH com fail2ban na VM de produção
 
 ---
 
