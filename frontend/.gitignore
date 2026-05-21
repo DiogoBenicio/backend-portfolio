@@ -1,0 +1,13 @@
+# Build output (static export)
+out/
+
+# Next.js
+.next/
+*.tsbuildinfo
+next-env.d.ts
+
+# Dependencies
+node_modules/
+
+# Env
+.env*.local
