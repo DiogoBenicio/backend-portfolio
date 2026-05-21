@@ -28,7 +28,7 @@ function formatTime(seconds: number): string {
 }
 
 export function RateLimitModal() {
-  const { isBlocked, timeRemaining, show, hide, startUsageTimer } = useRateLimit()
+  const { isBlocked, timeRemaining, hide, startUsageTimer } = useRateLimit()
   const router = useRouter()
   const pathname = usePathname()
 

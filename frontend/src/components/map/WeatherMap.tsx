@@ -686,8 +686,10 @@ export function WeatherMap({
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
 
-  const tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
-  const tileAttribution = '&copy; <a href="https://www.esri.com/">Esri</a>, Maxar, Earthstar Geographics'
+  const tileUrl =
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+  const tileAttribution =
+    '&copy; <a href="https://www.esri.com/">Esri</a>, Maxar, Earthstar Geographics'
 
   const onMarkersChangeRef = useRef(onMarkersChange)
   onMarkersChangeRef.current = onMarkersChange

@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, Cloud, MapPin, Star, Download } from 'lucide-react'
+import { Cloud, MapPin, Star, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { IconTexture } from './IconTexture'
