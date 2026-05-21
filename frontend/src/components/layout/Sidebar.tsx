@@ -78,7 +78,9 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
       </div>
 
       {/* Navegação */}
-      <nav className={cn('flex-1 p-2 transition-opacity duration-150', !contentVisible && 'opacity-0')}>
+      <nav
+        className={cn('flex-1 p-2 transition-opacity duration-150', !contentVisible && 'opacity-0')}
+      >
         <ul className="space-y-1">
           {navItems.map(({ href, label, icon: Icon }) => (
             <li key={href}>
@@ -149,7 +151,12 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
       </nav>
 
       {/* Links externos + tema */}
-      <div className={cn('border-t border-gray-200 p-2 transition-opacity duration-150 dark:border-slate-700', !contentVisible && 'opacity-0')}>
+      <div
+        className={cn(
+          'border-t border-gray-200 p-2 transition-opacity duration-150 dark:border-slate-700',
+          !contentVisible && 'opacity-0'
+        )}
+      >
         <div className={cn('flex items-center gap-1', collapsed && 'flex-col')}>
           <a
             href="https://github.com/DiogoBenicio/backend-portfolio"

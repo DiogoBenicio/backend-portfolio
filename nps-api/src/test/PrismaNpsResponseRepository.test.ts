@@ -23,7 +23,12 @@ describe("PrismaNpsResponseRepository", () => {
 
   describe("create", () => {
     it("deve chamar prisma.create com os campos corretos", async () => {
-      const input = { score: 9, comment: "Ótimo!", name: "Ana", page: "portfolio" };
+      const input = {
+        score: 9,
+        comment: "Ótimo!",
+        name: "Ana",
+        page: "portfolio",
+      };
       const created = { id: "1", ...input, createdAt: new Date() };
       mockPrisma.npsResponse.create.mockResolvedValue(created);
 
@@ -37,12 +42,24 @@ describe("PrismaNpsResponseRepository", () => {
 
     it("deve funcionar sem comment e name", async () => {
       const input = { score: 7, page: "portfolio" };
-      mockPrisma.npsResponse.create.mockResolvedValue({ id: "2", score: 7, comment: null, name: null, page: "portfolio", createdAt: new Date() });
+      mockPrisma.npsResponse.create.mockResolvedValue({
+        id: "2",
+        score: 7,
+        comment: null,
+        name: null,
+        page: "portfolio",
+        createdAt: new Date(),
+      });
 
       await repo.create(input);
 
       expect(mockPrisma.npsResponse.create).toHaveBeenCalledWith({
-        data: { score: 7, comment: undefined, name: undefined, page: "portfolio" },
+        data: {
+          score: 7,
+          comment: undefined,
+          name: undefined,
+          page: "portfolio",
+        },
       });
     });
   });
@@ -57,9 +74,11 @@ describe("PrismaNpsResponseRepository", () => {
       await repo.findMany({ page: "portfolio", limit: 10, offset: 0 });
 
       expect(mockPrisma.npsResponse.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({ where: { page: "portfolio" } })
+        expect.objectContaining({ where: { page: "portfolio" } }),
       );
-      expect(mockPrisma.npsResponse.count).toHaveBeenCalledWith({ where: { page: "portfolio" } });
+      expect(mockPrisma.npsResponse.count).toHaveBeenCalledWith({
+        where: { page: "portfolio" },
+      });
     });
 
     it("deve usar where vazio quando page não é fornecido", async () => {
@@ -69,12 +88,20 @@ describe("PrismaNpsResponseRepository", () => {
       await repo.findMany({ limit: 5, offset: 10 });
 
       expect(mockPrisma.npsResponse.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({ where: {}, take: 5, skip: 10 })
+        expect.objectContaining({ where: {}, take: 5, skip: 10 }),
       );
     });
 
     it("deve retornar data e total", async () => {
-      const data = [{ id: "1", score: 9, comment: null, page: "portfolio", createdAt: new Date() }];
+      const data = [
+        {
+          id: "1",
+          score: 9,
+          comment: null,
+          page: "portfolio",
+          createdAt: new Date(),
+        },
+      ];
       mockPrisma.npsResponse.findMany.mockResolvedValue(data);
       mockPrisma.npsResponse.count.mockResolvedValue(1);
 
@@ -91,7 +118,7 @@ describe("PrismaNpsResponseRepository", () => {
       await repo.findMany({ limit: 10, offset: 0 });
 
       expect(mockPrisma.npsResponse.findMany).toHaveBeenCalledWith(
-        expect.objectContaining({ orderBy: { createdAt: "desc" } })
+        expect.objectContaining({ orderBy: { createdAt: "desc" } }),
       );
     });
   });
@@ -130,7 +157,9 @@ describe("PrismaNpsResponseRepository", () => {
 
       await repo.deleteById("abc-123");
 
-      expect(mockPrisma.npsResponse.delete).toHaveBeenCalledWith({ where: { id: "abc-123" } });
+      expect(mockPrisma.npsResponse.delete).toHaveBeenCalledWith({
+        where: { id: "abc-123" },
+      });
     });
 
     it("deve lançar erro com statusCode 404 quando registro não existe (P2025)", async () => {
