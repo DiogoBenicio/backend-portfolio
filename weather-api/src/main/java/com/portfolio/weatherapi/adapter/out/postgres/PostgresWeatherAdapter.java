@@ -71,7 +71,10 @@ public class PostgresWeatherAdapter implements WeatherDataRepository {
     @Transactional
     @SuppressWarnings("null")
     public void save(Weather weather) {
-        repository.save(toEntity(weather));
+        WeatherEntity entity = toEntity(weather);
+        if (!repository.existsById(entity.getId())) {
+            repository.save(entity);
+        }
     }
 
     @Override
