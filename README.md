@@ -48,13 +48,13 @@ Portfólio técnico com 5 microsserviços interconectados demonstrando arquitetu
 
 ## Projetos
 
-| Projeto | Stack | Porta |
-|---|---|---|
-| [nginx](./nginx) | Nginx 1.27 | **:80 / :443** (único ponto externo) |
-| [gateway-api](./gateway-api) | Node.js 20 + Fastify + JWT | Interno :4000 |
-| [weather-api](./weather-api) | Java 21 + Spring Boot 3.3 + PostgreSQL | Interno :8080 |
-| [nps-api](./nps-api) | Node.js 20 + Fastify + Prisma + PostgreSQL 15 | Interno :3001 |
-| [frontend](./frontend) | Next.js 14 + shadcn/ui + Tailwind | Interno :3000 |
+| Projeto | Stack |
+|---|---|
+| [nginx](./nginx) | Nginx 1.27 |
+| [gateway-api](./gateway-api) | Node.js 20 + Fastify + JWT |
+| [weather-api](./weather-api) | Java 21 + Spring Boot 3.3 + PostgreSQL |
+| [nps-api](./nps-api) | Node.js 20 + Fastify + Prisma + PostgreSQL 15 |
+| [frontend](./frontend) | Next.js 14 + shadcn/ui + Tailwind |
 
 ---
 
