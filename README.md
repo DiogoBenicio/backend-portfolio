@@ -4,7 +4,7 @@
 
 Portfólio técnico com 5 microsserviços interconectados demonstrando arquitetura hexagonal, SOA, segurança com JWT e infraestrutura containerizada. Deploy em produção na Oracle Cloud (OCI) com HTTPS via Let's Encrypt.
 
-[![Version](https://img.shields.io/badge/version-v1.0.0-blue?style=flat-square)](https://github.com/DiogoBenicio/backend-portfolio/releases/tag/v1.0.0)
+[![Version](https://img.shields.io/badge/version-v1.0.1-blue?style=flat-square)](https://github.com/DiogoBenicio/backend-portfolio/releases/tag/v1.0.1)
 [![Live](https://img.shields.io/badge/live-diogoportfolio.opiniaolivre.com-green?style=flat-square)](https://diogoportfolio.opiniaolivre.com)
 
 ---
@@ -153,6 +153,14 @@ docker compose up --build -d
 ---
 
 ## Changelog
+
+### v1.0.1 — 2026-05-21
+- Download de Currículo PDF na Hero section
+- Rate limits da API afrouxados (500 req/min global, 300 req/min rotas pesadas)
+- 429 da API desacoplado do usage gate de 1h
+- Usage gate aumentado de 10 para 30 minutos
+- Sidebar: fade de conteúdo durante animação de colapso
+- Correção de ícones centralizados no sidebar colapsado
 
 ### v1.0.0 — 2026-05-21
 - Deploy em produção na Oracle Cloud (OCI) com HTTPS automático via Let's Encrypt
