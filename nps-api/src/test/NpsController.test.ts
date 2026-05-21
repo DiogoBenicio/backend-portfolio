@@ -28,7 +28,19 @@ function makeSummary(): NpsSummary {
     promoters: 2,
     passives: 0,
     detractors: 1,
-    distribution: { 0:0,1:0,2:0,3:0,4:0,5:0,6:1,7:0,8:0,9:1,10:1 },
+    distribution: {
+      0: 0,
+      1: 0,
+      2: 0,
+      3: 0,
+      4: 0,
+      5: 0,
+      6: 1,
+      7: 0,
+      8: 0,
+      9: 1,
+      10: 1,
+    },
   };
 }
 
@@ -51,7 +63,13 @@ describe("NpsController — rotas HTTP", () => {
     };
 
     app = Fastify({ logger: false });
-    registerNpsRoutes(app, submitUseCase, summaryUseCase, listUseCase, repository);
+    registerNpsRoutes(
+      app,
+      submitUseCase,
+      summaryUseCase,
+      listUseCase,
+      repository,
+    );
     await app.ready();
   });
 
@@ -128,7 +146,10 @@ describe("NpsController — rotas HTTP", () => {
     it("deve chamar o use case com o page correto", async () => {
       vi.mocked(summaryUseCase.execute).mockResolvedValue(makeSummary());
 
-      await app.inject({ method: "GET", url: "/api/v1/nps/summary?page=portfolio" });
+      await app.inject({
+        method: "GET",
+        url: "/api/v1/nps/summary?page=portfolio",
+      });
 
       expect(summaryUseCase.execute).toHaveBeenCalledWith("portfolio");
     });
@@ -153,7 +174,10 @@ describe("NpsController — rotas HTTP", () => {
         offset: 0,
       });
 
-      const res = await app.inject({ method: "GET", url: "/api/v1/nps/responses" });
+      const res = await app.inject({
+        method: "GET",
+        url: "/api/v1/nps/responses",
+      });
 
       expect(res.statusCode).toBe(200);
       const body = JSON.parse(res.body);
@@ -162,12 +186,20 @@ describe("NpsController — rotas HTTP", () => {
     });
 
     it("deve repassar limit e offset ao use case", async () => {
-      vi.mocked(listUseCase.execute).mockResolvedValue({ data: [], total: 0, limit: 5, offset: 10 });
+      vi.mocked(listUseCase.execute).mockResolvedValue({
+        data: [],
+        total: 0,
+        limit: 5,
+        offset: 10,
+      });
 
-      await app.inject({ method: "GET", url: "/api/v1/nps/responses?limit=5&offset=10" });
+      await app.inject({
+        method: "GET",
+        url: "/api/v1/nps/responses?limit=5&offset=10",
+      });
 
       expect(listUseCase.execute).toHaveBeenCalledWith(
-        expect.objectContaining({ limit: 5, offset: 10 })
+        expect.objectContaining({ limit: 5, offset: 10 }),
       );
     });
   });
@@ -178,17 +210,26 @@ describe("NpsController — rotas HTTP", () => {
     it("deve retornar 204 quando deletion ocorre com sucesso", async () => {
       vi.mocked(repository.deleteById).mockResolvedValue(undefined);
 
-      const res = await app.inject({ method: "DELETE", url: "/api/v1/nps/responses/abc-123" });
+      const res = await app.inject({
+        method: "DELETE",
+        url: "/api/v1/nps/responses/abc-123",
+      });
 
       expect(res.statusCode).toBe(204);
       expect(repository.deleteById).toHaveBeenCalledWith("abc-123");
     });
 
     it("deve retornar 404 quando registro não existe (statusCode 404)", async () => {
-      const notFound = Object.assign(new Error("Resposta NPS não encontrada: xyz"), { statusCode: 404 });
+      const notFound = Object.assign(
+        new Error("Resposta NPS não encontrada: xyz"),
+        { statusCode: 404 },
+      );
       vi.mocked(repository.deleteById).mockRejectedValue(notFound);
 
-      const res = await app.inject({ method: "DELETE", url: "/api/v1/nps/responses/xyz" });
+      const res = await app.inject({
+        method: "DELETE",
+        url: "/api/v1/nps/responses/xyz",
+      });
 
       expect(res.statusCode).toBe(404);
       const body = JSON.parse(res.body);
@@ -198,7 +239,10 @@ describe("NpsController — rotas HTTP", () => {
     it("deve retornar 500 para erro genérico", async () => {
       vi.mocked(repository.deleteById).mockRejectedValue(new Error("db down"));
 
-      const res = await app.inject({ method: "DELETE", url: "/api/v1/nps/responses/any" });
+      const res = await app.inject({
+        method: "DELETE",
+        url: "/api/v1/nps/responses/any",
+      });
 
       expect(res.statusCode).toBe(500);
     });

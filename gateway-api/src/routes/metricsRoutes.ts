@@ -24,7 +24,9 @@ export function unescapeHtml(str: string): string {
     .replace(/&#39;/g, "'")
     .replace(/&nbsp;/g, " ")
     .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(parseInt(code, 10)))
-    .replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCharCode(parseInt(code, 16)));
+    .replace(/&#x([0-9a-f]+);/gi, (_, code) =>
+      String.fromCharCode(parseInt(code, 16)),
+    );
 }
 
 export function extractTableField(html: string, fieldName: string): string {
@@ -78,7 +80,8 @@ export function parseInmetRss(xml: string): InmetAlert[] {
           .filter(Boolean)
       : [];
 
-    if (id) alerts.push({ id, event, severity, start, end, description, areas });
+    if (id)
+      alerts.push({ id, event, severity, start, end, description, areas });
   }
   return alerts;
 }
@@ -102,7 +105,9 @@ export function registerMetricsRoutes(server: FastifyInstance): void {
         available: stats.bavail * stats.bsize,
       };
     } catch (err) {
-      logger.warn(`statfs indisponível: ${err instanceof Error ? err.message : String(err)}`);
+      logger.warn(
+        `statfs indisponível: ${err instanceof Error ? err.message : String(err)}`,
+      );
       disk = null;
     }
 
@@ -146,7 +151,9 @@ export function registerMetricsRoutes(server: FastifyInstance): void {
         .header("Cache-Control", "s-maxage=1800, stale-while-revalidate")
         .send(parseInmetRss(xml));
     } catch (err) {
-      logger.warn(`INMET RSS erro: ${err instanceof Error ? err.message : String(err)}`);
+      logger.warn(
+        `INMET RSS erro: ${err instanceof Error ? err.message : String(err)}`,
+      );
       return reply.send([]);
     }
   });

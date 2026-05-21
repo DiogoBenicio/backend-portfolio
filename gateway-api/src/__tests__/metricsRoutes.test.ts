@@ -158,7 +158,9 @@ describe("parseInmetRss", () => {
   });
 
   it("deve retornar array vazio para XML sem <item>", () => {
-    expect(parseInmetRss("<rss><channel><title>T</title></channel></rss>")).toEqual([]);
+    expect(
+      parseInmetRss("<rss><channel><title>T</title></channel></rss>"),
+    ).toEqual([]);
   });
 
   it("deve ignorar item sem GUID", () => {
@@ -330,9 +332,7 @@ describe("GET /api/inmet-alerts", () => {
   beforeEach(() => {
     fetchSpy = jest
       .spyOn(global, "fetch")
-      .mockResolvedValue(
-        new Response(RSS_WITH_ONE_ALERT, { status: 200 }),
-      );
+      .mockResolvedValue(new Response(RSS_WITH_ONE_ALERT, { status: 200 }));
   });
 
   afterEach(() => fetchSpy.mockRestore());
@@ -355,7 +355,9 @@ describe("GET /api/inmet-alerts", () => {
 
   it("deve retornar array vazio quando fetch lança exceção (timeout/rede)", async () => {
     fetchSpy.mockRejectedValueOnce(
-      Object.assign(new Error("The operation was aborted"), { name: "AbortError" }),
+      Object.assign(new Error("The operation was aborted"), {
+        name: "AbortError",
+      }),
     );
     const res = await app.inject({ method: "GET", url: "/api/inmet-alerts" });
     expect(res.statusCode).toBe(200);
