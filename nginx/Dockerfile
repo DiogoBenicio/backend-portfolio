@@ -1,4 +1,5 @@
 # ─── Stage 1: Build Next.js estático ─────────────────────────
+# ─── Stage 1: Build Next.js estático ─────────────────────────
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app
 
