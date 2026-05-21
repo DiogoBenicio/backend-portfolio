@@ -63,23 +63,23 @@ Portfólio técnico com 5 microsserviços interconectados demonstrando arquitetu
 ```
 Internet
    ↓
-Nginx :443 (HTTPS/TLS) ──── único ponto de entrada ───────────
+Nginx (HTTPS/TLS) ──── único ponto de entrada ────────────────
    │
-   ├── /          → Next.js Frontend (interno :3000)
+   ├── /          → Next.js Frontend
    │
-   └── /api/*     → API Gateway (interno :4000)
+   └── /api/*     → API Gateway
                        │
                        ├── JWT validation (rotas protegidas)
                        ├── Rate limiting (30 req/min)
                        ├── Request logging estruturado
                        │
-                       ├── /api/weather/* → Weather API (interno :8080)
-                       │                        └── PostgreSQL (interno :5432)
-                       └── /api/nps/*    → NPS API (interno :3001)
-                                                └── PostgreSQL (interno :5432)
+                       ├── /api/weather/* → Weather API
+                       │                        └── PostgreSQL
+                       └── /api/nps/*    → NPS API
+                                                └── PostgreSQL
 ```
 
-**Superfície de ataque:** antes 5 portas expostas → agora **1 porta** (Nginx :443)
+**Superfície de ataque:** antes 5 portas expostas → agora **1 porta** (Nginx)
 
 ---
 
