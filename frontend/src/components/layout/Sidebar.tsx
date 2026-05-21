@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useState, useEffect } from 'react'
 import {
   Cloud,
   Map,
@@ -34,6 +35,13 @@ interface Props {
 
 export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
   const pathname = usePathname()
+  const [contentVisible, setContentVisible] = useState(true)
+
+  useEffect(() => {
+    setContentVisible(false)
+    const t = setTimeout(() => setContentVisible(true), 220)
+    return () => clearTimeout(t)
+  }, [collapsed])
 
   return (
     <aside
@@ -55,7 +63,7 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
       <div
         className={cn(
           'flex items-center border-b border-gray-200 py-5 dark:border-slate-700',
-          collapsed ? 'px-3.5' : 'gap-3 px-5'
+          collapsed ? 'justify-center' : 'gap-3 px-5'
         )}
       >
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-600">
@@ -70,7 +78,7 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
       </div>
 
       {/* Navegação */}
-      <nav className="flex-1 p-2">
+      <nav className={cn('flex-1 p-2 transition-opacity duration-150', !contentVisible && 'opacity-0')}>
         <ul className="space-y-1">
           {navItems.map(({ href, label, icon: Icon }) => (
             <li key={href}>
@@ -79,8 +87,8 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
                 title={collapsed ? label : undefined}
                 onClick={onMobileClose}
                 className={cn(
-                  'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
-                  collapsed ? 'pl-3.5' : '',
+                  'flex items-center rounded-lg py-2 text-sm transition-colors',
+                  collapsed ? 'justify-center px-2' : 'gap-3 px-3',
                   pathname === href
                     ? 'bg-blue-50 font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
                     : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100'
@@ -117,8 +125,8 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
                   title={collapsed ? label : undefined}
                   onClick={onMobileClose}
                   className={cn(
-                    'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors',
-                    collapsed ? 'pl-3.5' : '',
+                    'flex items-center rounded-lg py-2 text-sm transition-colors',
+                    collapsed ? 'justify-center px-2' : 'gap-3 px-3',
                     pathname === href
                       ? 'bg-blue-50 font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400'
                       : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100'
@@ -141,14 +149,17 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
       </nav>
 
       {/* Links externos + tema */}
-      <div className="border-t border-gray-200 p-2 dark:border-slate-700">
+      <div className={cn('border-t border-gray-200 p-2 transition-opacity duration-150 dark:border-slate-700', !contentVisible && 'opacity-0')}>
         <div className={cn('flex items-center gap-1', collapsed && 'flex-col')}>
           <a
             href="https://github.com/DiogoBenicio/backend-portfolio"
             target="_blank"
             rel="noopener noreferrer"
             title="GitHub"
-            className="flex items-center gap-2 rounded-lg px-2 py-2 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+            className={cn(
+              'flex items-center rounded-lg py-2 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100',
+              collapsed ? 'justify-center px-2' : 'gap-2 px-2'
+            )}
           >
             <Github size={16} className="shrink-0" />
             <span
@@ -165,7 +176,10 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
             target="_blank"
             rel="noopener noreferrer"
             title="LinkedIn"
-            className="flex items-center gap-2 rounded-lg px-2 py-2 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100"
+            className={cn(
+              'flex items-center rounded-lg py-2 text-xs text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-100',
+              collapsed ? 'justify-center px-2' : 'gap-2 px-2'
+            )}
           >
             <Linkedin size={16} className="shrink-0" />
             <span

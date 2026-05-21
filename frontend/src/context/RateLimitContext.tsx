@@ -116,7 +116,17 @@ export function RateLimitProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <RateLimitContext.Provider
-      value={{ visible, isBlocked, blockedUntil, timeRemaining, retryAfter, show, hide, blockUser, startUsageTimer }}
+      value={{
+        visible,
+        isBlocked,
+        blockedUntil,
+        timeRemaining,
+        retryAfter,
+        show,
+        hide,
+        blockUser,
+        startUsageTimer,
+      }}
     >
       {children}
     </RateLimitContext.Provider>
