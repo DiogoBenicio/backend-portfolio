@@ -83,19 +83,6 @@ Nginx (HTTPS/TLS) ──── único ponto de entrada ────────�
 
 ---
 
-## Rotas Públicas vs Protegidas (JWT)
-
-| Endpoint | Auth |
-|---|---|
-| `GET /api/weather/current` | público |
-| `GET /api/weather/forecast` | público |
-| `GET /api/weather/history` | JWT obrigatório |
-| `POST /api/weather/refresh` | JWT obrigatório |
-| `POST /api/nps/responses` | público |
-| `GET /api/nps/summary` | público |
-| `GET /api/nps/responses` | JWT obrigatório |
-
----
 
 ## Arquiteturas por Projeto
 
@@ -162,20 +149,6 @@ docker compose up --build -d
 | **Health Nginx** | http://localhost/nginx-health |
 | **Health Gateway** | http://localhost/api/health |
 
-### Obter token JWT (rotas admin)
-
-```bash
-curl -X POST http://localhost/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"<ADMIN_PASS>"}'
-```
-
-### Usar token
-
-```bash
-curl "http://localhost/api/weather/history?city=Uberlândia" \
-  -H "Authorization: Bearer <token>"
-```
 
 ---
 
