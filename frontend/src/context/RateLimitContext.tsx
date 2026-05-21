@@ -3,6 +3,8 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 
 const RL_KEY = 'rl-blocked-until'
+const USAGE_KEY = 'usage-start'
+const USAGE_GATE_MS = 10 * 60 * 1000
 
 interface RateLimitState {
   visible: boolean
@@ -61,6 +63,7 @@ export function RateLimitProvider({ children }: { children: React.ReactNode }) {
         setTimeRemaining(0)
         setVisible(false)
         localStorage.removeItem(RL_KEY)
+        localStorage.removeItem(USAGE_KEY)
       } else {
         setTimeRemaining(remaining)
       }
@@ -96,6 +99,26 @@ export function RateLimitProvider({ children }: { children: React.ReactNode }) {
   const hide = useCallback(() => {
     setVisible(false)
   }, [])
+
+  // Usage gate: acumula tempo de uso e dispara o bloco após USAGE_GATE_MS
+  useEffect(() => {
+    if (isBlocked) return
+
+    const interval = setInterval(() => {
+      if (document.visibilityState !== 'visible') return
+
+      const stored = localStorage.getItem(USAGE_KEY)
+      const parsed = stored ? parseInt(stored, 10) : NaN
+      const start = stored && !isNaN(parsed) ? parsed : Date.now()
+      if (!stored || isNaN(parsed)) localStorage.setItem(USAGE_KEY, String(start))
+
+      if (Date.now() - start >= USAGE_GATE_MS) {
+        blockUser()
+      }
+    }, 10_000)
+
+    return () => clearInterval(interval)
+  }, [isBlocked, blockUser])
 
   return (
     <RateLimitContext.Provider

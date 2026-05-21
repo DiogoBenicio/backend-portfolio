@@ -143,13 +143,13 @@ export default function NpsPage() {
           </div>
         </div>
         {/* Avaliações recentes */}
-        {responses && responses.data.length > 0 && (
+        {responses && responses.data?.length > 0 && (
           <div>
             <h2 className="mb-3 text-sm font-semibold text-gray-700 dark:text-slate-200">
               Avaliações recentes
             </h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {responses.data.map((item) => {
+              {responses.data?.map((item) => {
                 const scoreColor =
                   item.score >= 9
                     ? 'text-green-600 bg-green-50 border-green-200 dark:text-green-300 dark:bg-green-900/30 dark:border-green-700'

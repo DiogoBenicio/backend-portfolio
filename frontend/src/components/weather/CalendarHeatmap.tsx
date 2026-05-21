@@ -4,7 +4,6 @@ import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useWeatherCalendar } from '@/hooks/useWeatherCalendar'
 import { weatherApi } from '@/lib/api/weatherClient'
-import { ElasticLogo } from '@/components/ui/ElasticLogo'
 import { cn } from '@/lib/utils/cn'
 
 const WEEKDAYS = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
@@ -50,7 +49,10 @@ export function CalendarHeatmap({ city, initialYear, initialMonth }: Props) {
   // Build calendar grid
   const firstDay = new Date(year, month - 1, 1).getDay() // 0=Sun
   const daysInMonth = new Date(year, month, 0).getDate()
-  const todayStr = new Date().toISOString().split('T')[0]
+  const todayStr = now.toISOString().split('T')[0]
+  const minClickableDate = new Date(now)
+  minClickableDate.setDate(minClickableDate.getDate() - 6)
+  const minClickableStr = minClickableDate.toISOString().split('T')[0]
 
   const cells: (number | null)[] = [
     ...Array(firstDay).fill(null),
@@ -83,14 +85,23 @@ export function CalendarHeatmap({ city, initialYear, initialMonth }: Props) {
     return dateString(day) > todayStr
   }
 
+  function isOutsideWindow(day: number) {
+    const ds = dateString(day)
+    return ds < minClickableStr || ds > todayStr
+  }
+
   return (
     <div className="space-y-3">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <ElasticLogo size={28} />
+          <span className="flex h-7 w-7 items-center justify-center rounded-md bg-blue-100 dark:bg-blue-900/30">
+            <svg viewBox="0 0 24 24" className="h-4 w-4 text-blue-600 dark:text-blue-400" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+            </svg>
+          </span>
           <span className="text-sm font-semibold text-gray-700 dark:text-slate-200">
-            Dados no Elasticsearch
+            Dados no PostgreSQL
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -125,7 +136,7 @@ export function CalendarHeatmap({ city, initialYear, initialMonth }: Props) {
         </span>
         <span className="flex items-center gap-1.5">
           <span className="h-3 w-3 rounded-sm bg-gray-200 dark:bg-slate-700" />
-          Sem dados (clique para buscar)
+          Sem dados (últimos 6 dias: clique para buscar)
         </span>
       </div>
 
@@ -157,33 +168,35 @@ export function CalendarHeatmap({ city, initialYear, initialMonth }: Props) {
                 const ds = dateString(day)
                 const hasData = daysWithData.has(ds)
                 const future = isFuture(day)
+                const outsideWindow = isOutsideWindow(day)
+                const canFetch = !hasData && !future && !outsideWindow && !populating
 
                 return (
                   <button
                     key={ds}
-                    disabled={future || populating}
-                    onClick={() => !hasData && !future && populate(ds)}
+                    disabled={!canFetch && !hasData}
+                    onClick={() => canFetch && populate(ds)}
                     title={
                       future
                         ? 'Data futura'
                         : hasData
                           ? `Dados disponíveis — ${ds}`
-                          : `Clique para buscar dados de ${ds}`
+                          : outsideWindow
+                            ? 'Fora da janela de 6 dias'
+                            : `Clique para buscar dados de ${ds}`
                     }
                     className={cn(
                       'relative flex h-9 w-full items-center justify-center rounded-md text-xs font-medium transition-all',
                       hasData
-                        ? 'bg-blue-500/80 text-white hover:bg-blue-500'
-                        : future
+                        ? 'cursor-default bg-blue-500/80 text-white ring-2 ring-blue-400/40'
+                        : future || outsideWindow
                           ? 'cursor-default bg-gray-100 text-gray-300 dark:bg-slate-800/50 dark:text-slate-600'
                           : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-slate-800 dark:text-slate-400 dark:hover:bg-slate-700'
                     )}
                   >
                     {day}
                     {hasData && (
-                      <span className="absolute bottom-0.5 right-0.5">
-                        <ElasticLogo size={8} />
-                      </span>
+                      <span className="absolute bottom-0.5 right-0.5 h-1.5 w-1.5 rounded-full bg-blue-300" />
                     )}
                   </button>
                 )

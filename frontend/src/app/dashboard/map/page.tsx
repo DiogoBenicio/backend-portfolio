@@ -1,10 +1,9 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { PageLoader } from '@/components/ui/PageLoader'
 import { CitySearch } from '@/components/weather/CitySearch'
-import type { WeatherMapHandle } from '@/components/map/WeatherMap'
 
 // Importação dinâmica: Leaflet depende de `window` (não funciona no SSR)
 const WeatherMap = dynamic(
@@ -16,7 +15,7 @@ const WeatherMap = dynamic(
 )
 
 export default function MapPage() {
-  const mapRef = useRef<WeatherMapHandle>(null)
+  const [clearTrigger, setClearTrigger] = useState(0)
   const [markerCount, setMarkerCount] = useState(0)
   const [pendingMarker, setPendingMarker] = useState<{
     name: string
@@ -27,17 +26,33 @@ export default function MapPage() {
 
   return (
     <div className="mx-auto flex h-svh w-full max-w-5xl flex-col px-6 py-8 md:px-10 xl:max-w-7xl">
-      <div className="mb-4 flex items-start justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Mapa de Clima</h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
-            Clique no mapa ou busque uma cidade para adicionar marcadores · OpenStreetMap (gratuito)
-          </p>
-        </div>
+      <div className="mb-4">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-100">Mapa de Clima</h1>
+        <p className="mt-1 text-sm text-gray-500 dark:text-slate-400">
+          Clique no mapa ou busque uma cidade para adicionar marcadores · OpenStreetMap (gratuito)
+        </p>
+      </div>
+
+      <div className="relative z-50 mb-3 w-full max-w-xs sm:max-w-sm">
+        <CitySearch
+          onSearch={() => {}}
+          onSelectFull={(r) =>
+            setPendingMarker({ name: r.name, country: r.country, lat: r.lat, lon: r.lon })
+          }
+        />
+      </div>
+
+      <div className="relative z-0 min-h-0 flex-1 overflow-hidden rounded-xl border border-gray-200 shadow-sm dark:border-slate-700">
+        <WeatherMap
+          pendingMarker={pendingMarker}
+          onPendingMarkerConsumed={() => setPendingMarker(null)}
+          onMarkersChange={setMarkerCount}
+          clearTrigger={clearTrigger}
+        />
         {markerCount > 0 && (
           <button
-            onClick={() => mapRef.current?.clearAllMarkers()}
-            className="flex shrink-0 items-center gap-1.5 rounded-md border border-red-200 bg-white px-3 py-1.5 text-xs font-medium text-red-600 shadow-sm hover:bg-red-50 dark:border-red-800/50 dark:bg-slate-900 dark:text-red-400 dark:hover:bg-red-950/40"
+            onClick={() => setClearTrigger((t) => t + 1)}
+            className="absolute bottom-2 left-2 z-[1000] flex items-center gap-1.5 rounded-md border border-red-200 bg-white/90 px-2.5 py-1.5 text-xs font-medium text-red-600 shadow-sm backdrop-blur-sm hover:bg-red-50 dark:border-red-800/50 dark:bg-slate-900/90 dark:text-red-400 dark:hover:bg-red-950/40"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -59,24 +74,6 @@ export default function MapPage() {
             Limpar {markerCount} marcador{markerCount !== 1 ? 'es' : ''}
           </button>
         )}
-      </div>
-
-      <div className="relative z-50 mb-3 w-full max-w-xs sm:max-w-sm">
-        <CitySearch
-          onSearch={() => {}}
-          onSelectFull={(r) =>
-            setPendingMarker({ name: r.name, country: r.country, lat: r.lat, lon: r.lon })
-          }
-        />
-      </div>
-
-      <div className="relative z-0 min-h-0 flex-1 overflow-hidden rounded-xl border border-gray-200 shadow-sm dark:border-slate-700">
-        <WeatherMap
-          ref={mapRef}
-          pendingMarker={pendingMarker}
-          onPendingMarkerConsumed={() => setPendingMarker(null)}
-          onMarkersChange={setMarkerCount}
-        />
       </div>
     </div>
   )

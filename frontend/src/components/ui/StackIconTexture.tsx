@@ -110,16 +110,21 @@ export function StackIconTexture({
   }, [initialCount])
 
   useEffect(() => {
+    const timeouts: ReturnType<typeof setTimeout>[] = []
     const interval = setInterval(() => {
       const id = nextId.current++
       const item = createItem(id, isDarkRef.current)
       setItems((cur) => [...cur, item].slice(-maxIcons))
-      setTimeout(
+      const t = setTimeout(
         () => setItems((cur) => cur.filter((i) => i.id !== id)),
         item.duration * 1000 + 2000
       )
+      timeouts.push(t)
     }, spawnInterval)
-    return () => clearInterval(interval)
+    return () => {
+      clearInterval(interval)
+      timeouts.forEach(clearTimeout)
+    }
   }, [spawnInterval, maxIcons])
 
   return (

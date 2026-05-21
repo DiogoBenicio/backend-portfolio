@@ -15,7 +15,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { useRateLimit } from '@/context/RateLimitContext'
 
-const BLOCKED_ROUTES = ['/dashboard/weather', '/dashboard/map']
+const ALLOWED_WHILE_BLOCKED = ['/dashboard/nps']
 
 function formatTime(seconds: number): string {
   if (seconds <= 0) return '0s'
@@ -32,8 +32,7 @@ export function RateLimitModal() {
   const router = useRouter()
   const pathname = usePathname()
 
-  const isOnBlockedRoute = BLOCKED_ROUTES.some((r) => pathname.startsWith(r))
-  const shouldShow = isBlocked && isOnBlockedRoute
+  const shouldShow = isBlocked && !ALLOWED_WHILE_BLOCKED.some((r) => pathname.startsWith(r))
 
   useEffect(() => {
     function handleRateLimit(e: Event) {
@@ -65,8 +64,8 @@ export function RateLimitModal() {
             Você explorou bastante o portfólio — incrível! 🎉
             <br />
             <br />
-            Para proteger a demonstração, o Clima e o Mapa ficarão pausados por 1 hora. Aproveite
-            para deixar sua avaliação no{' '}
+            Para manter a demonstração saudável, o acesso ficará pausado por 1 hora. Aproveite para
+            deixar sua avaliação no{' '}
             <strong className="text-gray-700 dark:text-slate-200">NPS</strong> — seu feedback é
             muito valioso!
           </DialogDescription>

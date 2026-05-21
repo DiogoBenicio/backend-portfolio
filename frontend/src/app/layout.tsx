@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 import { RateLimitModal } from '@/components/ui/ratelimitmodal'
+import { NavigationProgress } from '@/components/ui/NavigationProgress'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Providers>
           {children}
           <RateLimitModal />
+          <NavigationProgress />
         </Providers>
       </body>
     </html>

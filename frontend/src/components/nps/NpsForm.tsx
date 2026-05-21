@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useSubmitNps } from '@/hooks/useSubmitNps'
 import { ScoreSelector } from './ScoreSelector'
 import { Button } from '@/components/ui/button'
@@ -11,11 +12,14 @@ export function NpsForm() {
   const [comment, setComment] = useState('')
   const [name, setName] = useState('')
   const [submitted, setSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const { mutate, isPending } = useSubmitNps()
+  const queryClient = useQueryClient()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (score === null) return
+    setSubmitError(null)
     mutate(
       {
         score,
@@ -23,7 +27,14 @@ export function NpsForm() {
         name: name.trim() || undefined,
         page: 'portfolio',
       },
-      { onSuccess: () => setSubmitted(true) }
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['nps-responses'] })
+          queryClient.invalidateQueries({ queryKey: ['nps', 'summary'] })
+          setSubmitted(true)
+        },
+        onError: () => setSubmitError('Erro ao enviar avaliação. Tente novamente.'),
+      }
     )
   }
 
@@ -67,6 +78,9 @@ export function NpsForm() {
         <p className="mt-1 text-xs text-gray-400 dark:text-slate-500">{comment.length}/1000</p>
       </div>
 
+      {submitError && (
+        <p className="text-sm text-red-500 dark:text-red-400">{submitError}</p>
+      )}
       <Button type="submit" disabled={score === null || isPending} className="w-full">
         {isPending ? 'Enviando...' : 'Enviar Avaliação'}
       </Button>

@@ -52,12 +52,14 @@ export function CitySearch({ onSearch, onSelectFull, defaultCity = '' }: CitySea
       return
     }
 
+    const controller = new AbortController()
     const timer = setTimeout(async () => {
       if (!apiKey) return
       setLoading(true)
       try {
         const res = await fetch(
-          `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=6&appid=${apiKey}`
+          `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=6&appid=${apiKey}`,
+          { signal: controller.signal }
         )
         const data: GeoResult[] = await res.json()
         // Deduplicar: manter apenas o primeiro resultado por nome normalizado+país
@@ -76,14 +78,17 @@ export function CitySearch({ onSearch, onSelectFull, defaultCity = '' }: CitySea
         })
         setSuggestions(unique)
         setOpen(focused && unique.length > 0)
-      } catch {
-        setSuggestions([])
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') setSuggestions([])
       } finally {
         setLoading(false)
       }
     }, 350)
 
-    return () => clearTimeout(timer)
+    return () => {
+      clearTimeout(timer)
+      controller.abort()
+    }
   }, [query, apiKey, focused])
 
   function handleSelect(result: GeoResult) {

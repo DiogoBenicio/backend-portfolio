@@ -1,6 +1,6 @@
 'use client'
 
-import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   MapContainer,
   TileLayer,
@@ -13,7 +13,7 @@ import {
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { useTheme } from 'next-themes'
-import { useCurrentWeather } from '@/hooks/useCurrentWeather'
+import { useWeatherByCoords } from '@/hooks/useWeatherByCoords'
 import { useWindField } from '@/hooks/useWindField'
 import { useInmetAlerts, type InmetAlert } from '@/hooks/useInmetAlerts'
 import { useIbgeStates } from '@/hooks/useIbgeStates'
@@ -45,10 +45,6 @@ interface MapMarker {
   country?: string
 }
 
-export interface WeatherMapHandle {
-  clearAllMarkers: () => void
-}
-
 interface WeatherMapProps {
   initialLat?: number
   initialLon?: number
@@ -56,6 +52,7 @@ interface WeatherMapProps {
   pendingMarker?: { name: string; country: string; lat: number; lon: number } | null
   onPendingMarkerConsumed?: () => void
   onMarkersChange?: (count: number) => void
+  clearTrigger?: number
 }
 
 // ── Configuração das camadas ──────────────────────────────────────────────────
@@ -391,46 +388,34 @@ function MarkerPopupContent({
   onRemove: (id: string) => void
   hideRemove?: boolean
 }) {
-  const {
-    data: weather,
-    isLoading,
-    isError,
-  } = useCurrentWeather(marker.city ?? '', marker.country, { throwOnError: false })
+  const { data: weather, isLoading, isError } = useWeatherByCoords(marker.lat, marker.lon)
 
   return (
     <div className="min-w-[200px] p-1">
       <p className="font-semibold text-gray-900 dark:text-slate-100 mb-2">{marker.label}</p>
 
-      {marker.city ? (
-        <>
-          {marker.city !== marker.label && (
-            <p className="text-xs text-gray-400 dark:text-slate-500 mb-2">Dados de {marker.city}</p>
-          )}
-          {isLoading && <p className="text-sm text-gray-500 dark:text-slate-400">Carregando...</p>}
-          {isError && (
-            <p className="text-xs text-gray-400 dark:text-slate-500">
-              Sem dados de clima disponíveis
-            </p>
-          )}
-          {weather && (
-            <div className="space-y-1 text-sm">
-              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                {formatTemperature(weather.temperature)}
-              </p>
-              <p className="capitalize text-gray-600 dark:text-slate-300">{weather.description}</p>
-              <p className="text-gray-500 dark:text-slate-400">
-                Sensação: {formatTemperature(weather.feelsLike)}
-              </p>
-              <p className="text-gray-500 dark:text-slate-400">Umidade: {weather.humidity}%</p>
-              <p className="text-gray-500 dark:text-slate-400">
-                Vento: {formatWindSpeed(weather.windSpeed)}
-                {weather.windDirection ? ` · ${weather.windDirection}` : ''}
-              </p>
-            </div>
-          )}
-        </>
-      ) : (
+      {marker.city && marker.city !== marker.label && (
+        <p className="text-xs text-gray-400 dark:text-slate-500 mb-2">Dados de {marker.city}</p>
+      )}
+      {isLoading && <p className="text-sm text-gray-500 dark:text-slate-400">Carregando...</p>}
+      {isError && (
         <p className="text-xs text-gray-400 dark:text-slate-500">Sem dados de clima disponíveis</p>
+      )}
+      {weather && (
+        <div className="space-y-1 text-sm">
+          <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+            {formatTemperature(weather.temperature)}
+          </p>
+          <p className="capitalize text-gray-600 dark:text-slate-300">{weather.description}</p>
+          <p className="text-gray-500 dark:text-slate-400">
+            Sensação: {formatTemperature(weather.feelsLike)}
+          </p>
+          <p className="text-gray-500 dark:text-slate-400">Umidade: {weather.humidity}%</p>
+          <p className="text-gray-500 dark:text-slate-400">
+            Vento: {formatWindSpeed(weather.windSpeed)}
+            {weather.windDirection ? ` · ${weather.windDirection}` : ''}
+          </p>
+        </div>
       )}
 
       {hideRemove && (
@@ -685,22 +670,17 @@ function WeatherLayers({ active, apiKey }: { active: Set<LayerId>; apiKey: strin
 
 // ── Componente principal ─────────────────────────────────────────────────────
 
-export const WeatherMap = forwardRef<WeatherMapHandle, WeatherMapProps>(function WeatherMap({
+export function WeatherMap({
   initialLat = -14.235,
   initialLon = -51.925,
   initialZoom = 4,
   pendingMarker,
   onPendingMarkerConsumed,
   onMarkersChange,
-}: WeatherMapProps, ref: React.Ref<WeatherMapHandle>) {
+  clearTrigger,
+}: WeatherMapProps) {
   const [active, setActive] = useState<Set<LayerId>>(new Set())
-  const [markers, setMarkers] = useState<MapMarker[]>(() => {
-    try {
-      return JSON.parse(localStorage.getItem('mapMarkers') || '[]')
-    } catch {
-      return []
-    }
-  })
+  const [markers, setMarkers] = useState<MapMarker[]>([])
   const [flyTo, setFlyTo] = useState<{ lat: number; lon: number } | null>(null)
   const apiKey = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY ?? ''
   const { resolvedTheme } = useTheme()
@@ -713,11 +693,11 @@ export const WeatherMap = forwardRef<WeatherMapHandle, WeatherMapProps>(function
     ? '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 
-  // Sincronizar marcadores no localStorage e notificar pai
+  const onMarkersChangeRef = useRef(onMarkersChange)
+  onMarkersChangeRef.current = onMarkersChange
   useEffect(() => {
-    localStorage.setItem('mapMarkers', JSON.stringify(markers))
-    onMarkersChange?.(markers.length)
-  }, [markers, onMarkersChange])
+    onMarkersChangeRef.current?.(markers.length)
+  }, [markers])
 
   const addMarker = (lat: number, lon: number, label: string, city?: string, country?: string) => {
     const newMarker: MapMarker = {
@@ -735,12 +715,10 @@ export const WeatherMap = forwardRef<WeatherMapHandle, WeatherMapProps>(function
     setMarkers((prev) => prev.filter((m) => m.id !== id))
   }
 
-  const clearAllMarkers = () => {
+  useEffect(() => {
+    if (!clearTrigger) return
     setMarkers([])
-    localStorage.removeItem('mapMarkers')
-  }
-
-  useImperativeHandle(ref, () => ({ clearAllMarkers }), [])
+  }, [clearTrigger])
 
   const toggle = (id: LayerId) =>
     setActive((prev) => {
@@ -839,4 +817,4 @@ export const WeatherMap = forwardRef<WeatherMapHandle, WeatherMapProps>(function
       </MapContainer>
     </>
   )
-})
+}

@@ -11,6 +11,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [collapsed, setCollapsed] = useState(true)
   const [mobileOpen, setMobileOpen] = useState(false)
 
+  const closeMobile = () => setMobileOpen(false)
+
   const closeAll = () => {
     setMobileOpen(false)
     setCollapsed(true)
@@ -27,8 +29,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Mobile: top bar */}
         <MobileTopBar onMenuOpen={() => setMobileOpen(true)} />
 
-        {/* Overlay invisível — fecha o menu ao clicar fora */}
-        {overlayVisible && <div className="fixed inset-0 z-40" onClick={closeAll} />}
+        {/* Overlay invisível — fecha o menu ao clicar fora (apenas mobile ou sidebar expandida) */}
+        {mobileOpen && <div className="fixed inset-0 z-40 md:hidden" onClick={closeAll} />}
+        {!collapsed && <div className="fixed inset-0 z-40 hidden md:block" onClick={closeAll} />}
 
         {/* Sidebar */}
         <div
@@ -43,7 +46,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <Sidebar
             collapsed={collapsed}
             onToggle={() => setCollapsed((v) => !v)}
-            onMobileClose={closeAll}
+            onMobileClose={closeMobile}
           />
         </div>
 
