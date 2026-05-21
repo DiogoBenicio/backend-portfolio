@@ -78,9 +78,7 @@ export function NpsForm() {
         <p className="mt-1 text-xs text-gray-400 dark:text-slate-500">{comment.length}/1000</p>
       </div>
 
-      {submitError && (
-        <p className="text-sm text-red-500 dark:text-red-400">{submitError}</p>
-      )}
+      {submitError && <p className="text-sm text-red-500 dark:text-red-400">{submitError}</p>}
       <Button type="submit" disabled={score === null || isPending} className="w-full">
         {isPending ? 'Enviando...' : 'Enviar Avaliação'}
       </Button>

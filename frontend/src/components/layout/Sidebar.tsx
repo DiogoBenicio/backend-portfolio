@@ -142,10 +142,7 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
 
       {/* Links externos + tema */}
       <div className="border-t border-gray-200 p-2 dark:border-slate-700">
-        <div
-          className={cn('flex items-center gap-1', collapsed && 'flex-col')}
-
-        >
+        <div className={cn('flex items-center gap-1', collapsed && 'flex-col')}>
           <a
             href="https://github.com/DiogoBenicio/backend-portfolio"
             target="_blank"

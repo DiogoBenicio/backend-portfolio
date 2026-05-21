@@ -96,8 +96,12 @@ export function CalendarHeatmap({ city, initialYear, initialMonth }: Props) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="flex h-7 w-7 items-center justify-center rounded-md bg-blue-100 dark:bg-blue-900/30">
-            <svg viewBox="0 0 24 24" className="h-4 w-4 text-blue-600 dark:text-blue-400" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/>
+            <svg
+              viewBox="0 0 24 24"
+              className="h-4 w-4 text-blue-600 dark:text-blue-400"
+              fill="currentColor"
+            >
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" />
             </svg>
           </span>
           <span className="text-sm font-semibold text-gray-700 dark:text-slate-200">

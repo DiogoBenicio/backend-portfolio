@@ -18,9 +18,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     setCollapsed(true)
   }
 
-  // Sidebar visível (overlay) quando expandida no desktop ou aberta no mobile
-  const overlayVisible = mobileOpen || !collapsed
-
   return (
     <SidebarContext.Provider value={{ collapsed }}>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
