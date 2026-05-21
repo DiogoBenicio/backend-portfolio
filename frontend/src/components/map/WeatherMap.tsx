@@ -686,12 +686,8 @@ export function WeatherMap({
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme === 'dark'
 
-  const tileUrl = isDark
-    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
-  const tileAttribution = isDark
-    ? '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
-    : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+  const tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+  const tileAttribution = '&copy; <a href="https://www.esri.com/">Esri</a>, Maxar, Earthstar Geographics'
 
   const onMarkersChangeRef = useRef(onMarkersChange)
   onMarkersChangeRef.current = onMarkersChange
@@ -791,6 +787,13 @@ export function WeatherMap({
         <RainZoomGuard rainActive={active.has('precipitation_new')} />
 
         <TileLayer key={tileUrl} attribution={tileAttribution} url={tileUrl} />
+
+        {/* Fronteiras de estados/países e nomes sobre o satélite */}
+        <TileLayer
+          url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
+          attribution='&copy; <a href="https://www.esri.com/">Esri</a>'
+          pane="shadowPane"
+        />
 
         {apiKey && <WeatherLayers active={active} apiKey={apiKey} />}
 
