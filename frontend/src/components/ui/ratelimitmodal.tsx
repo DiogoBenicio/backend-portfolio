@@ -15,7 +15,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { useRateLimit } from '@/context/RateLimitContext'
 
-const ALLOWED_WHILE_BLOCKED = ['/dashboard/nps']
+const GATED_ROUTES = ['/dashboard/weather', '/dashboard/map']
 
 function formatTime(seconds: number): string {
   if (seconds <= 0) return '0s'
@@ -28,11 +28,19 @@ function formatTime(seconds: number): string {
 }
 
 export function RateLimitModal() {
-  const { isBlocked, timeRemaining, show, hide } = useRateLimit()
+  const { isBlocked, timeRemaining, show, hide, startUsageTimer } = useRateLimit()
   const router = useRouter()
   const pathname = usePathname()
 
-  const shouldShow = isBlocked && !ALLOWED_WHILE_BLOCKED.some((r) => pathname.startsWith(r))
+  const isGatedPage = GATED_ROUTES.some((r) => pathname.startsWith(r))
+  const shouldShow = isBlocked && isGatedPage
+
+  // Acumula tempo de uso apenas nas páginas com gate
+  useEffect(() => {
+    if (!isGatedPage) return
+    const interval = setInterval(startUsageTimer, 10_000)
+    return () => clearInterval(interval)
+  }, [isGatedPage, startUsageTimer])
 
   useEffect(() => {
     function handleRateLimit(e: Event) {

@@ -15,6 +15,7 @@ interface RateLimitState {
   show: (retryAfter?: string) => void
   hide: () => void
   blockUser: () => void
+  startUsageTimer: () => void
 }
 
 const RateLimitContext = createContext<RateLimitState>({
@@ -25,6 +26,7 @@ const RateLimitContext = createContext<RateLimitState>({
   show: () => {},
   hide: () => {},
   blockUser: () => {},
+  startUsageTimer: () => {},
 })
 
 export function RateLimitProvider({ children }: { children: React.ReactNode }) {
@@ -100,29 +102,21 @@ export function RateLimitProvider({ children }: { children: React.ReactNode }) {
     setVisible(false)
   }, [])
 
-  // Usage gate: acumula tempo de uso e dispara o bloco após USAGE_GATE_MS
-  useEffect(() => {
+  // Usage gate: timer exposto via context para ser ativado só nas páginas relevantes
+  const startUsageTimer = useCallback(() => {
     if (isBlocked) return
-
-    const interval = setInterval(() => {
-      if (document.visibilityState !== 'visible') return
-
-      const stored = localStorage.getItem(USAGE_KEY)
-      const parsed = stored ? parseInt(stored, 10) : NaN
-      const start = stored && !isNaN(parsed) ? parsed : Date.now()
-      if (!stored || isNaN(parsed)) localStorage.setItem(USAGE_KEY, String(start))
-
-      if (Date.now() - start >= USAGE_GATE_MS) {
-        blockUser()
-      }
-    }, 10_000)
-
-    return () => clearInterval(interval)
+    const stored = localStorage.getItem(USAGE_KEY)
+    const parsed = stored ? parseInt(stored, 10) : NaN
+    const start = stored && !isNaN(parsed) ? parsed : Date.now()
+    if (!stored || isNaN(parsed)) localStorage.setItem(USAGE_KEY, String(start))
+    if (Date.now() - start >= USAGE_GATE_MS) {
+      blockUser()
+    }
   }, [isBlocked, blockUser])
 
   return (
     <RateLimitContext.Provider
-      value={{ visible, isBlocked, blockedUntil, timeRemaining, retryAfter, show, hide, blockUser }}
+      value={{ visible, isBlocked, blockedUntil, timeRemaining, retryAfter, show, hide, blockUser, startUsageTimer }}
     >
       {children}
     </RateLimitContext.Provider>
