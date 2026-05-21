@@ -11,7 +11,7 @@ ENV NEXT_PUBLIC_OPENWEATHER_API_KEY=$NEXT_PUBLIC_OPENWEATHER_API_KEY
 ENV NEXT_TELEMETRY_DISABLED=1
 
 COPY frontend/package*.json ./
-RUN npm ci
+RUN npm install --prefer-offline 2>/dev/null || npm install
 
 COPY frontend/ .
 RUN npm run build
