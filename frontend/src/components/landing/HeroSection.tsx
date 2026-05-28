@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Cloud, MapPin, Star, Download, Layers } from 'lucide-react'
+import { Cloud, MapPin, Star, Download, Layers, Github, Linkedin } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { IconTexture } from './IconTexture'
@@ -69,13 +69,31 @@ export function HeroSection() {
 
             {/* CTAs */}
             <div className="flex flex-col gap-5">
-              {/* Download CV — ação principal */}
-              <a href="/curriculo-diogo-benicio.pdf" download className="w-full sm:w-fit">
-                <Button className="w-full gap-2 sm:w-fit">
-                  <Download size={16} />
-                  Baixar Currículo PDF
-                </Button>
-              </a>
+              {/* Download CV + links sociais */}
+              <div className="flex flex-wrap items-center gap-2">
+                <a href="/curriculo-diogo-benicio.pdf" download className="w-full sm:w-fit">
+                  <Button className="w-full gap-2 sm:w-fit">
+                    <Download size={16} />
+                    Baixar Currículo PDF
+                  </Button>
+                </a>
+                <a href="https://github.com/DiogoBenicio" target="_blank" rel="noopener noreferrer">
+                  <Button variant="outline" size="sm" className="gap-1.5">
+                    <Github size={14} />
+                    GitHub
+                  </Button>
+                </a>
+                <a
+                  href="https://linkedin.com/in/diogosbenicio"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button variant="outline" size="sm" className="gap-1.5">
+                    <Linkedin size={14} />
+                    LinkedIn
+                  </Button>
+                </a>
+              </div>
 
               {/* Explorar projetos */}
               <div className="flex flex-col gap-2">
