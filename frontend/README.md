@@ -1,6 +1,6 @@
 # Portfolio Frontend
 
-Landing page + dashboard com visualizações de clima e formulário NPS.
+Landing page + dashboards com visualizações de clima, mapa interativo e formulário NPS.
 
 ![Next.js](https://img.shields.io/badge/Next.js_14-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)
 ![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)
@@ -13,18 +13,18 @@ Landing page + dashboard com visualizações de clima e formulário NPS.
 
 | Rota                   | Descrição                                                                  |
 | ---------------------- | -------------------------------------------------------------------------- |
-| `/`                    | Landing page com hero, stack e diagrama de arquitetura                     |
+| `/`                    | Landing page com hero, download de CV, stack e diagrama de arquitetura     |
 | `/dashboard/weather`   | Clima atual, gráficos de sensores, previsão 5 dias e heatmap mensal        |
-| `/dashboard/map`       | Mapa interativo Leaflet com marcadores e popup de clima em tempo real      |
+| `/dashboard/map`       | Mapa Leaflet com satélite ESRI, fronteiras de estados e popup de clima     |
 | `/dashboard/nps`       | Formulário NPS (0–10) + painel com score, zonas e distribuição             |
 | `/dashboard/ecosystem` | Diagrama interativo da arquitetura de microsserviços e status dos serviços |
 
 ## Design
 
-- Paleta sóbria: `white/gray-50` fundo, `gray-900` texto, `blue-600` acento
-- Gráficos monocromáticos em tons de azul (Recharts)
-- Sidebar responsiva com colapso em mobile
-- Totalmente responsivo com CSS Grid do Tailwind
+- Tema escuro como padrão, alternável via toggle
+- Gráficos em tons de azul (Recharts)
+- Sidebar responsiva colapsável com animação de fade
+- Totalmente responsivo (mobile-first)
 
 ## Cache (TanStack Query)
 
@@ -48,8 +48,8 @@ Acesse http://localhost:3000
 
 ```bash
 # Da raiz do repositório:
-docker compose up --build -d frontend nginx
-docker compose logs -f frontend
+docker compose up --build -d nginx
+docker compose logs -f nginx
 ```
 
 ## Testes
@@ -61,12 +61,12 @@ npm run test:coverage
 
 ## Stack
 
-- Next.js 14 (App Router, output standalone)
+- Next.js 14 (App Router, static export)
 - TypeScript 5
 - Tailwind CSS 3 + shadcn/ui (Radix UI primitives)
 - TanStack Query 5 (React Query — cache e estado de servidor)
 - Recharts 2 (gráficos de temperatura, umidade, sensores)
-- Leaflet 1.9 + React-Leaflet 4 (mapa — importado dinamicamente, sem SSR)
+- Leaflet 1.9 + React-Leaflet 4 (mapa com tiles ESRI satélite)
 - Lucide React (ícones)
 - Axios 1 (HTTP client)
 - Vitest (testes unitários)

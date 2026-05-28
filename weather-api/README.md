@@ -1,10 +1,10 @@
 # Weather API
 
-API RESTful que consulta a OpenWeather API e armazena dados históricos no Elasticsearch 8.
+API RESTful que consulta a OpenWeather API e armazena dados históricos no PostgreSQL.
 
 ![Java](https://img.shields.io/badge/Java_21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot_3.3-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
-![Elasticsearch](https://img.shields.io/badge/Elasticsearch_8-005571?style=for-the-badge&logo=elasticsearch&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL_15-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Maven](https://img.shields.io/badge/Maven-C71A36?style=for-the-badge&logo=apachemaven&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 
@@ -23,7 +23,7 @@ adapter/
   out/
     openweather/  → OpenWeatherClientAdapter (WebClient — clima atual e previsão)
     openmeteo/    → OpenMeteoClientAdapter (WebClient — histórico horário)
-    elasticsearch/ → ElasticsearchWeatherAdapter (Spring Data ES)
+    postgres/     → PostgresWeatherAdapter (Spring Data JPA)
 
 config/          → UseCaseConfig (wiring dos beans), WebConfig (CORS + Swagger)
 application/dto/ → DTOs de resposta (records imutáveis)
@@ -35,27 +35,27 @@ application/dto/ → DTOs de resposta (records imutáveis)
 |---|---|---|
 | GET | `/api/v1/weather/current?city=` | Clima atual via OpenWeather |
 | GET | `/api/v1/weather/forecast?city=&days=5` | Previsão 5 dias |
-| GET | `/api/v1/weather/history?city=&from=&to=&page=&size=` | Histórico (Elasticsearch) |
+| GET | `/api/v1/weather/history?city=&from=&to=&page=&size=` | Histórico paginado |
 | GET | `/api/v1/weather/sensors?city=&from=&to=` | Dados horários para gráficos |
 | GET | `/api/v1/weather/calendar?city=&year=&month=` | Heatmap mensal |
-| GET | `/api/v1/weather/cities` | Cidades com dados indexados |
-| POST | `/api/v1/weather/refresh` | Forçar atualização no Elasticsearch |
+| GET | `/api/v1/weather/cities` | Cidades com dados persistidos |
+| POST | `/api/v1/weather/populate?city=&date=` | Seed de dados históricos (idempotente) |
 | GET | `/swagger-ui.html` | Documentação interativa |
 | GET | `/actuator/health` | Health check |
 
-## Elasticsearch
+## PostgreSQL
 
-- Índices mensais: `weather-data-YYYY-MM`
-- ID determinístico: `{city-slug}-{YYYY-MM-DD-HH}`
-- Gap-fill automático: Open-Meteo preenche lacunas no histórico
+- ID determinístico: `{city-slug}-{YYYY-MM-DD-HH}` (garante idempotência)
+- Gap-fill automático via Open-Meteo quando há lacunas no histórico
+- Compartilha instância PostgreSQL com o nps-api
 
 ## Executar localmente
 
 ```bash
-# Requisitos: Java 21, Maven 3.9+, Elasticsearch 8 em localhost:9200
+# Requisitos: Java 21, Maven 3.9+, PostgreSQL 15 em localhost:5432
 
 cp .env.example .env
-# Edite .env com sua OPENWEATHER_API_KEY
+# Edite .env com sua OPENWEATHER_API_KEY e POSTGRES_PASSWORD
 
 mvn spring-boot:run
 ```
@@ -64,7 +64,7 @@ mvn spring-boot:run
 
 ```bash
 # Da raiz do repositório:
-docker compose up --build -d elasticsearch weather-api
+docker compose up --build -d postgres weather-api
 docker compose logs -f weather-api
 ```
 

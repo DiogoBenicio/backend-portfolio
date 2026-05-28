@@ -47,27 +47,9 @@ O gateway reescreve o path antes de encaminhar ao upstream:
 
 | Escopo | Limite |
 |---|---|
-| Global | 100 req/min |
-| Rotas pesadas (history, sensors) | 30 req/min |
-| NPS submit | 300 req/min |
-
-## Obter Token
-
-```bash
-curl -X POST http://localhost/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"<ADMIN_PASS>"}'
-
-# Resposta:
-# { "token": "eyJ...", "tokenType": "Bearer", "expiresIn": "2h" }
-```
-
-## Usar Token
-
-```bash
-curl "http://localhost/api/weather/history?city=Uberlândia" \
-  -H "Authorization: Bearer <token>"
-```
+| Global | 500 req/min |
+| Rotas pesadas (sensors, calendar, populate) | 300 req/min |
+| NPS | 300 req/min |
 
 ## Executar via Docker
 

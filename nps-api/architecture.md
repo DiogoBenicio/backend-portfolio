@@ -1,11 +1,11 @@
 # NPS-API — Arquitetura
 
 ## Stack
-- **Node.js + Fastify 4**
+- **Node.js 20 + Fastify 5**
 - **TypeScript**
 - **Arquitetura Hexagonal (Ports & Adapters)**
 - **Prisma ORM**
-- **PostgreSQL** — persistência das respostas NPS
+- **PostgreSQL 15** — persistência das respostas NPS
 
 ## Estrutura de pastas
 
@@ -29,8 +29,8 @@ src/
 
 | Método | Rota | Descrição |
 |---|---|---|
-| `POST` | `/nps/submit` | Submete uma avaliação (score 0–10 + comentário opcional) |
-| `GET` | `/nps/summary` | Retorna média, total e distribuição por score |
+| `POST` | `/nps/responses` | Submete uma avaliação (score 0–10 + comentário opcional) |
+| `GET` | `/nps/summary` | Retorna score NPS, total e distribuição |
 | `GET` | `/nps/responses` | Lista paginada de respostas |
 
 ## Modelo de dados
@@ -50,8 +50,14 @@ NpsResponse {
 Promotores  = scores 9-10
 Detratores  = scores 0-6
 NPS = (promotores - detratores) / total × 100
+
+Zonas:
+  -100 →  0:  Crítico
+     1 → 50:  Aperfeiçoamento
+    51 → 75:  Qualidade
+    76 → 100: Excelência
 ```
 
 ## Rate limit
 
-As rotas `/api/nps/*` têm rate limit próprio no Gateway (300 req/min), mais generoso que o global (100 req/min), para garantir que o formulário de feedback funcione mesmo após o usuário ter atingido o limite nas outras rotas.
+As rotas `/api/nps/*` têm rate limit próprio no Gateway (300 req/min), igual ao global elevado, garantindo que o formulário de feedback funcione sem restrições para visitantes normais.
