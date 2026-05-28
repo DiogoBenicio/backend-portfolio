@@ -57,6 +57,7 @@ export function HeroSection() {
                 'AWS',
                 'Docker',
                 'Next.js',
+                'Oracle Cloud',
               ].map((tech) => (
                 <span
                   key={tech}
@@ -70,29 +71,38 @@ export function HeroSection() {
             {/* CTAs */}
             <div className="flex flex-col gap-5">
               {/* Download CV + links sociais */}
-              <div className="flex flex-wrap items-center gap-2">
-                <a href="/curriculo-diogo-benicio.pdf" download className="w-full sm:w-fit">
-                  <Button className="w-full gap-2 sm:w-fit">
-                    <Download size={16} />
-                    Baixar Currículo PDF
-                  </Button>
-                </a>
-                <a href="https://github.com/DiogoBenicio" target="_blank" rel="noopener noreferrer">
-                  <Button variant="outline" size="sm" className="gap-1.5">
-                    <Github size={14} />
-                    GitHub
-                  </Button>
-                </a>
-                <a
-                  href="https://linkedin.com/in/diogosbenicio"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button variant="outline" size="sm" className="gap-1.5">
-                    <Linkedin size={14} />
-                    LinkedIn
-                  </Button>
-                </a>
+              <div className="flex flex-col gap-2">
+                <p className="text-xs font-medium uppercase tracking-wider text-gray-400 dark:text-gray-500">
+                  Links
+                </p>
+                <div className="flex flex-wrap items-center gap-2">
+                  <a href="/curriculo-diogo-benicio.pdf" download className="w-full sm:w-fit">
+                    <Button className="w-full gap-2 sm:w-fit">
+                      <Download size={16} />
+                      Baixar Currículo PDF
+                    </Button>
+                  </a>
+                  <a
+                    href="https://github.com/DiogoBenicio"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button variant="outline" size="sm" className="gap-1.5">
+                      <Github size={14} />
+                      GitHub
+                    </Button>
+                  </a>
+                  <a
+                    href="https://linkedin.com/in/diogosbenicio"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button variant="outline" size="sm" className="gap-1.5">
+                      <Linkedin size={14} />
+                      LinkedIn
+                    </Button>
+                  </a>
+                </div>
               </div>
 
               {/* Explorar projetos */}
