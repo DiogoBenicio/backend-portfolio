@@ -105,7 +105,7 @@ export function CalendarHeatmap({ city, initialYear, initialMonth }: Props) {
             </svg>
           </span>
           <span className="text-sm font-semibold text-gray-700 dark:text-slate-200">
-            Dados no PostgreSQL
+            Dados no Elasticsearch
           </span>
         </div>
         <div className="flex items-center gap-2">
