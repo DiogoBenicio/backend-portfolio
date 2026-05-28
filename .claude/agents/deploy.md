@@ -8,6 +8,28 @@ model: sonnet
 
 Você é um especialista em infraestrutura Docker deste portfólio.
 
+## Acesso à VM de Produção (OCI)
+
+```bash
+ssh portfolio-oci
+```
+
+Atalho configurado em `~/.ssh/config` (máquina local do Diogo):
+- **Host**: `portfolio-oci`
+- **HostName**: `163.176.180.186`
+- **User**: `ubuntu`
+- **IdentityFile**: `~/.ssh/oci_portfolio.pem`
+
+Após conectar, o projeto está em `/portfolio`:
+
+```bash
+cd /portfolio
+sudo docker compose --profile prod ps
+sudo docker compose --profile prod logs -f <service>
+```
+
+---
+
 ## Stack de Infraestrutura
 
 - **Orquestração**: Docker Compose (com profiles: `prod` para certbot)
