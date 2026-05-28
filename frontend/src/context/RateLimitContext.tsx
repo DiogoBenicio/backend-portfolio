@@ -3,11 +3,8 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 
 const RL_KEY = 'rl-blocked-until'
-const USAGE_KEY = 'usage-start'
-const USAGE_GATE_MS = 30 * 60 * 1000
 
 interface RateLimitState {
-  visible: boolean
   isBlocked: boolean
   blockedUntil: number | null
   timeRemaining: number
@@ -15,28 +12,24 @@ interface RateLimitState {
   show: (retryAfter?: string) => void
   hide: () => void
   blockUser: () => void
-  startUsageTimer: () => void
 }
 
 const RateLimitContext = createContext<RateLimitState>({
-  visible: false,
   isBlocked: false,
   blockedUntil: null,
   timeRemaining: 0,
   show: () => {},
   hide: () => {},
   blockUser: () => {},
-  startUsageTimer: () => {},
 })
 
 export function RateLimitProvider({ children }: { children: React.ReactNode }) {
-  const [visible, setVisible] = useState(false)
   const [retryAfter, setRetryAfter] = useState<string | undefined>()
   const [isBlocked, setIsBlocked] = useState(false)
   const [blockedUntil, setBlockedUntil] = useState<number | null>(null)
   const [timeRemaining, setTimeRemaining] = useState(0)
 
-  // Restore block state on mount
+  // Restaura bloqueio ativo ao montar (persiste entre reloads)
   useEffect(() => {
     const stored = localStorage.getItem(RL_KEY)
     if (stored) {
@@ -63,9 +56,7 @@ export function RateLimitProvider({ children }: { children: React.ReactNode }) {
         setIsBlocked(false)
         setBlockedUntil(null)
         setTimeRemaining(0)
-        setVisible(false)
         localStorage.removeItem(RL_KEY)
-        localStorage.removeItem(USAGE_KEY)
       } else {
         setTimeRemaining(remaining)
       }
@@ -77,7 +68,6 @@ export function RateLimitProvider({ children }: { children: React.ReactNode }) {
   }, [isBlocked, blockedUntil])
 
   const blockUser = useCallback(() => {
-    // Se já há um bloco ativo, não resetar o countdown
     const stored = localStorage.getItem(RL_KEY)
     if (stored) {
       const existing = parseInt(stored, 10)
@@ -93,31 +83,20 @@ export function RateLimitProvider({ children }: { children: React.ReactNode }) {
     (after?: string) => {
       setRetryAfter(after)
       blockUser()
-      setVisible(true)
     },
     [blockUser]
   )
 
   const hide = useCallback(() => {
-    setVisible(false)
+    setIsBlocked(false)
+    setBlockedUntil(null)
+    setTimeRemaining(0)
+    localStorage.removeItem(RL_KEY)
   }, [])
-
-  // Usage gate: timer exposto via context para ser ativado só nas páginas relevantes
-  const startUsageTimer = useCallback(() => {
-    if (isBlocked) return
-    const stored = localStorage.getItem(USAGE_KEY)
-    const parsed = stored ? parseInt(stored, 10) : NaN
-    const start = stored && !isNaN(parsed) ? parsed : Date.now()
-    if (!stored || isNaN(parsed)) localStorage.setItem(USAGE_KEY, String(start))
-    if (Date.now() - start >= USAGE_GATE_MS) {
-      blockUser()
-    }
-  }, [isBlocked, blockUser])
 
   return (
     <RateLimitContext.Provider
       value={{
-        visible,
         isBlocked,
         blockedUntil,
         timeRemaining,
@@ -125,7 +104,6 @@ export function RateLimitProvider({ children }: { children: React.ReactNode }) {
         show,
         hide,
         blockUser,
-        startUsageTimer,
       }}
     >
       {children}

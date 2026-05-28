@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { usePathname } from 'next/navigation'
-import { Heart, MessageSquareHeart, Clock } from 'lucide-react'
+import { AlertTriangle, MessageSquareHeart, Clock } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -14,8 +14,6 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useRateLimit } from '@/context/RateLimitContext'
-
-const GATED_ROUTES = ['/dashboard/weather', '/dashboard/map']
 
 function formatTime(seconds: number): string {
   if (seconds <= 0) return '0s'
@@ -28,21 +26,21 @@ function formatTime(seconds: number): string {
 }
 
 export function RateLimitModal() {
-  const { isBlocked, timeRemaining, hide, startUsageTimer } = useRateLimit()
+  const { isBlocked, timeRemaining, show, hide } = useRateLimit()
   const router = useRouter()
   const pathname = usePathname()
 
-  const isGatedPage = GATED_ROUTES.some((r) => pathname.startsWith(r))
-  const shouldShow = isBlocked && isGatedPage
+  const shouldShow = isBlocked && pathname !== '/dashboard/nps'
 
-  // Acumula tempo de uso apenas nas páginas com gate
+  // Dispara o modal apenas em respostas 429 reais da API
   useEffect(() => {
-    if (!isGatedPage) return
-    const interval = setInterval(startUsageTimer, 10_000)
-    return () => clearInterval(interval)
-  }, [isGatedPage, startUsageTimer])
-
-  // 429 da API não dispara mais o bloqueio de 1h — apenas o usage gate faz isso
+    function handleRateLimit(e: Event) {
+      const detail = (e as CustomEvent<{ retryAfter?: string }>).detail
+      show(detail?.retryAfter)
+    }
+    window.addEventListener('rate-limit', handleRateLimit)
+    return () => window.removeEventListener('rate-limit', handleRateLimit)
+  }, [show])
 
   function goToNps() {
     hide()
@@ -53,22 +51,22 @@ export function RateLimitModal() {
     <Dialog open={shouldShow} onOpenChange={() => {}}>
       <DialogContent className="sm:max-w-sm text-center [&>button:last-child]:hidden">
         <DialogHeader className="items-center gap-3">
-          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-orange-50 dark:bg-orange-900/20">
-            <Heart className="h-8 w-8 text-orange-500" fill="currentColor" />
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-red-50 dark:bg-red-900/20">
+            <AlertTriangle className="h-8 w-8 text-red-500" />
           </div>
 
           <DialogTitle className="text-xl font-bold text-gray-900 dark:text-slate-100">
-            Obrigado por explorar!
+            Limite de requisições atingido
           </DialogTitle>
 
           <DialogDescription className="text-sm text-gray-500 dark:text-slate-400 leading-relaxed">
-            Você explorou bastante o portfólio — incrível! 🎉
+            A API retornou um erro{' '}
+            <strong className="text-gray-700 dark:text-slate-200">429 — Too Many Requests</strong>.
             <br />
             <br />
-            Para manter a demonstração saudável, o acesso ficará pausado por 1 hora. Aproveite para
-            deixar sua avaliação no{' '}
-            <strong className="text-gray-700 dark:text-slate-200">NPS</strong> — seu feedback é
-            muito valioso!
+            Isso acontece quando muitas chamadas são feitas em pouco tempo. O acesso será liberado
+            automaticamente em instantes. Aproveite para deixar sua avaliação no{' '}
+            <strong className="text-gray-700 dark:text-slate-200">NPS</strong>!
           </DialogDescription>
         </DialogHeader>
 
@@ -85,7 +83,7 @@ export function RateLimitModal() {
         <DialogFooter className="flex-col gap-2 sm:flex-col">
           <Button
             onClick={goToNps}
-            className="w-full gap-2 bg-orange-500 hover:bg-orange-600 text-white"
+            className="w-full gap-2 bg-blue-600 hover:bg-blue-700 text-white"
           >
             <MessageSquareHeart className="h-4 w-4" />
             Deixar minha avaliação

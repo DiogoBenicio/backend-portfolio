@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Cloud, MapPin, Star, Download } from 'lucide-react'
+import { Cloud, MapPin, Star, Download, Layers } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { IconTexture } from './IconTexture'
@@ -99,6 +99,12 @@ export function HeroSection() {
                     <Button variant="outline" size="sm" className="gap-1.5">
                       <Star size={14} />
                       Avaliação NPS
+                    </Button>
+                  </Link>
+                  <Link href="/dashboard/ecosystem">
+                    <Button variant="outline" size="sm" className="gap-1.5">
+                      <Layers size={14} />
+                      Observabilidade
                     </Button>
                   </Link>
                 </div>
