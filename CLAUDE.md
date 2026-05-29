@@ -2,7 +2,7 @@
 
 ## Visão Geral
 
-Portfólio Full Stack com microsserviços containerizados demonstrando arquitetura hexagonal, SOA, JWT, reverse proxy e observabilidade. Deploy em produção na Oracle Cloud (OCI) com HTTPS via Let's Encrypt.
+Portfólio Full Stack com microsserviços containerizados demonstrando arquitetura hexagonal, SOA, segurança em camadas, reverse proxy e observabilidade. Deploy em produção na Oracle Cloud (OCI) com HTTPS via Let's Encrypt.
 
 ## Serviços e Portas
 
@@ -22,7 +22,7 @@ Portfólio Full Stack com microsserviços containerizados demonstrando arquitetu
 ├── docker-compose.yml       # Orquestração completa (profiles: prod para certbot)
 ├── nginx/                   # Reverse proxy (entry point único, dev + prod configs)
 ├── frontend/                # Next.js 14 (App Router, TanStack Query, shadcn/ui)
-├── gateway-api/             # API Gateway (JWT auth, rate limit, proxy)
+├── gateway-api/             # API Gateway (rate limit, proxy, CORS)
 ├── nps-api/                 # NPS API (Hexagonal, Prisma, PostgreSQL)
 └── weather-api/             # Weather API (Hexagonal, JPA, PostgreSQL, OpenWeather)
 ```

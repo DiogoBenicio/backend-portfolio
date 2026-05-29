@@ -16,13 +16,12 @@ Portfólio técnico com 5 microsserviços interconectados demonstrando arquitetu
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![Oracle Cloud](https://img.shields.io/badge/Oracle_Cloud-F80000?style=for-the-badge&logo=oracle&logoColor=white)
 ![Let's Encrypt](https://img.shields.io/badge/Let's_Encrypt-003A70?style=for-the-badge&logo=letsencrypt&logoColor=white)
-![Oracle Cloud](https://img.shields.io/badge/Oracle_Cloud-F80000?style=for-the-badge&logo=oracle&logoColor=white)
-![Let's Encrypt](https://img.shields.io/badge/Let's_Encrypt-003A70?style=for-the-badge&logo=letsencrypt&logoColor=white)
 
 ### API Gateway
 ![Node.js](https://img.shields.io/badge/Node.js_20-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Fastify](https://img.shields.io/badge/Fastify-000000?style=for-the-badge&logo=fastify&logoColor=white)
+
 ### Weather API
 ![Java](https://img.shields.io/badge/Java_21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot_3.3-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
@@ -160,7 +159,8 @@ docker compose up --build -d
 
 ### v1.1.1 — 2026-05-29
 - 25 bugs corrigidos em 3 rodadas de auditoria (frontend, gateway, nps-api, weather-api, infra)
-- Correções críticas: slug Unicode, score NPS float, test compile error, seed busybox
+- Correções críticas: slug Unicode, score NPS float, test compile error, seed busybox/awk
+- weather-api Dockerfile: `dependency:go-offline` → `dependency:resolve` (robusto em OCI)
 - Logging limits em todos os containers, rate limit OPTIONS excluído, regex INMET
 
 ### v1.1.0 — 2026-05-29
