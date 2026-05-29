@@ -1,6 +1,6 @@
 {
   "name": "nps-api",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "NPS API — Hexagonal Architecture | Fastify + TypeScript + PostgreSQL",
   "main": "dist/main.js",
   "scripts": {
