@@ -13,6 +13,7 @@ async function buildServer() {
   const server = fastify({
     logger: false, // log próprio via utils/logger
     trustProxy: 1, // confiar apenas no primeiro hop (Nginx)
+    ignoreTrailingSlash: true,
   });
 
   // ── Plugins ────────────────────────────────────────────────
@@ -65,7 +66,9 @@ async function buildServer() {
   server.get("/api/health", healthResponse); // acessível via Nginx /api/*
 
   server.get("/api/v1/health", async () => {
-    const npsOk = await fetch(`${env.npsApiUrl}/api/v1/health`)
+    const npsOk = await fetch(`${env.npsApiUrl}/api/v1/health`, {
+      signal: AbortSignal.timeout(5000),
+    })
       .then((r) => r.ok)
       .catch(() => false);
     return {

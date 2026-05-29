@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 # Seed de dados meteorológicos — chama weather-api diretamente (sem JWT)
 # Idempotente: IDs são determinísticos (city-slug + YYYY-MM-DD-HH)
 
@@ -27,6 +28,8 @@ for city in "São Paulo" "Recife" "Manaus" "Curitiba" "Brasília"; do
     else
       skipped=$((skipped + 1))
     fi
+
+    sleep 2
   done
 done
 

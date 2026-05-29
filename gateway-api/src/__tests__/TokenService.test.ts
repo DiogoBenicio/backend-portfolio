@@ -3,6 +3,7 @@ jest.mock("../config/env", () => ({
     jwtSecret: "test-secret-key-for-unit-tests",
     jwtExpiresIn: "2h",
     port: 4000,
+    adminUser: "admin",
     weatherApiUrl: "http://weather-api:8080",
     npsApiUrl: "http://nps-api:3001",
   },
@@ -65,17 +66,22 @@ describe("TokenService", () => {
 
   describe("refresh", () => {
     it("deve gerar novo token com mesmo sub e role", () => {
-      const original = service.sign({ sub: "u1", role: "admin" });
+      const original = service.sign({ sub: "admin", role: "admin" });
       const refreshed = service.refresh(original);
       const payload = service.verify(refreshed);
-      expect(payload.sub).toBe("u1");
+      expect(payload.sub).toBe("admin");
       expect(payload.role).toBe("admin");
     });
 
     it("token renovado deve ser verificável (ainda válido)", () => {
-      const original = service.sign({ sub: "u1", role: "admin" });
+      const original = service.sign({ sub: "admin", role: "admin" });
       const refreshed = service.refresh(original);
       expect(() => service.verify(refreshed)).not.toThrow();
+    });
+
+    it("deve lançar erro 401 se sub não corresponde ao adminUser", () => {
+      const original = service.sign({ sub: "outro-usuario", role: "admin" });
+      expect(() => service.refresh(original)).toThrow("Token inválido");
     });
   });
 

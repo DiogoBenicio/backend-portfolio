@@ -41,9 +41,9 @@ describe("calculateNps", () => {
     expect(calculateNps(3, 1, 5)).toBe(40);
   });
 
-  it("deve arredondar 1 casa decimal", () => {
-    // ((3-1)/6)*100 = 33.333... → 33.3
-    expect(calculateNps(3, 1, 6)).toBe(33.3);
+  it("deve arredondar para inteiro", () => {
+    // ((3-1)/6)*100 = 33.333... → 33 (NPS canônico é inteiro)
+    expect(calculateNps(3, 1, 6)).toBe(33);
   });
 });
 

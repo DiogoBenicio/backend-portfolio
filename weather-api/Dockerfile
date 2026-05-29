@@ -22,4 +22,6 @@ COPY --from=builder /app/target/weather-api-*.jar app.jar
 
 EXPOSE 8080
 
+ENV JAVA_TOOL_OPTIONS="-Xms64m -Xmx128m -XX:+UseSerialGC -XX:MaxMetaspaceSize=160m"
+
 ENTRYPOINT ["java", "-jar", "app.jar"]

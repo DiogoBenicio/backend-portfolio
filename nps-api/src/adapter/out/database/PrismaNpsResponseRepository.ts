@@ -39,11 +39,19 @@ export class PrismaNpsResponseRepository implements NpsResponseRepository {
   }
 
   async findAllByPage(page?: string): Promise<NpsResponse[]> {
+    const MAX = 10_000;
     const where = page ? { page } : {};
-    return this.prisma.npsResponse.findMany({
+    const results = await this.prisma.npsResponse.findMany({
       where,
       orderBy: { createdAt: "desc" },
+      take: MAX,
     });
+    if (results.length === MAX) {
+      console.warn(
+        `[NPS] findAllByPage truncado em ${MAX} registros para page="${page}"`,
+      );
+    }
+    return results;
   }
 
   async deleteById(id: string): Promise<void> {

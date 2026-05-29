@@ -65,7 +65,10 @@ public class GetWeatherSensorsService implements GetWeatherSensorsUseCase {
         if (!existing.isEmpty()) {
             lat = existing.get(0).latitude();
             lon = existing.get(0).longitude();
-        } else {
+        }
+
+        // BUG M8: coords 0,0 are invalid (equator/prime-meridian) — re-fetch from provider
+        if (lat == 0.0 && lon == 0.0) {
             try {
                 Weather current = weatherProvider.fetchCurrentWeather(city, null);
                 lat = current.latitude();

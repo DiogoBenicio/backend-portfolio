@@ -9,10 +9,15 @@ export interface TokenPayload {
 export class TokenService {
   private readonly secret: string;
   private readonly expiresIn: string;
+  private readonly adminUser: string;
 
   constructor() {
     this.secret = env.jwtSecret;
     this.expiresIn = env.jwtExpiresIn;
+    this.adminUser = env.adminUser;
+    if (!/^\d+[smhd]$/.test(this.expiresIn)) {
+      throw new Error(`JWT_EXPIRES_IN inválido: "${this.expiresIn}"`);
+    }
   }
 
   sign(payload: TokenPayload): string {
@@ -33,6 +38,9 @@ export class TokenService {
       algorithms: ["HS256"],
       ignoreExpiration: true,
     }) as TokenPayload & JwtPayload;
+    if (decoded.sub !== this.adminUser) {
+      throw Object.assign(new Error("Token inválido"), { statusCode: 401 });
+    }
     const { iat: _iat, exp: _exp, ...payload } = decoded;
     return this.sign(payload as TokenPayload);
   }

@@ -67,8 +67,9 @@ public class UseCaseConfig {
 
     @Bean
     public PopulateWeatherUseCase populateWeatherUseCase(
-            WeatherProviderClient client, WeatherDataRepository repository) {
-        return new PopulateWeatherService(client, repository);
+            WeatherProviderClient client, HistoricalWeatherClient historicalClient,
+            WeatherDataRepository repository) {
+        return new PopulateWeatherService(client, historicalClient, repository);
     }
 
     @Bean

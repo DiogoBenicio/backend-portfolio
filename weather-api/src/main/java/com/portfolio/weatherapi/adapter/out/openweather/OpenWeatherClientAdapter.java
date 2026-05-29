@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -147,15 +148,20 @@ public class OpenWeatherClientAdapter implements WeatherProviderClient {
         String windDir = degToCompass(r.wind() != null ? r.wind().deg() : 0);
         double rainfall = r.rain() != null && r.rain().oneHour() != null ? r.rain().oneHour() : 0.0;
 
+        double temp      = r.main() != null ? r.main().temp()      : 0.0;
+        double feelsLike = r.main() != null ? r.main().feelsLike() : 0.0;
+        int    humidity  = r.main() != null ? r.main().humidity()  : 0;
+        int    pressure  = r.main() != null ? r.main().pressure()  : 0;
+
         return Weather.of(
                 r.name() != null ? r.name() : "",
                 r.sys() != null ? r.sys().country() : "",
                 r.coord() != null ? r.coord().lat() : 0.0,
                 r.coord() != null ? r.coord().lon() : 0.0,
-                r.main().temp(),
-                r.main().feelsLike(),
-                r.main().humidity(),
-                r.main().pressure(),
+                temp,
+                feelsLike,
+                humidity,
+                pressure,
                 r.wind() != null ? r.wind().speed() * 3.6 : 0.0, // m/s → km/h
                 windDir,
                 description,
@@ -170,7 +176,7 @@ public class OpenWeatherClientAdapter implements WeatherProviderClient {
         Map<LocalDate, List<OpenWeatherForecastResponse.ForecastItem>> byDay = r.list().stream()
                 .collect(Collectors.groupingBy(item -> {
                     // Usa o formatter definido para parse do dt_txt retornado pelo OpenWeather
-                    return LocalDate.parse(item.dtTxt(), FORECAST_FORMATTER);
+                    return LocalDateTime.parse(item.dtTxt(), FORECAST_FORMATTER).toLocalDate();
                 }, LinkedHashMap::new, Collectors.toList()));
 
         List<ForecastDay> forecastDays = byDay.entrySet().stream()

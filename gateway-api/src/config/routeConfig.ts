@@ -15,7 +15,7 @@ export const PATH_REWRITES: Array<{ from: RegExp; to: string }> = [
 
 // Rotas públicas — não exigem JWT
 export const PUBLIC_ROUTES: Array<{ method: string; pattern: RegExp }> = [
-  { method: "POST", pattern: /^\/api\/auth\/login$/ },
+  { method: "POST", pattern: /^\/api\/auth\/login/ },
   { method: "POST", pattern: /^\/api\/auth\/refresh$/ },
   { method: "GET", pattern: /^\/api\/weather\/health$/ },
   { method: "GET", pattern: /^\/api\/weather\/current/ },
@@ -24,10 +24,8 @@ export const PUBLIC_ROUTES: Array<{ method: string; pattern: RegExp }> = [
   { method: "GET", pattern: /^\/api\/weather\/calendar/ },
   { method: "GET", pattern: /^\/api\/weather\/windfield/ },
   { method: "GET", pattern: /^\/api\/weather\/cities/ },
-  { method: "POST", pattern: /^\/api\/weather\/populate/ },
   { method: "POST", pattern: /^\/api\/nps\/responses$/ },
   { method: "GET", pattern: /^\/api\/nps\/responses/ },
-  { method: "DELETE", pattern: /^\/api\/nps\/responses\// },
   { method: "GET", pattern: /^\/api\/nps\/summary/ },
   { method: "GET", pattern: /^\/api\/metrics$/ },
   { method: "GET", pattern: /^\/api\/inmet-alerts$/ },

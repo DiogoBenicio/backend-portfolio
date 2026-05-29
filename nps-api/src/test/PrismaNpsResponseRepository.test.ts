@@ -134,6 +134,7 @@ describe("PrismaNpsResponseRepository", () => {
       expect(mockPrisma.npsResponse.findMany).toHaveBeenCalledWith({
         where: { page: "portfolio" },
         orderBy: { createdAt: "desc" },
+        take: 10_000,
       });
     });
 
@@ -145,6 +146,7 @@ describe("PrismaNpsResponseRepository", () => {
       expect(mockPrisma.npsResponse.findMany).toHaveBeenCalledWith({
         where: {},
         orderBy: { createdAt: "desc" },
+        take: 10_000,
       });
     });
   });

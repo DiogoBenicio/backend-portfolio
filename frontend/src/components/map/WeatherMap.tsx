@@ -189,16 +189,27 @@ function VelocityLayer({ data, apiKey }: { data: unknown; apiKey: string }) {
   const layerRef = useRef<L.Layer | null>(null)
 
   useEffect(() => {
+    // Remover layer anterior imediatamente no cleanup, antes do then resolver
+    if (layerRef.current) {
+      try {
+        map.removeLayer(layerRef.current)
+      } catch {}
+      layerRef.current = null
+    }
+
     if (!data) return
     let cancelled = false
 
     velocityReady.then(() => {
       if (cancelled) return
-      try {
-        if (layerRef.current) {
+      // Remover novamente — pode ter sido adicionado por ciclo anterior concorrente
+      if (layerRef.current) {
+        try {
           map.removeLayer(layerRef.current)
-          layerRef.current = null
-        }
+        } catch {}
+        layerRef.current = null
+      }
+      try {
         const layer = (L as unknown as Record<string, (opts: unknown) => L.Layer>).velocityLayer({
           displayValues: true,
           displayOptions: {
@@ -234,7 +245,7 @@ function VelocityLayer({ data, apiKey }: { data: unknown; apiKey: string }) {
         layerRef.current = null
       }
     }
-  }, [map, data, apiKey])
+  }, [map, data, apiKey]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return null
 }

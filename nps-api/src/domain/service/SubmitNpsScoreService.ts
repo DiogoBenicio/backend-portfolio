@@ -10,13 +10,15 @@ export class SubmitNpsScoreService implements SubmitNpsScoreUseCase {
 
   async execute(input: SubmitNpsScoreInput): Promise<NpsResponse> {
     if (!isValidScore(input.score)) {
-      throw new Error("Score inválido: deve ser um inteiro entre 0 e 10");
+      const err = new Error("Score inválido: deve ser um inteiro entre 0 e 10");
+      Object.assign(err, { statusCode: 422 });
+      throw err;
     }
 
     return this.repository.create({
       score: input.score,
-      comment: input.comment,
-      name: input.name,
+      comment: input.comment?.trim() || null,
+      name: input.name?.trim() || null,
       page: input.page ?? "portfolio",
     });
   }

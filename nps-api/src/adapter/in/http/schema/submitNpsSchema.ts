@@ -48,6 +48,19 @@ export const getSummarySchema = {
       page: { type: "string", maxLength: 100 },
     },
   },
+  response: {
+    200: {
+      type: "object",
+      properties: {
+        npsScore: { type: "number" },
+        total: { type: "number" },
+        promoters: { type: "number" },
+        passives: { type: "number" },
+        detractors: { type: "number" },
+        zone: { type: "string" },
+      },
+    },
+  },
 };
 
 export const listResponsesSchema = {
@@ -78,7 +91,7 @@ export const listResponsesSchema = {
   querystring: {
     type: "object",
     properties: {
-      page: { type: "string" },
+      page: { type: "string", maxLength: 100 },
       limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
       offset: { type: "integer", minimum: 0, default: 0 },
     },

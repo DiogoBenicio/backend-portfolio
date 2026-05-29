@@ -10,7 +10,12 @@ function optional(key: string, fallback: string): string {
 }
 
 export const env = {
-  port: Number(optional("PORT", "4000")),
+  port: (() => {
+    const p = Number(optional("PORT", "4000"));
+    if (!Number.isInteger(p) || p < 1 || p > 65535)
+      throw new Error(`PORT inválido: "${process.env.PORT}"`);
+    return p;
+  })(),
   nodeEnv: optional("NODE_ENV", "development"),
 
   jwtSecret: required("JWT_SECRET"),

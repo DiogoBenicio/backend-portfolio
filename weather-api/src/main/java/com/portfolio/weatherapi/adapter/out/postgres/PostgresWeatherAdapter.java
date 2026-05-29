@@ -2,6 +2,8 @@ package com.portfolio.weatherapi.adapter.out.postgres;
 
 import com.portfolio.weatherapi.domain.model.Weather;
 import com.portfolio.weatherapi.domain.port.out.WeatherDataRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +19,7 @@ import java.util.List;
 @Transactional(readOnly = true)
 public class PostgresWeatherAdapter implements WeatherDataRepository {
 
+    private static final Logger log = LoggerFactory.getLogger(PostgresWeatherAdapter.class);
     private static final DateTimeFormatter HOUR_FMT =
             DateTimeFormatter.ofPattern("yyyy-MM-dd-HH").withZone(ZoneOffset.UTC);
 
@@ -91,10 +94,15 @@ public class PostgresWeatherAdapter implements WeatherDataRepository {
 
     @Override
     public List<Weather> findSensorData(String city, Instant from, Instant to) {
-        return repository.findTop500ByCityIgnoreCaseAndTimestampGreaterThanEqualAndTimestampLessThanOrderByTimestampAsc(city, from, to)
+        List<Weather> result = repository
+                .findTop500ByCityIgnoreCaseAndTimestampGreaterThanEqualAndTimestampLessThanOrderByTimestampAsc(city, from, to)
                 .stream()
                 .map(this::toModel)
                 .toList();
+        if (result.size() == 500) {
+            log.warn("findSensorData: resultado truncado em 500 registros para city={}, from={}, to={}", city, from, to);
+        }
+        return result;
     }
 
     @Override

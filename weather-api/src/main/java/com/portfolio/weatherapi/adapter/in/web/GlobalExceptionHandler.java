@@ -54,6 +54,11 @@ public class GlobalExceptionHandler {
             WebClientResponseException ex, HttpServletRequest req) {
         log.error("OpenWeather API error: {} {}  [{} {}]",
                 ex.getStatusCode(), ex.getMessage(), req.getMethod(), req.getRequestURI());
+        if (ex.getStatusCode().value() == 429) {
+            return ResponseEntity.status(429)
+                    .body(ErrorResponse.of(429, "Too Many Requests",
+                            "Limite da API externa atingido. Tente novamente em instantes."));
+        }
         if (ex.getStatusCode().value() == 404) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(ErrorResponse.of(404, "City Not Found", "Cidade não encontrada na OpenWeather API"));

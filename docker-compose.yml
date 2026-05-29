@@ -4,6 +4,7 @@ services:
   postgres:
     image: postgres:15-alpine
     container_name: portfolio-postgres
+    restart: unless-stopped
     environment:
       POSTGRES_DB: nps_db
       POSTGRES_USER: nps_user
@@ -33,6 +34,7 @@ services:
       context: ./weather-api
       dockerfile: Dockerfile
     container_name: portfolio-weather-api
+    restart: unless-stopped
     environment:
       SPRING_PROFILES_ACTIVE: docker
       OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY}
@@ -57,6 +59,7 @@ services:
       context: ./nps-api
       dockerfile: Dockerfile
     container_name: portfolio-nps-api
+    restart: unless-stopped
     environment:
       DATABASE_URL: postgresql://nps_user:${POSTGRES_PASSWORD}@postgres:5432/nps_db
       PORT: 3001
@@ -82,6 +85,7 @@ services:
       context: ./gateway-api
       dockerfile: Dockerfile
     container_name: portfolio-api-gateway
+    restart: unless-stopped
     ports:
       - "127.0.0.1:4000:4000"
     environment:
@@ -118,6 +122,7 @@ services:
         NGINX_CONF: ${NGINX_CONF:-nginx.dev.conf}
         NEXT_PUBLIC_OPENWEATHER_API_KEY: ${OPENWEATHER_API_KEY}
     container_name: portfolio-nginx
+    restart: unless-stopped
     ports:
       - "80:80"
       - "443:443"
@@ -135,7 +140,7 @@ services:
   # Execute manualmente: ./scripts/renew-cert.sh
   certbot:
     profiles: [prod]
-    image: certbot/certbot
+    image: certbot/certbot:v2.11.0
     container_name: portfolio-certbot
     volumes:
       - certbot-certs:/etc/letsencrypt
