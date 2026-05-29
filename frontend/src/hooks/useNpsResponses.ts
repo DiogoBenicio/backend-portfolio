@@ -6,6 +6,6 @@ export function useNpsResponses(page = 'portfolio', limit = 20) {
     queryKey: ['nps-responses', page, limit],
     queryFn: () => npsApi.listResponses({ page, limit, offset: 0 }),
     staleTime: 30_000,
-    refetchInterval: 60_000,
+    refetchInterval: (query) => (query.state.status === 'error' ? false : 60_000),
   })
 }

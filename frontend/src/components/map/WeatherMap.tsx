@@ -159,7 +159,8 @@ function RainViewerLayer({ pane }: { pane: string }) {
   const [tileUrl, setTileUrl] = useState<string | null>(null)
 
   useEffect(() => {
-    fetch('https://api.rainviewer.com/public/weather-maps.json')
+    const controller = new AbortController()
+    fetch('https://api.rainviewer.com/public/weather-maps.json', { signal: controller.signal })
       .then((r) => r.json())
       .then((data) => {
         const latest: string | undefined = data.radar?.past?.at(-1)?.path
@@ -167,7 +168,10 @@ function RainViewerLayer({ pane }: { pane: string }) {
           setTileUrl(`https://tilecache.rainviewer.com${latest}/512/{z}/{x}/{y}/4/1_1.png`)
         }
       })
-      .catch(() => null)
+      .catch((err) => {
+        if ((err as Error).name !== 'AbortError') console.error(err)
+      })
+    return () => controller.abort()
   }, [])
 
   if (!tileUrl) return null
@@ -362,6 +366,14 @@ function MapClickHandler({
   onAdd: (lat: number, lon: number, label: string, city?: string, country?: string) => void
   apiKey: string
 }) {
+  const controllerRef = useRef<AbortController | null>(null)
+
+  useEffect(() => {
+    return () => {
+      controllerRef.current?.abort()
+    }
+  }, [])
+
   useMapEvents({
     click(e) {
       const target = e.originalEvent.target as HTMLElement
@@ -384,15 +396,22 @@ function MapClickHandler({
         return
       }
 
+      controllerRef.current?.abort()
+      const controller = new AbortController()
+      controllerRef.current = controller
+
       fetch(
-        `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lng}&limit=1&appid=${apiKey}`
+        `https://api.openweathermap.org/geo/1.0/reverse?lat=${lat}&lon=${lng}&limit=1&appid=${apiKey}`,
+        { signal: controller.signal }
       )
         .then((r) => r.json())
         .then((data) => {
           const nearest = Array.isArray(data) && data[0]
           onAdd(lat, lng, coords, nearest?.name, nearest?.country)
         })
-        .catch(() => onAdd(lat, lng, coords))
+        .catch((err) => {
+          if ((err as Error).name !== 'AbortError') onAdd(lat, lng, coords)
+        })
     },
   })
   return null

@@ -6,6 +6,6 @@ export function useNpsSummary(page?: string) {
     queryKey: ['nps', 'summary', page],
     queryFn: () => npsApi.getSummary(page),
     staleTime: 30 * 1000, // 30 segundos
-    refetchInterval: 60 * 1000, // refetch a cada 1 minuto
+    refetchInterval: (query) => (query.state.status === 'error' ? false : 60_000),
   })
 }

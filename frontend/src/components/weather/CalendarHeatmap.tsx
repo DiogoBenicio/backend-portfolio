@@ -111,6 +111,7 @@ export function CalendarHeatmap({ city, initialYear, initialMonth }: Props) {
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigate(-1)}
+            aria-label="Mês anterior"
             className="rounded p-1 text-gray-500 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-800"
           >
             ‹
@@ -120,6 +121,7 @@ export function CalendarHeatmap({ city, initialYear, initialMonth }: Props) {
           </span>
           <button
             onClick={() => navigate(1)}
+            aria-label="Próximo mês"
             className={cn(
               'rounded p-1 text-gray-500 hover:bg-gray-100 dark:text-slate-400 dark:hover:bg-slate-800',
               month === now.getMonth() + 1 && year === now.getFullYear()

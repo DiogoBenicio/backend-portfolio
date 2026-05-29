@@ -36,6 +36,7 @@ export function ScoreSelector({ value, onChange }: ScoreSelectorProps) {
           <button
             key={i}
             type="button"
+            aria-label={`Nota ${i} de 10`}
             onClick={() => onChange(i)}
             className={cn(
               'h-10 w-10 rounded-lg border text-sm font-medium transition-all',

@@ -48,7 +48,7 @@ export function useSystemMetrics() {
         if (!r.ok) throw new Error(`metrics error ${r.status}`)
         return r.json()
       }),
-    refetchInterval: 5000,
+    refetchInterval: (query) => (query.state.status === 'error' ? false : 5000),
     staleTime: 4000,
     throwOnError: false,
   })

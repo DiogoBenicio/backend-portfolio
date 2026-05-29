@@ -54,6 +54,7 @@ export function Sidebar({ collapsed, onToggle, onMobileClose }: Props) {
       <button
         onClick={onToggle}
         title={collapsed ? 'Expandir menu' : 'Recolher menu'}
+        aria-expanded={!collapsed}
         className="absolute -right-3 top-1/2 z-50 hidden h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border border-gray-200 bg-white/50 text-gray-400 shadow-md backdrop-blur-sm transition-colors hover:border-blue-300 hover:text-blue-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400 dark:hover:border-blue-500 dark:hover:text-blue-400 md:flex"
       >
         {collapsed ? <ChevronRight size={13} /> : <ChevronLeft size={13} />}

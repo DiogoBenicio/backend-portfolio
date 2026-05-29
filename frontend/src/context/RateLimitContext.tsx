@@ -51,7 +51,8 @@ export function RateLimitProvider({ children }: { children: React.ReactNode }) {
     }
 
     function tick() {
-      const remaining = Math.ceil((blockedUntil! - Date.now()) / 1000)
+      if (!blockedUntil) return
+      const remaining = Math.ceil((blockedUntil - Date.now()) / 1000)
       if (remaining <= 0) {
         setIsBlocked(false)
         setBlockedUntil(null)

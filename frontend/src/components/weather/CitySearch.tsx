@@ -61,6 +61,7 @@ export function CitySearch({ onSearch, onSelectFull, defaultCity = '' }: CitySea
           `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(query)}&limit=6&appid=${apiKey}`,
           { signal: controller.signal }
         )
+        if (!res.ok) return
         const data: GeoResult[] = await res.json()
         // Deduplicar: manter apenas o primeiro resultado por nome normalizado+país
         const normalize = (s: string) =>

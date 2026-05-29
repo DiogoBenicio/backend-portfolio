@@ -82,15 +82,19 @@ export default function WeatherPage() {
 
   useEffect(() => {
     if (current) {
-      localStorage.setItem(
-        'selectedMapCity',
-        JSON.stringify({
-          name: current.city,
-          country,
-          lat: current.latitude,
-          lng: current.longitude,
-        })
-      )
+      try {
+        localStorage.setItem(
+          'selectedMapCity',
+          JSON.stringify({
+            name: current.city,
+            country,
+            lat: current.latitude,
+            lng: current.longitude,
+          })
+        )
+      } catch {
+        // storage indisponível, ignorar
+      }
     }
   }, [current, country])
 
