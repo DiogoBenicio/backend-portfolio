@@ -41,7 +41,7 @@ src/
 
 ```
 Browser → Nginx (reverse proxy :443)
-       → Gateway-API (autenticação JWT + rate limit)
+       → Gateway-API (rate limit + proxy reverso)
        → Weather-API / NPS-API
 ```
 

@@ -8,10 +8,10 @@
 
 ## Responsabilidades
 
-1. **Autenticação JWT** — valida token em todas as rotas protegidas (`/api/*`)
-2. **Rate limiting** — proteção contra abuso (configurável por rota)
-3. **Proxy reverso** — encaminha requisições para os serviços internos
-4. **Roteamento** — mapeia `/api/weather/*` → Weather-API, `/api/nps/*` → NPS-API
+1. **Rate limiting** — proteção contra abuso (500 req/min global, 300 req/min em rotas pesadas)
+2. **Proxy reverso** — encaminha requisições para os serviços internos
+3. **Roteamento** — mapeia `/api/weather/*` → Weather-API, `/api/nps/*` → NPS-API
+4. **Observabilidade** — log estruturado de todas as requisições + endpoint `/api/metrics`
 
 ## Estrutura de pastas
 
@@ -19,16 +19,14 @@
 src/
 ├── config/
 │   ├── env.ts              # Variáveis de ambiente tipadas
-│   └── routeConfig.ts      # Mapeamento de prefixos → upstream URLs
+│   └── routeConfig.ts      # Upstreams e regras de reescrita de path
 ├── middleware/
-│   ├── authMiddleware.ts   # Validação JWT (hook onRequest global)
 │   └── requestLogger.ts    # Log estruturado de todas as requisições
 ├── routes/
-│   ├── authRoutes.ts       # POST /auth/login — emissão de JWT
-│   └── proxyRoutes.ts      # Registro de todas as rotas /api/*
+│   ├── proxyRoutes.ts      # Registro de todas as rotas /api/*
+│   └── metricsRoutes.ts    # Métricas do sistema e alertas INMET
 ├── services/
-│   ├── ProxyService.ts     # Encaminhamento HTTP para upstreams
-│   └── TokenService.ts     # Geração e validação de JWT
+│   └── ProxyService.ts     # Encaminhamento HTTP para upstreams
 └── utils/
     └── logger.ts           # Logger estruturado (pino)
 ```
@@ -47,16 +45,26 @@ src/
 Browser
   → Nginx (:443)
     → Gateway-API (:4000)
-        1. authMiddleware — valida JWT (se rota protegida)
-        2. rateLimit — verifica contadores por IP
-        3. proxyHandler — resolve upstream via routeConfig
+        1. rateLimit      — verifica contadores por IP
+        2. requestLogger  — registra método, path, IP
+        3. proxyHandler   — resolve upstream via routeConfig
         4. ProxyService.forward() — HTTP para o serviço interno
         5. Retorna resposta ao cliente
 ```
 
-## Autenticação
+## Preparado para autenticação
 
-- Token JWT emitido em `POST /api/auth/login` (credenciais via `.env`)
-- Armazenado no `localStorage` do frontend
-- Enviado como `Authorization: Bearer <token>` nas rotas protegidas
-- Validade: 2 horas
+A arquitetura foi desenhada para receber camadas de segurança sem mudanças estruturais. O hook global `onRequest` do Fastify é o ponto de extensão natural:
+
+```typescript
+// JWT
+server.addHook("onRequest", jwtMiddleware);
+
+// API Key
+server.addHook("onRequest", apiKeyMiddleware);
+
+// OAuth2 / OIDC
+server.addHook("onRequest", oauthMiddleware);
+```
+
+O `routeConfig.ts` centraliza o mapeamento de rotas, permitindo definir regras de acesso (rotas públicas vs. protegidas) em um único lugar. O `ProxyService` já descarta headers de autenticação antes de encaminhar ao upstream, garantindo que os serviços internos nunca recebam tokens do cliente.

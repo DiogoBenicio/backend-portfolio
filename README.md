@@ -2,7 +2,7 @@
 
 > Full Stack Engineer | Node.js • React • Java • PostgreSQL | Cloud & Data Platforms
 
-Portfólio técnico com 5 microsserviços interconectados demonstrando arquitetura hexagonal, SOA, segurança com JWT e infraestrutura containerizada. Deploy em produção na Oracle Cloud (OCI) com HTTPS via Let's Encrypt.
+Portfólio técnico com 5 microsserviços interconectados demonstrando arquitetura hexagonal, SOA, segurança em camadas e infraestrutura containerizada. Deploy em produção na Oracle Cloud (OCI) com HTTPS via Let's Encrypt.
 
 [![Version](https://img.shields.io/badge/version-v1.0.2-blue?style=flat-square)](https://github.com/DiogoBenicio/backend-portfolio/releases/tag/v1.0.2)
 [![Live](https://img.shields.io/badge/live-diogoportfolio.opiniaolivre.com-green?style=flat-square)](https://diogoportfolio.opiniaolivre.com)
@@ -23,8 +23,6 @@ Portfólio técnico com 5 microsserviços interconectados demonstrando arquitetu
 ![Node.js](https://img.shields.io/badge/Node.js_20-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
 ![Fastify](https://img.shields.io/badge/Fastify-000000?style=for-the-badge&logo=fastify&logoColor=white)
-![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
-
 ### Weather API
 ![Java](https://img.shields.io/badge/Java_21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot_3.3-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
@@ -53,7 +51,7 @@ Portfólio técnico com 5 microsserviços interconectados demonstrando arquitetu
 | Projeto | Stack |
 |---|---|
 | [nginx](./nginx) | Nginx 1.27 |
-| [gateway-api](./gateway-api) | Node.js 20 + Fastify + JWT |
+| [gateway-api](./gateway-api) | Node.js 20 + Fastify + Rate Limiting |
 | [weather-api](./weather-api) | Java 21 + Spring Boot 3.3 + PostgreSQL |
 | [nps-api](./nps-api) | Node.js 20 + Fastify + Prisma + PostgreSQL 15 |
 | [frontend](./frontend) | Next.js 14 + shadcn/ui + Tailwind |
@@ -66,14 +64,18 @@ Portfólio técnico com 5 microsserviços interconectados demonstrando arquitetu
 Internet
    ↓
 Nginx (HTTPS/TLS) ──── único ponto de entrada ────────────────
+   │   • TLS 1.2/1.3 + Let's Encrypt
+   │   • HSTS, CSP, X-Frame-Options, X-Content-Type-Options
+   │   • HTTP → HTTPS redirect
    │
-   ├── /          → Next.js Frontend
+   ├── /          → Next.js Frontend (static files)
    │
    └── /api/*     → API Gateway
                        │
-                       ├── JWT validation (rotas protegidas)
-                       ├── Rate limiting (30 req/min)
+                       ├── Rate limiting (500 req/min por IP)
+                       ├── CORS controlado por origem
                        ├── Request logging estruturado
+                       ├── Preparado para JWT / API Key / OAuth2
                        │
                        ├── /api/weather/* → Weather API
                        │                        └── PostgreSQL
@@ -96,10 +98,10 @@ Nginx (HTTPS/TLS) ──── único ponto de entrada ────────�
 - `adapter/out/` — repositórios e clientes externos
 
 **Gateway API** — Arquitetura em Camadas SOA:
-- `config/` — configuração estática (env, routes, upstreams)
-- `services/` — TokenService (JWT), ProxyService (HTTP proxy)
-- `middleware/` — authMiddleware (JWT hook), rateLimitPlugin, requestLogger
-- `routes/` — authRoutes (`/api/auth/*`), proxyRoutes (`/api/weather/*`, `/api/nps/*`)
+- `config/` — configuração estática (env, upstreams, rewrite rules)
+- `services/` — ProxyService (HTTP proxy com timeout e error mapping)
+- `middleware/` — requestLogger (log estruturado), extensível para auth
+- `routes/` — proxyRoutes (`/api/weather/*`, `/api/nps/*`), metricsRoutes
 
 ---
 
@@ -137,7 +139,7 @@ Nenhum use case, porta ou controller foi alterado. O domínio permanece agnósti
 
 ```bash
 cp .env.example .env
-# Edite .env: OPENWEATHER_API_KEY, JWT_SECRET (mín. 32 chars), ADMIN_PASS
+# Edite .env: OPENWEATHER_API_KEY, POSTGRES_PASSWORD
 
 docker compose up --build -d
 ```
