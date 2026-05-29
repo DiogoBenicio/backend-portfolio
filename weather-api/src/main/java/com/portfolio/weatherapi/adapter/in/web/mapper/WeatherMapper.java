@@ -75,7 +75,25 @@ public class WeatherMapper {
                         w.radiation()
                 ))
                 .toList();
-        return new SensorDataResponse(city, points);
+        return new SensorDataResponse(city, points, false);
+    }
+
+    public SensorDataResponse toSensorDataResponse(String city, List<Weather> data, boolean partial) {
+        List<SensorPointResponse> points = data.stream()
+                .map(w -> new SensorPointResponse(
+                        w.timestamp(),
+                        w.temperature(),
+                        w.feelsLike(),
+                        w.humidity(),
+                        w.pressure(),
+                        w.windSpeed(),
+                        w.rainfall(),
+                        w.uvIndex(),
+                        w.dewPoint(),
+                        w.radiation()
+                ))
+                .toList();
+        return new SensorDataResponse(city, points, partial);
     }
 
     public CalendarResponse toCalendarResponse(String city, int year, int month,

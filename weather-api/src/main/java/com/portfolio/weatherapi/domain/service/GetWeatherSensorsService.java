@@ -1,6 +1,9 @@
 package com.portfolio.weatherapi.domain.service;
 
+import com.portfolio.weatherapi.domain.model.SensorsResult;
 import com.portfolio.weatherapi.domain.model.Weather;
+
+import java.text.Normalizer;
 import com.portfolio.weatherapi.domain.port.in.GetWeatherSensorsUseCase;
 import com.portfolio.weatherapi.domain.port.out.HistoricalWeatherClient;
 import com.portfolio.weatherapi.domain.port.out.WeatherDataRepository;
@@ -33,10 +36,15 @@ public class GetWeatherSensorsService implements GetWeatherSensorsUseCase {
     }
 
     @Override
-    public List<Weather> execute(String city, Instant from, Instant to) {
+    public SensorsResult execute(String city, Instant from, Instant to) {
         List<Weather> existing = repository.findSensorData(city, from, to);
 
-        String citySlug = city.toLowerCase().replaceAll("[^a-z0-9]", "-");
+        String citySlug = Normalizer.normalize(city, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}", "")
+                .toLowerCase()
+                .replaceAll("[^a-z0-9]", "-")
+                .replaceAll("-+", "-")
+                .replaceAll("^-|-$", "");
         Set<String> existingIds = new HashSet<>();
         for (Weather w : existing) {
             existingIds.add(citySlug + "-" + HOUR_FMT.format(w.timestamp().truncatedTo(ChronoUnit.HOURS)));
@@ -57,7 +65,7 @@ public class GetWeatherSensorsService implements GetWeatherSensorsUseCase {
         }
 
         if (!hasGap) {
-            return existing;
+            return new SensorsResult(existing, false);
         }
 
         // Obtém coordenadas: usa dados existentes no repositório ou busca current weather
@@ -75,7 +83,7 @@ public class GetWeatherSensorsService implements GetWeatherSensorsUseCase {
                 lon = current.longitude();
             } catch (Exception e) {
                 log.warn("Gap-fill: não foi possível obter coordenadas para '{}': {}", city, e.getMessage());
-                return existing;
+                return new SensorsResult(existing, true);
             }
         }
 
@@ -85,7 +93,7 @@ public class GetWeatherSensorsService implements GetWeatherSensorsUseCase {
             historical = historicalClient.fetchHistoricalHourly(city, lat, lon, from, to);
         } catch (Exception e) {
             log.warn("Gap-fill: falha ao buscar Open-Meteo para '{}': {}", city, e.getMessage());
-            return existing;
+            return new SensorsResult(existing, true);
         }
 
         // Persiste apenas slots novos dentro do range (não futuros)
@@ -104,8 +112,8 @@ public class GetWeatherSensorsService implements GetWeatherSensorsUseCase {
 
         log.info("Gap-fill: {} ponto(s) salvos para '{}'", saved, city);
 
-        if (saved == 0) return existing;
+        if (saved == 0) return new SensorsResult(existing, false);
 
-        return repository.findSensorData(city, from, to);
+        return new SensorsResult(repository.findSensorData(city, from, to), false);
     }
 }

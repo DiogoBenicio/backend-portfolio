@@ -241,7 +241,7 @@ public class OpenWeatherClientAdapter implements WeatherProviderClient {
                         .onErrorResume(ex -> {
                             log.warn("Failed to fetch wind data for city '{}': {}", city, ex.getMessage());
                             return Mono.empty();
-                        }))
+                        }), 3) // maxConcurrency = 3 to avoid rate-limit 429
                 .collectList()
                 .blockOptional()
                 .orElseGet(List::of);

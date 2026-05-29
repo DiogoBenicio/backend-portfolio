@@ -132,8 +132,8 @@ public class WeatherController {
             throw new IllegalArgumentException(
                     "Janela de consulta não pode exceder 7 dias. Reduza o intervalo entre 'from' e 'to'.");
         }
-        var data = getWeatherSensors.execute(city.trim(), from, to);
-        return ResponseEntity.ok(mapper.toSensorDataResponse(city.trim(), data));
+        var result = getWeatherSensors.execute(city.trim(), from, to);
+        return ResponseEntity.ok(mapper.toSensorDataResponse(city.trim(), result.data(), result.partial()));
     }
 
     @GetMapping("/calendar")

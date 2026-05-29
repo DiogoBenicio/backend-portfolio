@@ -7,7 +7,10 @@ import java.time.Instant;
 
 @Entity
 @Table(name = "weather_data", indexes = {
-        @Index(name = "idx_weather_city_timestamp", columnList = "city, timestamp")
+        @Index(name = "idx_weather_city_timestamp", columnList = "city, timestamp"),
+        // Functional index so LOWER(city) = LOWER(:city) queries can use the index instead of a seq-scan.
+        // Hibernate 6 (Spring Boot 3.3) passes the expression through to DDL unchanged.
+        @Index(name = "idx_weather_city_lower_timestamp", columnList = "lower(city), timestamp")
 })
 @Data
 @Builder

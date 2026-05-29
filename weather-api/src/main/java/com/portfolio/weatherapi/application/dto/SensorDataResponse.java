@@ -4,5 +4,6 @@ import java.util.List;
 
 public record SensorDataResponse(
         String city,
-        List<SensorPointResponse> data
+        List<SensorPointResponse> data,
+        boolean partial
 ) {}

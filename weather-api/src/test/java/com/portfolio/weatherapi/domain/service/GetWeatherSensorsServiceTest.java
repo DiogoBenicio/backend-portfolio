@@ -1,5 +1,6 @@
 package com.portfolio.weatherapi.domain.service;
 
+import com.portfolio.weatherapi.domain.model.SensorsResult;
 import com.portfolio.weatherapi.domain.model.Weather;
 import com.portfolio.weatherapi.domain.port.out.HistoricalWeatherClient;
 import com.portfolio.weatherapi.domain.port.out.WeatherDataRepository;
@@ -51,9 +52,10 @@ class GetWeatherSensorsServiceTest {
         );
         when(repository.findSensorData("Uberlândia", from, to)).thenReturn(existing);
 
-        List<Weather> result = service.execute("Uberlândia", from, to);
+        SensorsResult result = service.execute("Uberlândia", from, to);
 
-        assertThat(result).hasSize(2);
+        assertThat(result.data()).hasSize(2);
+        assertThat(result.partial()).isFalse();
         verify(historicalClient, never()).fetchHistoricalHourly(any(), anyDouble(), anyDouble(), any(), any());
     }
 
@@ -77,15 +79,15 @@ class GetWeatherSensorsServiceTest {
                 weather("Uberlândia", from.plus(1, ChronoUnit.HOURS)),
                 weather("Uberlândia", to)
         );
-        // Como não há dados no repositório, o service busca coordenadas via weatherProvider
         when(weatherProvider.fetchCurrentWeather("Uberlândia", null))
                 .thenReturn(weather("Uberlândia", Instant.now()));
         when(historicalClient.fetchHistoricalHourly(eq("Uberlândia"), anyDouble(), anyDouble(), any(), any()))
                 .thenReturn(historical);
 
-        List<Weather> result = service.execute("Uberlândia", from, to);
+        SensorsResult result = service.execute("Uberlândia", from, to);
 
-        assertThat(result).hasSize(3);
+        assertThat(result.data()).hasSize(3);
+        assertThat(result.partial()).isFalse();
         verify(historicalClient, times(1)).fetchHistoricalHourly(eq("Uberlândia"), anyDouble(), anyDouble(), any(), any());
         verify(repository, times(2)).save(any());
     }
@@ -102,9 +104,10 @@ class GetWeatherSensorsServiceTest {
         when(historicalClient.fetchHistoricalHourly(anyString(), anyDouble(), anyDouble(), any(), any()))
                 .thenThrow(new RuntimeException("Open-Meteo indisponível"));
 
-        List<Weather> result = service.execute("CidadeVazia", from, to);
+        SensorsResult result = service.execute("CidadeVazia", from, to);
 
-        assertThat(result).isEmpty();
+        assertThat(result.data()).isEmpty();
+        assertThat(result.partial()).isTrue();
         verify(repository, never()).save(any());
     }
 }

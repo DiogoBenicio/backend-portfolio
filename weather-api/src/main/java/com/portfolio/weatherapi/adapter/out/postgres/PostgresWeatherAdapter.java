@@ -10,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.Normalizer;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -30,7 +31,12 @@ public class PostgresWeatherAdapter implements WeatherDataRepository {
     }
 
     private String entityId(String city, Instant timestamp) {
-        String slug = city.toLowerCase().replaceAll("[^a-z0-9]", "-");
+        String normalized = Normalizer.normalize(city, Normalizer.Form.NFD)
+                .replaceAll("\\p{InCombiningDiacriticalMarks}", "");
+        String slug = normalized.toLowerCase()
+                .replaceAll("[^a-z0-9]", "-")
+                .replaceAll("-+", "-")
+                .replaceAll("^-|-$", "");
         Instant hour = timestamp.truncatedTo(ChronoUnit.HOURS);
         return slug + "-" + HOUR_FMT.format(hour);
     }

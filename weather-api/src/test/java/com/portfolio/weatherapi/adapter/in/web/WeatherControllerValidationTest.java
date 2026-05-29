@@ -3,6 +3,7 @@ package com.portfolio.weatherapi.adapter.in.web;
 import com.portfolio.weatherapi.adapter.in.web.mapper.WeatherMapper;
 import com.portfolio.weatherapi.application.dto.CalendarResponse;
 import com.portfolio.weatherapi.application.dto.SensorDataResponse;
+import com.portfolio.weatherapi.domain.model.SensorsResult;
 import com.portfolio.weatherapi.domain.model.Weather;
 import com.portfolio.weatherapi.domain.port.in.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -66,8 +67,8 @@ class WeatherControllerValidationTest {
         void shouldAccept7DayRange() {
             Instant from = Instant.parse("2025-03-01T00:00:00Z");
             Instant to   = Instant.parse("2025-03-08T00:00:00Z"); // exatos 7 dias
-            when(getWeatherSensors.execute(any(), any(), any())).thenReturn(List.of());
-            when(mapper.toSensorDataResponse(any(), any())).thenReturn(new SensorDataResponse("Uberlândia", List.of()));
+            when(getWeatherSensors.execute(any(), any(), any())).thenReturn(new SensorsResult(List.of(), false));
+            when(mapper.toSensorDataResponse(any(), any(), anyBoolean())).thenReturn(new SensorDataResponse("Uberlândia", List.of(), false));
 
             ResponseEntity<SensorDataResponse> response = controller.getSensors("Uberlândia", from, to);
 
@@ -101,8 +102,8 @@ class WeatherControllerValidationTest {
         void shouldTrimCityBeforePassingToUseCase() {
             Instant from = Instant.parse("2025-03-01T00:00:00Z");
             Instant to   = Instant.parse("2025-03-05T00:00:00Z");
-            when(getWeatherSensors.execute(eq("Uberlândia"), any(), any())).thenReturn(List.of());
-            when(mapper.toSensorDataResponse(any(), any())).thenReturn(new SensorDataResponse("Uberlândia", List.of()));
+            when(getWeatherSensors.execute(eq("Uberlândia"), any(), any())).thenReturn(new SensorsResult(List.of(), false));
+            when(mapper.toSensorDataResponse(any(), any(), anyBoolean())).thenReturn(new SensorDataResponse("Uberlândia", List.of(), false));
 
             controller.getSensors("  Uberlândia  ", from, to);
 
