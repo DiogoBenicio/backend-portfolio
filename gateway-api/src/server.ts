@@ -2,9 +2,7 @@ import fastify from "fastify";
 import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
 import { env } from "./config/env";
-import { authMiddleware } from "./middleware/authMiddleware";
 import { registerRequestLogger } from "./middleware/requestLogger";
-import { registerAuthRoutes } from "./routes/authRoutes";
 import { registerMetricsRoutes } from "./routes/metricsRoutes";
 import { registerProxyRoutes } from "./routes/proxyRoutes";
 import { logger, printBanner } from "./utils/logger";
@@ -26,7 +24,7 @@ async function buildServer() {
       "https://diogoportfolio.opiniaolivre.com",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type"],
     credentials: true,
   });
 
@@ -53,10 +51,7 @@ async function buildServer() {
   // ── Middleware global ───────────────────────────────────────
   registerRequestLogger(server);
 
-  // Hook de autenticação — executado em TODAS as rotas
-  server.addHook("onRequest", authMiddleware);
-
-  // ── Health check (público, sem auth) ───────────────────────
+  // ── Health check ───────────────────────────────────────────
   const healthResponse = async () => ({
     status: "ok",
     service: "gateway-api",
@@ -82,7 +77,6 @@ async function buildServer() {
   });
 
   // ── Rotas ──────────────────────────────────────────────────
-  registerAuthRoutes(server);
   registerMetricsRoutes(server);
   registerProxyRoutes(server);
 

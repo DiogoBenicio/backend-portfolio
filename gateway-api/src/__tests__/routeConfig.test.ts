@@ -1,51 +1,12 @@
 jest.mock("../config/env", () => ({
   env: {
-    jwtSecret: "test-secret",
-    jwtExpiresIn: "2h",
     port: 4000,
     weatherApiUrl: "http://weather-api:8080",
     npsApiUrl: "http://nps-api:3001",
   },
 }));
 
-import {
-  isPublicRoute,
-  resolveUpstream,
-  PATH_REWRITES,
-} from "../config/routeConfig";
-
-describe("isPublicRoute", () => {
-  it.each([
-    ["POST", "/api/auth/login"],
-    ["GET", "/api/weather/current"],
-    ["GET", "/api/weather/current?city=SP"],
-    ["GET", "/api/weather/forecast"],
-    ["GET", "/api/weather/forecast?city=RJ&days=5"],
-    ["POST", "/api/nps/responses"],
-    ["GET", "/api/nps/summary"],
-    ["GET", "/api/nps/summary?page=portfolio"],
-    ["GET", "/api/metrics"],
-    ["GET", "/api/inmet-alerts"],
-  ])("%s %s deve ser pública", (method, path) => {
-    expect(isPublicRoute(method, path)).toBe(true);
-  });
-
-  it.each([
-    ["GET", "/api/weather/history"],
-    ["DELETE", "/api/nps/responses"],
-    ["POST", "/api/weather/refresh"],
-    ["GET", "/api/auth/login"],
-    ["GET", "/dashboard"],
-    ["POST", "/api/metrics"],
-    ["GET", "/api/metrics/extra"],
-  ])("%s %s deve ser protegida", (method, path) => {
-    expect(isPublicRoute(method, path)).toBe(false);
-  });
-
-  it("GET /api/nps/responses deve ser protegida (requer JWT)", () => {
-    expect(isPublicRoute("GET", "/api/nps/responses")).toBe(false);
-  });
-});
+import { resolveUpstream, PATH_REWRITES } from "../config/routeConfig";
 
 describe("resolveUpstream", () => {
   it("deve resolver /api/weather/* para weather-api com path reescrito", () => {
@@ -73,7 +34,6 @@ describe("resolveUpstream", () => {
 
   it("deve retornar null para path fora dos upstreams", () => {
     expect(resolveUpstream("/health")).toBeNull();
-    expect(resolveUpstream("/api/auth/login")).toBeNull();
     expect(resolveUpstream("/api/unknown/route")).toBeNull();
   });
 });
