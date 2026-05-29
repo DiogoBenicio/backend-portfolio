@@ -292,7 +292,12 @@ function SelectedCityMarker() {
   useEffect(() => {
     try {
       const raw = localStorage.getItem('selectedMapCity')
-      if (raw) setSelected(JSON.parse(raw))
+      if (raw) {
+        const parsed = JSON.parse(raw)
+        if (typeof parsed?.lat === 'number' && typeof parsed?.lng === 'number') {
+          setSelected(parsed)
+        }
+      }
     } catch {}
   }, [])
 

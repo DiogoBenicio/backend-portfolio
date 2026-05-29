@@ -101,10 +101,11 @@ public class OpenWeatherClientAdapter implements WeatherProviderClient {
 
         if (response == null || response.list() == null) return List.of();
 
-        String cityName = response.city().name() != null ? response.city().name() : "";
-        String country  = response.city().country() != null ? response.city().country() : "";
-        double lat = response.city().coord() != null ? response.city().coord().lat() : 0.0;
-        double lon = response.city().coord() != null ? response.city().coord().lon() : 0.0;
+        // BUG C5-A: null check for city()
+        String cityName = response.city() != null && response.city().name() != null ? response.city().name() : "";
+        String country  = response.city() != null && response.city().country() != null ? response.city().country() : "";
+        double lat = response.city() != null && response.city().coord() != null ? response.city().coord().lat() : 0.0;
+        double lon = response.city() != null && response.city().coord() != null ? response.city().coord().lon() : 0.0;
 
         return response.list().stream()
                 .map(item -> {
@@ -117,11 +118,17 @@ public class OpenWeatherClientAdapter implements WeatherProviderClient {
                     double windSpeed = item.wind() != null ? item.wind().speed() * 3.6 : 0.0;
                     String windDir   = item.wind() != null ? degToCompass(item.wind().deg()) : "N";
 
+                    // BUG C5-B: null check for item.main()
+                    double temp      = item.main() != null ? item.main().temp() : 0.0;
+                    double feelsLike = item.main() != null ? item.main().feelsLike() : 0.0;
+                    int humidity     = item.main() != null ? item.main().humidity() : 0;
+                    int pressure     = item.main() != null ? item.main().pressure() : 0;
+
                     return new Weather(
                             cityName, country,
                             lat, lon,
-                            item.main().temp(), item.main().feelsLike(),
-                            item.main().humidity(), item.main().pressure(),
+                            temp, feelsLike,
+                            humidity, pressure,
                             windSpeed, windDir,
                             desc, icon,
                             0, rainfall,
@@ -170,9 +177,10 @@ public class OpenWeatherClientAdapter implements WeatherProviderClient {
                 .limit(days)
                 .map(entry -> {
                     List<OpenWeatherForecastResponse.ForecastItem> items = entry.getValue();
-                    double tempMin = items.stream().mapToDouble(i -> i.main().tempMin()).min().orElse(0);
-                    double tempMax = items.stream().mapToDouble(i -> i.main().tempMax()).max().orElse(0);
-                    int humidity = (int) items.stream().mapToInt(i -> i.main().humidity()).average().orElse(0);
+                    // BUG C5-B: null check for i.main()
+                    double tempMin = items.stream().mapToDouble(i -> i.main() != null ? i.main().tempMin() : 0.0).min().orElse(0);
+                    double tempMax = items.stream().mapToDouble(i -> i.main() != null ? i.main().tempMax() : 0.0).max().orElse(0);
+                    int humidity = (int) items.stream().mapToInt(i -> i.main() != null ? i.main().humidity() : 0).average().orElse(0);
                     double rainfall = items.stream()
                             .mapToDouble(i -> i.rain() != null && i.rain().threeHour() != null ? i.rain().threeHour() : 0)
                             .sum();
@@ -189,9 +197,10 @@ public class OpenWeatherClientAdapter implements WeatherProviderClient {
                 })
                 .toList();
 
+        // BUG C5-A: null check for r.city()
         return new Forecast(
-                r.city().name() != null ? r.city().name() : "",
-                r.city().country() != null ? r.city().country() : "",
+                r.city() != null && r.city().name() != null ? r.city().name() : "",
+                r.city() != null && r.city().country() != null ? r.city().country() : "",
                 forecastDays);
     }
 
@@ -231,6 +240,7 @@ public class OpenWeatherClientAdapter implements WeatherProviderClient {
 
     private String degToCompass(int deg) {
         String[] dirs = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
-        return dirs[(int) Math.round(deg / 45.0) % 8];
+        // BUG M4: use +8 to guarantee positive index for negative degree values
+        return dirs[((int) Math.round(deg / 45.0) % 8 + 8) % 8];
     }
 }

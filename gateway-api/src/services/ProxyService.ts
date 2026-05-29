@@ -34,12 +34,6 @@ export class ProxyService {
       forwardHeaders["content-type"] = contentType;
     }
 
-    // Repassa Authorization para o upstream (serviços internos podem ignorar, mas boa prática)
-    const auth = req.headers["authorization"];
-    if (auth && typeof auth === "string") {
-      forwardHeaders["x-user-token"] = auth;
-    }
-
     const config: AxiosRequestConfig = {
       method: req.method,
       url: `${req.baseUrl}${req.path}`,
@@ -65,7 +59,11 @@ export class ProxyService {
       };
     } catch (err) {
       const axiosErr = err as AxiosError;
-      if (axiosErr.code === "ECONNREFUSED" || axiosErr.code === "ENOTFOUND") {
+      if (
+        ["ECONNREFUSED", "ENOTFOUND", "ECONNRESET"].includes(
+          axiosErr.code ?? "",
+        )
+      ) {
         return {
           status: 503,
           data: {

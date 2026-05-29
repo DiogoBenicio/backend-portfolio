@@ -45,7 +45,7 @@ export const getSummarySchema = {
   querystring: {
     type: "object",
     properties: {
-      page: { type: "string" },
+      page: { type: "string", maxLength: 100 },
     },
   },
 };

@@ -33,7 +33,7 @@ export function calculateNps(
 }
 
 export function getZone(npsScore: number): NpsZone {
-  if (npsScore <= 0) return "Crítico";
+  if (npsScore < 0) return "Crítico";
   if (npsScore <= 50) return "Aperfeiçoamento";
   if (npsScore <= 75) return "Qualidade";
   return "Excelência";

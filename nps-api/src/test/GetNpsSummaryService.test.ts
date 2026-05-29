@@ -42,7 +42,7 @@ describe("GetNpsSummaryService", () => {
     expect(summary.totalResponses).toBe(5);
     // NPS = ((2-2)/5) * 100 = 0
     expect(summary.npsScore).toBe(0);
-    expect(summary.zone).toBe("Crítico");
+    expect(summary.zone).toBe("Aperfeiçoamento");
   });
 
   it("deve retornar NPS 100 com todos promotores", async () => {

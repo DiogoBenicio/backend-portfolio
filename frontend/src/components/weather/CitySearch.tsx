@@ -139,8 +139,8 @@ export function CitySearch({ onSearch, onSelectFull, defaultCity = '' }: CitySea
 
       {open && suggestions.length > 0 && (
         <ul className="absolute z-50 mt-1 w-full rounded-lg border border-gray-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900 overflow-hidden">
-          {suggestions.map((r, i) => (
-            <li key={i}>
+          {suggestions.map((r) => (
+            <li key={`${r.name}-${r.country}-${r.lat}`}>
               <button
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}

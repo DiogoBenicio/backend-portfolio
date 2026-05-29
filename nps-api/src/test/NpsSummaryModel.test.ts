@@ -48,12 +48,13 @@ describe("calculateNps", () => {
 });
 
 describe("getZone", () => {
-  it("score <= 0 deve ser Crítico", () => {
-    expect(getZone(0)).toBe("Crítico");
+  it("score < 0 deve ser Crítico", () => {
+    expect(getZone(-1)).toBe("Crítico");
     expect(getZone(-50)).toBe("Crítico");
   });
 
-  it("score entre 1 e 50 deve ser Aperfeiçoamento", () => {
+  it("score entre 0 e 50 deve ser Aperfeiçoamento", () => {
+    expect(getZone(0)).toBe("Aperfeiçoamento");
     expect(getZone(1)).toBe("Aperfeiçoamento");
     expect(getZone(50)).toBe("Aperfeiçoamento");
   });

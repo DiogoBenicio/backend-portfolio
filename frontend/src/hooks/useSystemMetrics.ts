@@ -43,7 +43,11 @@ export function useSystemMetrics() {
 
   const query = useQuery<SystemMetricsData>({
     queryKey: ['system-metrics'],
-    queryFn: () => fetch('/api/metrics').then((r) => r.json()),
+    queryFn: () =>
+      fetch('/api/metrics').then((r) => {
+        if (!r.ok) throw new Error(`metrics error ${r.status}`)
+        return r.json()
+      }),
     refetchInterval: 5000,
     staleTime: 4000,
     throwOnError: false,

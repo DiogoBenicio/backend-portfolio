@@ -57,6 +57,11 @@ export class PrismaNpsResponseRepository implements NpsResponseRepository {
         const notFound = new Error(`Resposta NPS não encontrada: ${id}`);
         (notFound as Error & { statusCode: number }).statusCode = 404;
         throw notFound;
+      } else if (
+        err instanceof Prisma.PrismaClientKnownRequestError &&
+        err.code === "P2023"
+      ) {
+        throw Object.assign(new Error("ID inválido"), { statusCode: 422 });
       }
       throw err;
     }

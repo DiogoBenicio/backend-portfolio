@@ -100,6 +100,15 @@ export function registerNpsRoutes(
 
   fastify.delete<{ Params: { id: string } }>(
     "/api/v1/nps/responses/:id",
+    {
+      schema: {
+        params: {
+          type: "object",
+          properties: { id: { type: "string", format: "uuid" } },
+          required: ["id"],
+        },
+      },
+    },
     async (req, reply) => {
       try {
         await repository.deleteById(req.params.id);

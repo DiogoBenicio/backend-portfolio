@@ -22,7 +22,7 @@ FROM nginx:1.27-alpine
 
 RUN rm /etc/nginx/conf.d/default.conf
 
-COPY nginx/nginx.dev.conf nginx/nginx.prod.conf /etc/nginx/
+COPY nginx/nginx.dev.conf nginx/nginx.prod.conf nginx/security-headers.conf /etc/nginx/
 
 ARG NGINX_CONF=nginx.dev.conf
 RUN rm -f /etc/nginx/nginx.conf && \

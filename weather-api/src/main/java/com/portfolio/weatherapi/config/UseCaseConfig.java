@@ -9,16 +9,26 @@ import com.portfolio.weatherapi.domain.service.GetDistinctCitiesService;
 import com.portfolio.weatherapi.domain.service.GetWeatherCalendarService;
 import com.portfolio.weatherapi.domain.service.GetWeatherSensorsService;
 import com.portfolio.weatherapi.domain.service.PopulateWeatherService;
+import io.netty.channel.ChannelOption;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
+
+import java.time.Duration;
 
 @Configuration
 public class UseCaseConfig {
 
     @Bean
     public WebClient.Builder webClientBuilder() {
-        return WebClient.builder();
+        // BUG C6: configure connection and response timeouts
+        HttpClient httpClient = HttpClient.create()
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10_000)
+                .responseTimeout(Duration.ofSeconds(15));
+        return WebClient.builder()
+                .clientConnector(new ReactorClientHttpConnector(httpClient));
     }
 
     @Bean

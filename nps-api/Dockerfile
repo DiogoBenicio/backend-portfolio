@@ -1,9 +1,11 @@
 # ─── Stage 1: Build ───────────────────────────────────────
-FROM node:20-bullseye AS builder
+FROM node:20-alpine AS builder
 WORKDIR /app
 
+RUN apk add --no-cache openssl
+
 COPY package*.json ./
-RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/* && npm install
+RUN npm install
 
 COPY prisma ./prisma
 RUN npx prisma generate
@@ -13,10 +15,10 @@ COPY src ./src
 RUN npm run build
 
 # ─── Stage 2: Runtime ─────────────────────────────────────
-FROM node:20-bullseye AS runner
+FROM node:20-alpine AS runner
 WORKDIR /app
 
-RUN groupadd -r appgroup && useradd -r -g appgroup -d /app -s /usr/sbin/nologin appuser
+RUN addgroup -S appgroup && adduser -S -G appgroup -h /app -s /sbin/nologin appuser
 
 COPY --from=builder /app/package*.json ./
 RUN npm ci --omit=dev

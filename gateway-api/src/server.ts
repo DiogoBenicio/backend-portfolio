@@ -12,7 +12,7 @@ import { logger, printBanner } from "./utils/logger";
 async function buildServer() {
   const server = fastify({
     logger: false, // log próprio via utils/logger
-    trustProxy: true, // confiar no X-Forwarded-For do Nginx
+    trustProxy: 1, // confiar apenas no primeiro hop (Nginx)
   });
 
   // ── Plugins ────────────────────────────────────────────────
@@ -123,7 +123,10 @@ async function buildServer() {
     return reply.status(status).send({
       status,
       error: err.name ?? "Error",
-      message: err.message ?? "Erro interno",
+      message:
+        status >= 500
+          ? "Erro interno do servidor"
+          : (err.message ?? "Erro interno"),
     });
   });
 

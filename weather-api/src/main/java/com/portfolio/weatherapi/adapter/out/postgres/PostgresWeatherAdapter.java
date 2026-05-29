@@ -2,6 +2,7 @@ package com.portfolio.weatherapi.adapter.out.postgres;
 
 import com.portfolio.weatherapi.domain.model.Weather;
 import com.portfolio.weatherapi.domain.port.out.WeatherDataRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -72,8 +73,13 @@ public class PostgresWeatherAdapter implements WeatherDataRepository {
     @SuppressWarnings("null")
     public void save(Weather weather) {
         WeatherEntity entity = toEntity(weather);
-        if (!repository.existsById(entity.getId())) {
-            repository.save(entity);
+        try {
+            // BUG M5: catch concurrent insert race condition — idempotent by design
+            if (!repository.existsById(entity.getId())) {
+                repository.save(entity);
+            }
+        } catch (DataIntegrityViolationException ignored) {
+            // ID already inserted by a concurrent thread — safe to ignore
         }
     }
 

@@ -58,7 +58,7 @@ export default function NpsPage() {
                           NPS Score
                         </p>
                         <p className={`text-5xl font-bold ${getNpsZoneColor(summary.zone)}`}>
-                          {summary.npsScore}
+                          {Number(summary.npsScore).toFixed(1)}
                         </p>
                         <p className={`mt-1 text-sm font-medium ${getNpsZoneColor(summary.zone)}`}>
                           Zona: {summary.zone}

@@ -119,6 +119,7 @@ public class OpenMeteoClientAdapter implements HistoricalWeatherClient {
 
     private String degToCompass(int deg) {
         String[] dirs = {"N", "NE", "E", "SE", "S", "SW", "W", "NW"};
-        return dirs[(int) Math.round(deg / 45.0) % 8];
+        // BUG M4: use +8 to guarantee positive index for negative degree values
+        return dirs[((int) Math.round(deg / 45.0) % 8 + 8) % 8];
     }
 }

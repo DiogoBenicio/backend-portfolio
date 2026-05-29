@@ -29,7 +29,10 @@ export class TokenService {
   }
 
   refresh(token: string): string {
-    const decoded = this.verify(token);
+    const decoded = jwt.verify(token, this.secret, {
+      algorithms: ["HS256"],
+      ignoreExpiration: true,
+    }) as TokenPayload & JwtPayload;
     const { iat: _iat, exp: _exp, ...payload } = decoded;
     return this.sign(payload as TokenPayload);
   }

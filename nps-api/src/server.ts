@@ -17,7 +17,7 @@ export async function buildServer(): Promise<FastifyInstance> {
       process.env.CORS_ORIGIN ?? "http://gateway-api:4000",
       "http://localhost:3001", // desenvolvimento local
     ],
-    methods: ["GET", "POST", "OPTIONS"],
+    methods: ["GET", "POST", "DELETE", "OPTIONS"],
     allowedHeaders: [
       "Content-Type",
       "Authorization",

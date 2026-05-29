@@ -14,7 +14,7 @@ skipped=0
 for city in "São Paulo" "Recife" "Manaus" "Curitiba" "Brasília"; do
   for i in $(seq 6 -1 0); do
     ts=$((today_ts - i * 86400))
-    d=$(date -u -d "@${ts}" +%Y-%m-%d)
+    d=$(awk -v ts="${ts}" 'BEGIN { print strftime("%Y-%m-%d", ts) }')
 
     status=$(curl -s -o /dev/null -w "%{http_code}" \
       -X POST -G \

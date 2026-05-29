@@ -131,6 +131,8 @@ services:
       - portfolio-network
 
   # ─── Certbot (somente prod) ───────────────────────────────────
+  # NOTA: após renovação automática, o nginx NÃO é recarregado automaticamente.
+  # Execute manualmente: ./scripts/renew-cert.sh
   certbot:
     profiles: [prod]
     image: certbot/certbot
@@ -144,14 +146,14 @@ services:
 
   # ─── Seed weather (idempotente, roda a cada startup) ────────
   seed:
-    image: curlimages/curl:latest
+    image: alpine:3.19
     container_name: portfolio-seed
     depends_on:
       weather-api:
         condition: service_healthy
     volumes:
       - ./scripts/seed-weather.sh:/seed.sh:ro
-    entrypoint: sh /seed.sh
+    entrypoint: sh -c "apk add --no-cache curl -q && sh /seed.sh"
     restart: "no"
     networks:
       - portfolio-network

@@ -212,23 +212,27 @@ describe("NpsController — rotas HTTP", () => {
 
       const res = await app.inject({
         method: "DELETE",
-        url: "/api/v1/nps/responses/abc-123",
+        url: "/api/v1/nps/responses/00000000-0000-0000-0000-000000000001",
       });
 
       expect(res.statusCode).toBe(204);
-      expect(repository.deleteById).toHaveBeenCalledWith("abc-123");
+      expect(repository.deleteById).toHaveBeenCalledWith(
+        "00000000-0000-0000-0000-000000000001",
+      );
     });
 
     it("deve retornar 404 quando registro não existe (statusCode 404)", async () => {
       const notFound = Object.assign(
-        new Error("Resposta NPS não encontrada: xyz"),
+        new Error(
+          "Resposta NPS não encontrada: 00000000-0000-0000-0000-000000000002",
+        ),
         { statusCode: 404 },
       );
       vi.mocked(repository.deleteById).mockRejectedValue(notFound);
 
       const res = await app.inject({
         method: "DELETE",
-        url: "/api/v1/nps/responses/xyz",
+        url: "/api/v1/nps/responses/00000000-0000-0000-0000-000000000002",
       });
 
       expect(res.statusCode).toBe(404);
@@ -236,12 +240,21 @@ describe("NpsController — rotas HTTP", () => {
       expect(body.error).toBe("Not Found");
     });
 
+    it("deve retornar 400 para UUID malformado", async () => {
+      const res = await app.inject({
+        method: "DELETE",
+        url: "/api/v1/nps/responses/not-a-uuid",
+      });
+
+      expect(res.statusCode).toBe(400);
+    });
+
     it("deve retornar 500 para erro genérico", async () => {
       vi.mocked(repository.deleteById).mockRejectedValue(new Error("db down"));
 
       const res = await app.inject({
         method: "DELETE",
-        url: "/api/v1/nps/responses/any",
+        url: "/api/v1/nps/responses/00000000-0000-0000-0000-000000000003",
       });
 
       expect(res.statusCode).toBe(500);
