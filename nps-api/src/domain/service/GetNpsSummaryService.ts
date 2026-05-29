@@ -11,7 +11,8 @@ export class GetNpsSummaryService implements GetNpsSummaryUseCase {
   constructor(private readonly repository: NpsResponseRepository) {}
 
   async execute(page?: string): Promise<NpsSummary> {
-    const responses = await this.repository.findAllByPage(page);
+    const { data: responses, truncated } =
+      await this.repository.findAllByPage(page);
 
     const distribution: Record<number, number> = {};
     for (let i = 0; i <= 10; i++) distribution[i] = 0;
@@ -42,6 +43,7 @@ export class GetNpsSummaryService implements GetNpsSummaryUseCase {
       passives,
       detractors,
       distribution,
+      ...(truncated ? { truncated: true } : {}),
     };
   }
 }

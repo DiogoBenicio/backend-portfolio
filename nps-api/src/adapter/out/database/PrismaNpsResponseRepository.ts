@@ -5,6 +5,7 @@ import {
   FindManyOptions,
   NpsResponseRepository,
 } from "../../../domain/port/out/NpsResponseRepository";
+import { logger } from "../../../utils/logger";
 
 export class PrismaNpsResponseRepository implements NpsResponseRepository {
   constructor(private readonly prisma: PrismaClient) {}
@@ -35,33 +36,65 @@ export class PrismaNpsResponseRepository implements NpsResponseRepository {
   ): Promise<{ data: NpsResponse[]; total: number }> {
     const where = options.page ? { page: options.page } : {};
 
-    const [data, total] = await Promise.all([
-      this.prisma.npsResponse.findMany({
-        where,
-        orderBy: { createdAt: "desc" },
-        take: options.limit,
-        skip: options.offset,
-      }),
-      this.prisma.npsResponse.count({ where }),
-    ]);
+    try {
+      const [data, total] = await Promise.all([
+        this.prisma.npsResponse.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
+          take: options.limit,
+          skip: options.offset,
+        }),
+        this.prisma.npsResponse.count({ where }),
+      ]);
 
-    return { data, total };
+      return { data, total };
+    } catch (err) {
+      if (
+        err instanceof Prisma.PrismaClientKnownRequestError ||
+        err instanceof Prisma.PrismaClientUnknownRequestError
+      ) {
+        logger.error("Erro de banco ao listar respostas NPS");
+        throw Object.assign(new Error("Erro ao listar avaliações"), {
+          statusCode: 500,
+        });
+      }
+      throw Object.assign(new Error("Erro interno"), { statusCode: 500 });
+    }
   }
 
-  async findAllByPage(page?: string): Promise<NpsResponse[]> {
+  async findAllByPage(
+    page?: string,
+  ): Promise<{ data: NpsResponse[]; truncated: boolean }> {
     const MAX = 10_000;
     const where = page ? { page } : {};
-    const results = await this.prisma.npsResponse.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      take: MAX,
-    });
-    if (results.length === MAX) {
-      console.warn(
-        `[NPS] findAllByPage truncado em ${MAX} registros para page="${page}"`,
-      );
+
+    try {
+      const results = await this.prisma.npsResponse.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        take: MAX,
+      });
+
+      const truncated = results.length === MAX;
+      if (truncated) {
+        logger.warn(
+          `findAllByPage truncado em ${MAX} registros para page="${page}"`,
+        );
+      }
+
+      return { data: results, truncated };
+    } catch (err) {
+      if (
+        err instanceof Prisma.PrismaClientKnownRequestError ||
+        err instanceof Prisma.PrismaClientUnknownRequestError
+      ) {
+        logger.error("Erro de banco ao buscar resumo NPS");
+        throw Object.assign(new Error("Erro ao calcular resumo NPS"), {
+          statusCode: 500,
+        });
+      }
+      throw Object.assign(new Error("Erro interno"), { statusCode: 500 });
     }
-    return results;
   }
 
   async deleteById(id: string): Promise<void> {

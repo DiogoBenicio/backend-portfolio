@@ -26,13 +26,16 @@ describe("GetNpsSummaryService", () => {
   });
 
   it("deve calcular NPS corretamente com promotores e detratores", async () => {
-    vi.mocked(repository.findAllByPage).mockResolvedValue([
-      makeResponse(10, "1"),
-      makeResponse(9, "2"),
-      makeResponse(7, "3"),
-      makeResponse(6, "4"),
-      makeResponse(0, "5"),
-    ]);
+    vi.mocked(repository.findAllByPage).mockResolvedValue({
+      data: [
+        makeResponse(10, "1"),
+        makeResponse(9, "2"),
+        makeResponse(7, "3"),
+        makeResponse(6, "4"),
+        makeResponse(0, "5"),
+      ],
+      truncated: false,
+    });
 
     const summary = await service.execute("portfolio");
 
@@ -46,11 +49,10 @@ describe("GetNpsSummaryService", () => {
   });
 
   it("deve retornar NPS 100 com todos promotores", async () => {
-    vi.mocked(repository.findAllByPage).mockResolvedValue([
-      makeResponse(10, "1"),
-      makeResponse(9, "2"),
-      makeResponse(10, "3"),
-    ]);
+    vi.mocked(repository.findAllByPage).mockResolvedValue({
+      data: [makeResponse(10, "1"), makeResponse(9, "2"), makeResponse(10, "3")],
+      truncated: false,
+    });
 
     const summary = await service.execute();
 
@@ -59,7 +61,7 @@ describe("GetNpsSummaryService", () => {
   });
 
   it("deve retornar sumário vazio quando sem respostas", async () => {
-    vi.mocked(repository.findAllByPage).mockResolvedValue([]);
+    vi.mocked(repository.findAllByPage).mockResolvedValue({ data: [], truncated: false });
 
     const summary = await service.execute();
 
@@ -68,12 +70,15 @@ describe("GetNpsSummaryService", () => {
   });
 
   it("deve classificar zona como Qualidade para NPS entre 51 e 75", async () => {
-    vi.mocked(repository.findAllByPage).mockResolvedValue([
-      makeResponse(10, "1"),
-      makeResponse(10, "2"),
-      makeResponse(9, "3"),
-      makeResponse(7, "4"),
-    ]);
+    vi.mocked(repository.findAllByPage).mockResolvedValue({
+      data: [
+        makeResponse(10, "1"),
+        makeResponse(10, "2"),
+        makeResponse(9, "3"),
+        makeResponse(7, "4"),
+      ],
+      truncated: false,
+    });
 
     const summary = await service.execute();
 

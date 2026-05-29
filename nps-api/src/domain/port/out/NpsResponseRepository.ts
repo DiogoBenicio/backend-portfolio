@@ -18,6 +18,6 @@ export interface NpsResponseRepository {
   findMany(
     options: FindManyOptions,
   ): Promise<{ data: NpsResponse[]; total: number }>;
-  findAllByPage(page?: string): Promise<NpsResponse[]>;
+  findAllByPage(page?: string): Promise<{ data: NpsResponse[]; truncated: boolean }>;
   deleteById(id: string): Promise<void>;
 }

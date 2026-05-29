@@ -21,6 +21,7 @@ export const submitNpsSchema = {
       },
       page: {
         type: "string",
+        minLength: 1,
         maxLength: 100,
         description: "Identificador da página avaliada",
         default: "portfolio",
@@ -63,6 +64,7 @@ export const getSummarySchema = {
           additionalProperties: { type: "number" },
         },
         page: { type: "string" },
+        truncated: { type: "boolean" },
       },
     },
   },

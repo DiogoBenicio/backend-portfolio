@@ -14,6 +14,7 @@ export interface NpsSummary {
   passives: number;
   detractors: number;
   distribution: Record<number, number>;
+  truncated?: boolean;
 }
 
 export function classifyScore(

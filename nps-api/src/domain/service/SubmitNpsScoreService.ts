@@ -19,7 +19,7 @@ export class SubmitNpsScoreService implements SubmitNpsScoreUseCase {
       score: input.score,
       comment: input.comment?.trim() || undefined,
       name: input.name?.trim() || undefined,
-      page: input.page ?? "portfolio",
+      page: (input.page && input.page.trim()) || "portfolio",
     });
   }
 }
