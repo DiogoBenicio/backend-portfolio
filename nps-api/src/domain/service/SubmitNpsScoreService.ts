@@ -17,8 +17,8 @@ export class SubmitNpsScoreService implements SubmitNpsScoreUseCase {
 
     return this.repository.create({
       score: input.score,
-      comment: input.comment?.trim() || null,
-      name: input.name?.trim() || null,
+      comment: input.comment?.trim() || undefined,
+      name: input.name?.trim() || undefined,
       page: input.page ?? "portfolio",
     });
   }
