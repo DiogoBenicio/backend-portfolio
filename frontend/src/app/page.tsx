@@ -109,10 +109,10 @@ export default function HomePage() {
 
               <div className="flex flex-col gap-2">
                 {[
-                  { label: 'Auth JWT', desc: 'Valida token em todas as rotas protegidas' },
-                  { label: 'Rate Limit', desc: '30 req/min por IP via @fastify/rate-limit' },
+                  { label: 'Rate Limit', desc: '500 req/min por IP via @fastify/rate-limit' },
                   { label: 'Route Proxy', desc: 'Repassa para Weather-API ou NPS-API' },
                   { label: 'Request Logger', desc: 'Log estruturado de método, path e status' },
+                  { label: 'Auth-Ready', desc: 'Preparado para JWT, API Key ou OAuth2' },
                 ].map(({ label, desc }) => (
                   <div
                     key={label}

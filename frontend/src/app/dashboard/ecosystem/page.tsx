@@ -29,9 +29,9 @@ const SERVICES = [
     icon: Lock,
     name: 'Gateway-API',
     description:
-      'Centraliza autenticação JWT (HS256, 2h TTL), rate limiting (30 req/min), logging colorido e proxy reverso para os backends.',
+      'Proxy reverso e único ponto de entrada para os backends. Rate limiting por IP, CORS, logging estruturado e arquitetura preparada para JWT, API Key ou OAuth2 sem mudanças estruturais.',
     pattern: 'Layered SOA',
-    tech: ['Node.js 20', 'TypeScript', 'Fastify 4', 'jsonwebtoken', 'axios'],
+    tech: ['Node.js 20', 'TypeScript', 'Fastify 4', 'axios'],
     borderColor: 'border-blue-300 dark:border-blue-800',
     docsUrl: '/api/health',
   },
