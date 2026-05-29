@@ -22,9 +22,14 @@ export class ProxyService {
     const requestId = randomUUID();
 
     // Limpa e constrói os headers para o upstream
+    const existingForwardedFor = req.headers["x-forwarded-for"];
+    const forwardedFor = existingForwardedFor
+      ? `${existingForwardedFor}, ${req.clientIp ?? "unknown"}`
+      : (req.clientIp ?? "unknown");
+
     const forwardHeaders: Record<string, string> = {
       "x-request-id": requestId,
-      "x-forwarded-for": req.clientIp ?? "unknown",
+      "x-forwarded-for": forwardedFor,
       "x-forwarded-by": "api-gateway",
     };
 

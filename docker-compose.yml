@@ -91,6 +91,7 @@ services:
     environment:
       PORT: 4000
       NODE_ENV: production
+      CORS_ORIGINS: "http://localhost,http://nginx,https://diogoportfolio.opiniaolivre.com"
       WEATHER_API_URL: http://weather-api:8080
       NPS_API_URL: http://nps-api:3001
       NODE_OPTIONS: --max-old-space-size=64

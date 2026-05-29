@@ -9,7 +9,7 @@ import type {
 import { RateLimitError } from '@/lib/errors'
 
 const weatherClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_WEATHER_API_URL ?? 'http://localhost:8080',
+  baseURL: process.env.NEXT_PUBLIC_WEATHER_API_URL ?? '/api/weather',
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 })

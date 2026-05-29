@@ -65,8 +65,16 @@ export default function WeatherPage() {
     isLoading: loadingCurrent,
     error: errorCurrent,
   } = useCurrentWeather(city, country)
-  const { data: forecast, isLoading: loadingForecast } = useForecast(city, country)
-  const { data: sensorData, isLoading: loadingSensors } = useWeatherSensors(
+  const {
+    data: forecast,
+    isLoading: loadingForecast,
+    error: errorForecast,
+  } = useForecast(city, country)
+  const {
+    data: sensorData,
+    isLoading: loadingSensors,
+    error: errorSensors,
+  } = useWeatherSensors(
     city,
     appliedRange ? toISOParam(appliedRange.from) : '',
     appliedRange ? toISOParam(appliedRange.to, true) : ''
@@ -127,6 +135,8 @@ export default function WeatherPage() {
                 <CardContent>
                   {loadingForecast ? (
                     <LoadingSpinner size={20} />
+                  ) : errorForecast && !isRateLimitError(errorForecast) ? (
+                    <ErrorMessage message="Erro ao buscar previsão." />
                   ) : forecast ? (
                     <TemperatureChart forecast={forecast.forecast} />
                   ) : null}
@@ -141,7 +151,11 @@ export default function WeatherPage() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {forecast && <HumidityChart forecast={forecast.forecast} />}
+                  {errorForecast && !isRateLimitError(errorForecast) ? (
+                    <ErrorMessage message="Erro ao buscar previsão." />
+                  ) : forecast ? (
+                    <HumidityChart forecast={forecast.forecast} />
+                  ) : null}
                 </CardContent>
               </Card>
             </div>
@@ -169,6 +183,8 @@ export default function WeatherPage() {
               <CardContent>
                 {loadingSensors ? (
                   <LoadingSpinner size={20} label="Buscando dados do período..." />
+                ) : errorSensors && !isRateLimitError(errorSensors) ? (
+                  <ErrorMessage message="Erro ao buscar dados dos sensores." />
                 ) : (
                   <SensorChart
                     data={sensorData?.data ?? []}

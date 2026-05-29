@@ -3,7 +3,7 @@ import type { NpsSummary, NpsListResult, NpsResponseItem, SubmitNpsInput } from 
 import { RateLimitError } from '@/lib/errors'
 
 const npsClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_NPS_API_URL ?? 'http://localhost:3001',
+  baseURL: process.env.NEXT_PUBLIC_NPS_API_URL ?? '/api/nps',
   timeout: 8000,
   headers: { 'Content-Type': 'application/json' },
 })

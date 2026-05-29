@@ -91,7 +91,7 @@ const HEAVY_RATE_LIMIT = {
 };
 
 export function registerProxyRoutes(server: FastifyInstance): void {
-  // Rotas sensíveis com rate limit próprio (3 req/min)
+  // Rotas sensíveis com rate limit próprio (300 req/min)
   server.get("/api/weather/sensors", HEAVY_RATE_LIMIT, proxyHandler);
   server.get("/api/weather/calendar", HEAVY_RATE_LIMIT, proxyHandler);
   server.post("/api/weather/populate", HEAVY_RATE_LIMIT, proxyHandler);

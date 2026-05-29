@@ -16,13 +16,7 @@ async function buildServer() {
 
   // ── Plugins ────────────────────────────────────────────────
   await server.register(cors, {
-    // Gateway aceita apenas origens internas (Nginx repassa)
-    origin: [
-      "http://localhost",
-      "http://localhost:3000",
-      "http://nginx",
-      "https://diogoportfolio.opiniaolivre.com",
-    ],
+    origin: env.corsOrigins,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type"],
     credentials: true,
