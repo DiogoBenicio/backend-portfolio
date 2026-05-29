@@ -2,9 +2,9 @@
 FROM maven:3.9-eclipse-temurin-21-alpine AS builder
 WORKDIR /app
 
-# Cache de dependências (só re-baixa se pom.xml mudar)
+# Cache de dependências via resolve — mais robusto que go-offline
 COPY pom.xml .
-RUN MAVEN_OPTS="-Xmx256m -XX:+UseSerialGC" mvn dependency:go-offline -B -q
+RUN MAVEN_OPTS="-Xmx256m -XX:+UseSerialGC" mvn dependency:resolve -B -q || true
 
 COPY src ./src
 RUN MAVEN_OPTS="-Xmx256m -XX:+UseSerialGC" mvn clean package -B -q -DskipTests
