@@ -4,7 +4,8 @@ export const submitNpsSchema = {
     required: ["score"],
     properties: {
       score: {
-        type: "integer",
+        type: "number",
+        multipleOf: 1,
         minimum: 0,
         maximum: 10,
         description: "Nota NPS de 0 a 10",

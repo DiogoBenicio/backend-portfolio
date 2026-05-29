@@ -169,7 +169,7 @@ function RainViewerLayer({ pane }: { pane: string }) {
         }
       })
       .catch((err) => {
-        if ((err as Error).name !== 'AbortError') console.error(err)
+        // RainViewer fetch failed — non-critical, map continues without radar layer
       })
     return () => controller.abort()
   }, [])

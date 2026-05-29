@@ -138,7 +138,7 @@ class WeatherMapperTest {
         @Test
         @DisplayName("deve mapear lista de sensores com todos os campos")
         void shouldMapSensorPoints() {
-            SensorDataResponse res = mapper.toSensorDataResponse("São Paulo", List.of(weather()));
+            SensorDataResponse res = mapper.toSensorDataResponse("São Paulo", List.of(weather()), false);
 
             assertThat(res.city()).isEqualTo("São Paulo");
             assertThat(res.data()).hasSize(1);
@@ -152,7 +152,7 @@ class WeatherMapperTest {
         @Test
         @DisplayName("deve retornar lista vazia quando sem dados")
         void shouldHandleEmptyData() {
-            SensorDataResponse res = mapper.toSensorDataResponse("Brasília", List.<Weather>of());
+            SensorDataResponse res = mapper.toSensorDataResponse("Brasília", List.<Weather>of(), false);
             assertThat(res.data()).isEmpty();
         }
     }

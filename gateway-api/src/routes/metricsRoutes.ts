@@ -31,7 +31,7 @@ export function unescapeHtml(str: string): string {
 
 export function extractTableField(html: string, fieldName: string): string {
   const re = new RegExp(
-    "<th[^>]*>\\s*" + fieldName + "\\s*</th>\\s*<td[^>]*>([\\s\\S]*?)</td>",
+    "<th[^>]*>\\s*" + fieldName + "\\s*</th>\\s*<td[^>]*>([^<]{0,500}(?:<(?!/td>)[^<]{0,200})*)</td>",
     "i",
   );
   const m = html.match(re);
@@ -48,7 +48,7 @@ export function parseSeverity(raw: string): InmetAlert["severity"] {
 
 export function parseInmetRss(xml: string): InmetAlert[] {
   const alerts: InmetAlert[] = [];
-  const itemRe = /<item>([\s\S]*?)<\/item>/gi;
+  const itemRe = /<item>([^]*?)<\/item>/gi;
   let itemMatch: RegExpExecArray | null;
 
   while ((itemMatch = itemRe.exec(xml)) !== null) {
