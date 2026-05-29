@@ -449,12 +449,13 @@ function LayerControls({
   active: Set<LayerId>
   toggle: (id: LayerId) => void
 }) {
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (ref.current) L.DomEvent.disableClickPropagation(ref.current)
+  }, [])
+
   return (
-    <div
-      style={{ position: 'absolute', top: 12, right: 12, zIndex: 1000 }}
-      onMouseDown={(e) => e.stopPropagation()}
-      onClick={(e) => e.stopPropagation()}
-    >
+    <div ref={ref} style={{ position: 'absolute', top: 12, right: 12, zIndex: 1000 }}>
       <div className="rounded-xl bg-white/97 shadow-xl backdrop-blur-sm border border-gray-100 p-2 flex flex-col gap-1.5 min-w-[115px] dark:bg-slate-900/95 dark:border-slate-700">
         <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-widest px-1 dark:text-slate-500">
           Camadas
@@ -484,17 +485,18 @@ function LayerControls({
 // ── Legenda de cores ─────────────────────────────────────────────────────────
 
 function MapLegend({ active }: { active: Set<LayerId> }) {
+  const legendRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (legendRef.current) L.DomEvent.disableClickPropagation(legendRef.current)
+  }, [])
+
   const activeLayers = (
     Object.entries(LAYER_CONFIGS) as [LayerId, (typeof LAYER_CONFIGS)[LayerId]][]
   ).filter(([id]) => active.has(id))
   if (activeLayers.length === 0) return null
 
   return (
-    <div
-      style={{ position: 'absolute', bottom: 28, right: 12, zIndex: 1000 }}
-      onMouseDown={(e) => e.stopPropagation()}
-      onClick={(e) => e.stopPropagation()}
-    >
+    <div ref={legendRef} style={{ position: 'absolute', bottom: 28, right: 12, zIndex: 1000 }}>
       <div className="rounded-xl bg-white/97 shadow-xl backdrop-blur-sm border border-gray-100 p-3 flex flex-col gap-3 min-w-[168px] dark:bg-slate-900/95 dark:border-slate-700">
         {activeLayers.map(([id, cfg]) => (
           <div key={id}>
