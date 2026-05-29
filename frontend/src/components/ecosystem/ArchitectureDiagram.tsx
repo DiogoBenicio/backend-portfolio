@@ -49,6 +49,7 @@ function nodeStyle(key: string): React.CSSProperties {
     left: pct(CX[key] - w / 2, VB_W),
     top: pct(CY[key] - BH / 2, VB_H),
     width: pct(w, VB_W),
+    height: pct(BH, VB_H),
   }
 }
 
@@ -103,7 +104,7 @@ function DiagramNode({ nodeKey, icon, label, sublabel, border, bg, status }: Nod
     <div
       style={nodeStyle(nodeKey)}
       className={cn(
-        'absolute flex flex-col items-center gap-0.5 rounded-xl border-2 px-2 py-2 text-center shadow-sm',
+        'absolute flex flex-col items-center justify-center gap-0.5 rounded-xl border-2 px-2 py-2 text-center shadow-sm',
         border,
         bg
       )}
@@ -125,15 +126,31 @@ function DiagramNode({ nodeKey, icon, label, sublabel, border, bg, status }: Nod
 }
 
 function Connector({ x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2: number }) {
+  const dx = x2 - x1
+  const my = (y1 + y2) / 2
+  const r = 12 // corner radius
+
+  let d: string
+  if (Math.abs(dx) < 4) {
+    // vertical — linha reta
+    d = `M ${x1} ${y1} L ${x2} ${y2}`
+  } else if (dx > 0) {
+    // vai para direita
+    d = `M ${x1} ${y1} L ${x1} ${my - r} Q ${x1} ${my} ${x1 + r} ${my} L ${x2 - r} ${my} Q ${x2} ${my} ${x2} ${my + r} L ${x2} ${y2}`
+  } else {
+    // vai para esquerda
+    d = `M ${x1} ${y1} L ${x1} ${my - r} Q ${x1} ${my} ${x1 - r} ${my} L ${x2 + r} ${my} Q ${x2} ${my} ${x2} ${my + r} L ${x2} ${y2}`
+  }
+
   return (
-    <line
-      x1={x1}
-      y1={y1}
-      x2={x2}
-      y2={y2}
-      stroke="#cbd5e1"
-      strokeWidth="1.5"
-      strokeDasharray="5 4"
+    <path
+      d={d}
+      fill="none"
+      stroke="#64748b"
+      strokeWidth="1.2"
+      strokeDasharray="4 3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
       markerEnd="url(#arch-arrow)"
     />
   )
@@ -145,11 +162,70 @@ interface Props {
   statuses: ServiceHealthResult
 }
 
+const MOBILE_FLOW = [
+  { label: 'Browser', sublabel: 'HTTP' },
+  { label: 'Nginx', sublabel: 'Reverse Proxy · TLS' },
+  { label: 'Gateway-API', sublabel: 'Rate Limit · Proxy' },
+  {
+    split: [
+      { label: 'Weather-API', sublabel: 'Spring Boot 3', color: 'border-orange-400 dark:border-orange-600' },
+      { label: 'NPS-API', sublabel: 'Fastify + Prisma', color: 'border-blue-400 dark:border-blue-600' },
+    ],
+  },
+  {
+    split: [
+      { label: 'Elasticsearch', sublabel: 'design', color: 'border-orange-400 dark:border-orange-600' },
+      { label: 'PostgreSQL', sublabel: 'produção', color: 'border-blue-400 dark:border-blue-600' },
+    ],
+  },
+]
+
+function MobileFlow() {
+  return (
+    <div className="flex flex-col items-center gap-1">
+      {MOBILE_FLOW.map((step, i) =>
+        'split' in step ? (
+          <div key={i} className="flex w-full flex-col items-center gap-1">
+            <div className="h-4 w-px bg-slate-500" />
+            <div className="flex w-full justify-center gap-3">
+              {step.split!.map((s) => (
+                <div
+                  key={s.label}
+                  className={cn(
+                    'flex flex-1 flex-col items-center rounded-lg border-2 px-2 py-2 text-center dark:bg-slate-800/60',
+                    s.color
+                  )}
+                >
+                  <span className="text-xs font-semibold text-gray-800 dark:text-slate-200">{s.label}</span>
+                  <span className="text-[10px] text-gray-400 dark:text-slate-500">{s.sublabel}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div key={i} className="flex w-full flex-col items-center gap-1">
+            {i > 0 && <div className="h-4 w-px bg-slate-500" />}
+            <div className="w-full rounded-lg border-2 border-slate-400 bg-slate-100/60 px-3 py-2 text-center dark:border-slate-600 dark:bg-slate-800/60">
+              <span className="text-xs font-semibold text-gray-800 dark:text-slate-200">{step.label}</span>
+              <span className="ml-2 text-[10px] text-gray-400 dark:text-slate-500">{step.sublabel}</span>
+            </div>
+          </div>
+        )
+      )}
+    </div>
+  )
+}
+
 export function ArchitectureDiagram({ statuses }: Props) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white/70 p-6 shadow-md backdrop-blur-sm dark:border-slate-700 dark:bg-gray-800/50">
-      {/* Responsive diagram container */}
-      <div className="overflow-x-auto">
+      {/* Mobile */}
+      <div className="sm:hidden">
+        <MobileFlow />
+      </div>
+
+      {/* Desktop */}
+      <div className="hidden overflow-x-auto sm:block">
         <div
           className="relative mx-auto w-full min-w-[580px]"
           style={{ aspectRatio: `${VB_W} / ${VB_H}` }}
@@ -163,13 +239,13 @@ export function ArchitectureDiagram({ statuses }: Props) {
             <defs>
               <marker
                 id="arch-arrow"
-                markerWidth="8"
-                markerHeight="6"
-                refX="7"
-                refY="3"
+                markerWidth="6"
+                markerHeight="5"
+                refX="5"
+                refY="2.5"
                 orient="auto"
               >
-                <polygon points="0 0, 8 3, 0 6" fill="#94a3b8" />
+                <polygon points="0 0, 6 2.5, 0 5" fill="#64748b" />
               </marker>
             </defs>
 
@@ -178,7 +254,7 @@ export function ArchitectureDiagram({ statuses }: Props) {
               x1={cx('browser')}
               y1={btm('browser')}
               x2={cx('nginx')}
-              y2={tp('nginx') - 4}
+              y2={tp('nginx')}
             />
 
             {/* Nginx → Frontend */}
@@ -186,7 +262,7 @@ export function ArchitectureDiagram({ statuses }: Props) {
               x1={cx('nginx')}
               y1={btm('nginx')}
               x2={cx('frontend')}
-              y2={tp('frontend') - 4}
+              y2={tp('frontend')}
             />
 
             {/* Nginx → Gateway */}
@@ -194,7 +270,7 @@ export function ArchitectureDiagram({ statuses }: Props) {
               x1={cx('nginx')}
               y1={btm('nginx')}
               x2={cx('gateway')}
-              y2={tp('gateway') - 4}
+              y2={tp('gateway')}
             />
 
             {/* Gateway → Weather */}
@@ -202,22 +278,22 @@ export function ArchitectureDiagram({ statuses }: Props) {
               x1={cx('gateway')}
               y1={btm('gateway')}
               x2={cx('weather')}
-              y2={tp('weather') - 4}
+              y2={tp('weather')}
             />
 
             {/* Gateway → NPS */}
-            <Connector x1={cx('gateway')} y1={btm('gateway')} x2={cx('nps')} y2={tp('nps') - 4} />
+            <Connector x1={cx('gateway')} y1={btm('gateway')} x2={cx('nps')} y2={tp('nps')} />
 
             {/* Weather → Elasticsearch */}
             <Connector
               x1={cx('weather')}
               y1={btm('weather')}
               x2={cx('elastic')}
-              y2={tp('elastic') - 4}
+              y2={tp('elastic')}
             />
 
             {/* NPS → PostgreSQL */}
-            <Connector x1={cx('nps')} y1={btm('nps')} x2={cx('postgres')} y2={tp('postgres') - 4} />
+            <Connector x1={cx('nps')} y1={btm('nps')} x2={cx('postgres')} y2={tp('postgres')} />
           </svg>
 
           {/* Nodes */}
@@ -250,7 +326,7 @@ export function ArchitectureDiagram({ statuses }: Props) {
             nodeKey="gateway"
             icon={<Lock size={13} className="text-blue-500 dark:text-blue-400" />}
             label="Gateway-API"
-            sublabel="JWT · Rate Limit"
+            sublabel="Rate Limit · Proxy"
             border="border-blue-200 dark:border-blue-700"
             bg="bg-blue-50 dark:bg-blue-900/30"
             status={statuses.gateway.status}

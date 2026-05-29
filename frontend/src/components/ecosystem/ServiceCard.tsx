@@ -11,6 +11,7 @@ const PATTERN_COLORS: Record<string, string> = {
   'Layered SOA': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
   'Reverse Proxy': 'bg-gray-100 text-gray-700 dark:bg-slate-700 dark:text-slate-300',
   'SSR / React': 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300',
+  'Design Decision': 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300',
 }
 
 interface Props {
@@ -22,6 +23,7 @@ interface Props {
   borderColor: string
   status?: ServiceStatus
   docsUrl?: string
+  note?: string
 }
 
 export function ServiceCard({
@@ -33,6 +35,7 @@ export function ServiceCard({
   borderColor,
   status,
   docsUrl,
+  note,
 }: Props) {
   return (
     <>
@@ -112,6 +115,13 @@ export function ServiceCard({
             </Badge>
           ))}
         </div>
+
+        {/* Nota de design */}
+        {note && (
+          <p className="rounded-lg border border-yellow-200 bg-yellow-50 px-3 py-2 text-xs text-yellow-700 dark:border-yellow-800/50 dark:bg-yellow-900/20 dark:text-yellow-400">
+            {note}
+          </p>
+        )}
       </div>
     </>
   )

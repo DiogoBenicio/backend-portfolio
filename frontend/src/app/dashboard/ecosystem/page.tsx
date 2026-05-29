@@ -1,6 +1,6 @@
 'use client'
 
-import { Cloud, Lock, Monitor, Activity, Star, Layers } from 'lucide-react'
+import { Cloud, Lock, Monitor, Activity, Star, Layers, Database } from 'lucide-react'
 import { useServiceHealth } from '@/hooks/useServiceHealth'
 import { ArchitectureDiagram } from '@/components/ecosystem/ArchitectureDiagram'
 import { ServiceCard } from '@/components/ecosystem/ServiceCard'
@@ -56,6 +56,16 @@ const SERVICES = [
     tech: ['Node.js 20', 'TypeScript', 'Fastify 4', 'Prisma 5', 'PostgreSQL 15'],
     borderColor: 'border-green-300 dark:border-green-800',
     docsUrl: '/api/nps/documentation',
+  },
+  {
+    key: undefined,
+    icon: Database,
+    name: 'Elasticsearch',
+    description:
+      'Banco de dados projetado para a Weather-API: buscas full-text, agregações em séries temporais e queries por período/cidade em escala. O adapter de saída da arquitetura hexagonal foi construído para ele. Contudo, por motivo de infraestrutura, usamos PostgreSQL no lugar — explicações no README do GitHub.',
+    pattern: 'Design Decision',
+    tech: ['Elasticsearch 8', 'REST API', 'Index per entity'],
+    borderColor: 'border-yellow-300 dark:border-yellow-700',
   },
   {
     key: undefined,
@@ -221,6 +231,7 @@ export default function EcosystemPage() {
                   service.key ? statuses[service.key as keyof typeof statuses].status : undefined
                 }
                 docsUrl={'docsUrl' in service ? service.docsUrl : undefined}
+                note={'note' in service ? (service.note as string | undefined) : undefined}
               />
             ))}
           </div>
