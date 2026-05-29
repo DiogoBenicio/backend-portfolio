@@ -240,13 +240,13 @@ describe("NpsController — rotas HTTP", () => {
       expect(body.error).toBe("Not Found");
     });
 
-    it("deve retornar 400 para UUID malformado", async () => {
+    it("deve retornar 404 para ID inexistente", async () => {
       const res = await app.inject({
         method: "DELETE",
-        url: "/api/v1/nps/responses/not-a-uuid",
+        url: "/api/v1/nps/responses/id-inexistente",
       });
 
-      expect(res.statusCode).toBe(400);
+      expect(res.statusCode).toBe(404);
     });
 
     it("deve retornar 500 para erro genérico", async () => {

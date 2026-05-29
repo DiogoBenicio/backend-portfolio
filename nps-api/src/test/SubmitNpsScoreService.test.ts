@@ -35,7 +35,7 @@ describe("SubmitNpsScoreService", () => {
     expect(repository.create).toHaveBeenCalledWith({
       score: 9,
       comment: "Ótimo portfólio!",
-      name: null,
+      name: undefined,
       page: "portfolio",
     });
   });

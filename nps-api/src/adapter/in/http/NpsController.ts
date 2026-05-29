@@ -104,7 +104,7 @@ export function registerNpsRoutes(
       schema: {
         params: {
           type: "object",
-          properties: { id: { type: "string", format: "uuid" } },
+          properties: { id: { type: "string", minLength: 1 } },
           required: ["id"],
         },
       },
