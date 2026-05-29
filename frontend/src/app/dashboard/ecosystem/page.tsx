@@ -7,7 +7,6 @@ import { ServiceCard } from '@/components/ecosystem/ServiceCard'
 import { LiveMetrics } from '@/components/ecosystem/LiveMetrics'
 import { SystemMetrics } from '@/components/ecosystem/SystemMetrics'
 import { PageContainer } from '@/components/layout/PageContainer'
-import { PageLoader } from '@/components/ui/PageLoader'
 import type {
   ServiceHealthEntry,
   ServiceHealthResult,
@@ -162,11 +161,6 @@ function ObservabilityMetrics({ statuses }: { statuses: ServiceHealthResult }) {
 
 export default function EcosystemPage() {
   const statuses = useServiceHealth()
-  const isChecking = Object.values(statuses).every((s) => s.status === 'checking')
-
-  if (isChecking) {
-    return <PageLoader label="Verificando serviços" />
-  }
 
   return (
     <PageContainer>

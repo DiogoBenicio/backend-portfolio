@@ -31,7 +31,7 @@ export class GetNpsSummaryService implements GetNpsSummaryUseCase {
 
     const total = responses.length;
     const npsScore = calculateNps(promoters, detractors, total);
-    const zone = getZone(npsScore);
+    const zone = total === 0 ? "Sem dados" : getZone(npsScore);
 
     return {
       page: page ?? "portfolio",

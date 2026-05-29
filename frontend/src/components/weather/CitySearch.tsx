@@ -88,6 +88,7 @@ export function CitySearch({ onSearch, onSelectFull, defaultCity = '' }: CitySea
     return () => {
       clearTimeout(timer)
       controller.abort()
+      setLoading(false)
     }
   }, [query, apiKey, focused])
 

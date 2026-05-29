@@ -45,10 +45,10 @@ public class GetWeatherSensorsService implements GetWeatherSensorsUseCase {
         // Verifica se há alguma hora faltante no range
         Instant now    = Instant.now().truncatedTo(ChronoUnit.HOURS);
         Instant cursor = from.truncatedTo(ChronoUnit.HOURS);
-        Instant end    = to.truncatedTo(ChronoUnit.HOURS);
+        Instant end    = to.truncatedTo(ChronoUnit.HOURS).plus(1, ChronoUnit.HOURS);
 
         boolean hasGap = false;
-        while (cursor.isBefore(end) && !cursor.isAfter(now)) {
+        while (!cursor.isAfter(end) && !cursor.isAfter(now)) {
             if (!existingIds.contains(citySlug + "-" + HOUR_FMT.format(cursor))) {
                 hasGap = true;
                 break;
@@ -94,7 +94,7 @@ public class GetWeatherSensorsService implements GetWeatherSensorsUseCase {
             Instant slotHour = point.timestamp().truncatedTo(ChronoUnit.HOURS);
             if (slotHour.isAfter(now)) continue;
             String slotId = citySlug + "-" + HOUR_FMT.format(slotHour);
-            if (!slotHour.isBefore(from) && slotHour.isBefore(end)
+            if (!slotHour.isBefore(from) && !slotHour.isAfter(end)
                     && !existingIds.contains(slotId)) {
                 repository.save(point);
                 existingIds.add(slotId);

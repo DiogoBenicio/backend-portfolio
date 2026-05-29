@@ -172,6 +172,13 @@ public class OpenWeatherClientAdapter implements WeatherProviderClient {
     }
 
     private Forecast mapToForecast(OpenWeatherForecastResponse r, int days) {
+        String cityName = r.city() != null && r.city().name() != null ? r.city().name() : "";
+        String country  = r.city() != null && r.city().country() != null ? r.city().country() : "";
+
+        if (r.list() == null || r.list().isEmpty()) {
+            return new Forecast(cityName, country, List.of());
+        }
+
         // Agrupa por dia e pega min/max/description do meio-dia
         Map<LocalDate, List<OpenWeatherForecastResponse.ForecastItem>> byDay = r.list().stream()
                 .collect(Collectors.groupingBy(item -> {
@@ -203,11 +210,7 @@ public class OpenWeatherClientAdapter implements WeatherProviderClient {
                 })
                 .toList();
 
-        // BUG C5-A: null check for r.city()
-        return new Forecast(
-                r.city() != null && r.city().name() != null ? r.city().name() : "",
-                r.city() != null && r.city().country() != null ? r.city().country() : "",
-                forecastDays);
+        return new Forecast(cityName, country, forecastDays);
     }
 
     @Override

@@ -42,8 +42,8 @@ describe("isPublicRoute", () => {
     expect(isPublicRoute(method, path)).toBe(false);
   });
 
-  it("GET /api/nps/responses deve ser pública", () => {
-    expect(isPublicRoute("GET", "/api/nps/responses")).toBe(true);
+  it("GET /api/nps/responses deve ser protegida (requer JWT)", () => {
+    expect(isPublicRoute("GET", "/api/nps/responses")).toBe(false);
   });
 });
 

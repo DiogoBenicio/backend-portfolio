@@ -69,7 +69,7 @@ export function printBanner(): void {
   console.log("║  GATEWAY-API  ·  JWT + Proxy + Rate Limit    ║");
   console.log("╚══════════════════════════════════════════════╝");
   console.log(
-    `${reset}${bold}  Porta: ${port} | Env: ${env} | Rate: 30 req/min${reset}`,
+    `${reset}${bold}  Porta: ${port} | Env: ${env} | Rate: 500 req/min${reset}`,
   );
   console.log();
 }

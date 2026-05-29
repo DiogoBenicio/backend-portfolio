@@ -17,14 +17,17 @@ for city in "São Paulo" "Recife" "Manaus" "Curitiba" "Brasília"; do
     ts=$((today_ts - i * 86400))
     d=$(awk -v ts="${ts}" 'BEGIN { print strftime("%Y-%m-%d", ts) }')
 
-    status=$(curl -s -o /dev/null -w "%{http_code}" \
+    status=$(curl -s -o /dev/null -w "%{http_code}" --fail --max-time 30 \
       -X POST -G \
       --data-urlencode "city=${city}" \
       --data-urlencode "date=${d}" \
-      "${WEATHER_URL}/populate")
+      "${WEATHER_URL}/populate" || echo "000")
 
     if [ "$status" = "200" ] || [ "$status" = "201" ]; then
       populated=$((populated + 1))
+    elif [ "$status" = "000" ]; then
+      skipped=$((skipped + 1))
+      echo "[seed-weather] WARN: falha de rede para ${city} ${d} (curl error)"
     else
       skipped=$((skipped + 1))
     fi

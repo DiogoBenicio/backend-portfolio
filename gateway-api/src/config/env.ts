@@ -18,7 +18,14 @@ export const env = {
   })(),
   nodeEnv: optional("NODE_ENV", "development"),
 
-  jwtSecret: required("JWT_SECRET"),
+  jwtSecret: (() => {
+    const secret = required("JWT_SECRET");
+    if (secret.length < 32)
+      throw new Error(
+        `JWT_SECRET muito curto (mín. 32 chars): tem ${secret.length}`,
+      );
+    return secret;
+  })(),
   jwtExpiresIn: optional("JWT_EXPIRES_IN", "2h"),
 
   adminUser: required("ADMIN_USER"),

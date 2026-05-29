@@ -45,7 +45,7 @@ export const getSummarySchema = {
   querystring: {
     type: "object",
     properties: {
-      page: { type: "string", maxLength: 100 },
+      page: { type: "string", minLength: 1, maxLength: 100 },
     },
   },
   response: {
@@ -53,11 +53,16 @@ export const getSummarySchema = {
       type: "object",
       properties: {
         npsScore: { type: "number" },
-        total: { type: "number" },
+        totalResponses: { type: "number" },
         promoters: { type: "number" },
         passives: { type: "number" },
         detractors: { type: "number" },
         zone: { type: "string" },
+        distribution: {
+          type: "object",
+          additionalProperties: { type: "number" },
+        },
+        page: { type: "string" },
       },
     },
   },
@@ -91,9 +96,9 @@ export const listResponsesSchema = {
   querystring: {
     type: "object",
     properties: {
-      page: { type: "string", maxLength: 100 },
+      page: { type: "string", minLength: 1, maxLength: 100 },
       limit: { type: "integer", minimum: 1, maximum: 100, default: 10 },
-      offset: { type: "integer", minimum: 0, default: 0 },
+      offset: { type: "integer", minimum: 0, maximum: 100000, default: 0 },
     },
   },
 };

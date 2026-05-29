@@ -125,12 +125,12 @@ public class WeatherController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant from,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) Instant to
     ) {
+        if (from.isAfter(to)) {
+            throw new IllegalArgumentException("'from' deve ser anterior a 'to'.");
+        }
         if (Duration.between(from, to).compareTo(MAX_SENSOR_RANGE) > 0) {
             throw new IllegalArgumentException(
                     "Janela de consulta não pode exceder 7 dias. Reduza o intervalo entre 'from' e 'to'.");
-        }
-        if (from.isAfter(to)) {
-            throw new IllegalArgumentException("'from' deve ser anterior a 'to'.");
         }
         var data = getWeatherSensors.execute(city.trim(), from, to);
         return ResponseEntity.ok(mapper.toSensorDataResponse(city.trim(), data));

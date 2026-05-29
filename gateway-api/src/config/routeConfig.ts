@@ -17,6 +17,7 @@ export const PATH_REWRITES: Array<{ from: RegExp; to: string }> = [
 export const PUBLIC_ROUTES: Array<{ method: string; pattern: RegExp }> = [
   { method: "POST", pattern: /^\/api\/auth\/login/ },
   { method: "POST", pattern: /^\/api\/auth\/refresh$/ },
+  { method: "GET", pattern: /^\/api\/health$/ },
   { method: "GET", pattern: /^\/api\/weather\/health$/ },
   { method: "GET", pattern: /^\/api\/weather\/current/ },
   { method: "GET", pattern: /^\/api\/weather\/forecast/ },
@@ -25,7 +26,6 @@ export const PUBLIC_ROUTES: Array<{ method: string; pattern: RegExp }> = [
   { method: "GET", pattern: /^\/api\/weather\/windfield/ },
   { method: "GET", pattern: /^\/api\/weather\/cities/ },
   { method: "POST", pattern: /^\/api\/nps\/responses$/ },
-  { method: "GET", pattern: /^\/api\/nps\/responses/ },
   { method: "GET", pattern: /^\/api\/nps\/summary/ },
   { method: "GET", pattern: /^\/api\/metrics$/ },
   { method: "GET", pattern: /^\/api\/inmet-alerts$/ },

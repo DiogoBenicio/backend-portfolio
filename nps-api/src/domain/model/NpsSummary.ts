@@ -2,7 +2,8 @@ export type NpsZone =
   | "Crítico"
   | "Aperfeiçoamento"
   | "Qualidade"
-  | "Excelência";
+  | "Excelência"
+  | "Sem dados";
 
 export interface NpsSummary {
   page: string;

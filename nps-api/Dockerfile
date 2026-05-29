@@ -34,8 +34,11 @@ RUN ln -sf ../prisma/build/index.js ./node_modules/.bin/prisma
 
 RUN chown -R appuser:appgroup /app
 
+COPY entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
+
 USER appuser
 
 EXPOSE 3001
 
-CMD ["sh", "-c", "./node_modules/.bin/prisma migrate deploy && node dist/main.js"]
+CMD ["./entrypoint.sh"]

@@ -71,8 +71,8 @@ export function SensorChart({ data, from, to }: Props) {
   }
 
   // Calcula o domínio do eixo X baseado no range selecionado (ou nos dados)
-  const domainFrom = from ? new Date(`${from}T00:00:00Z`).getTime() : undefined
-  const domainTo = to ? new Date(`${to}T23:59:59Z`).getTime() : undefined
+  const domainFrom = from ? new Date(`${from}T00:00:00`).getTime() : undefined
+  const domainTo = to ? new Date(`${to}T23:59:59`).getTime() : undefined
 
   const chartData = data.map((p) => ({
     _ts: new Date(p.timestamp).getTime(),

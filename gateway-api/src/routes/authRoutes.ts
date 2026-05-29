@@ -1,6 +1,14 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import { timingSafeEqual } from "crypto";
 import { tokenService } from "../services/TokenService";
 import { env } from "../config/env";
+
+function safeCompare(a: string, b: string): boolean {
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  if (bufA.length !== bufB.length) return false;
+  return timingSafeEqual(bufA, bufB);
+}
 
 interface LoginBody {
   username: string;
@@ -28,7 +36,10 @@ export function registerAuthRoutes(server: FastifyInstance): void {
     ) => {
       const { username, password } = request.body;
 
-      if (username !== env.adminUser || password !== env.adminPass) {
+      if (
+        !safeCompare(username, env.adminUser) ||
+        !safeCompare(password, env.adminPass)
+      ) {
         return reply.status(401).send({
           status: 401,
           error: "Unauthorized",

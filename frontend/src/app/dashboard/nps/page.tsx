@@ -17,7 +17,11 @@ export default function NpsPage() {
   const dark = resolvedTheme === 'dark'
   const { data: summary, isLoading } = useNpsSummary('portfolio')
   const { data: responses } = useNpsResponses('portfolio', 20)
-  const { mutate: deleteResponse, isPending: isDeleting } = useDeleteNpsResponse()
+  const {
+    mutate: deleteResponse,
+    isPending: isDeleting,
+    variables: deletingId,
+  } = useDeleteNpsResponse()
 
   return (
     <PageContainer>
@@ -191,7 +195,7 @@ export default function NpsPage() {
                       </div>
                       <button
                         onClick={() => deleteResponse(item.id)}
-                        disabled={isDeleting}
+                        disabled={isDeleting && deletingId === item.id}
                         className="shrink-0 rounded-lg p-1.5 text-gray-400 transition hover:bg-red-50 hover:text-red-500 disabled:opacity-40 dark:text-slate-500 dark:hover:bg-red-900/30 dark:hover:text-red-400"
                         title="Apagar avaliação"
                       >

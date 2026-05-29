@@ -53,7 +53,7 @@ export function CurrentWeatherCard({ weather }: CurrentWeatherCardProps) {
           <StatItem
             icon={<Thermometer size={16} />}
             label="Chuva"
-            value={`${weather.rainfall.toFixed(1)} mm`}
+            value={`${(weather.rainfall ?? 0).toFixed(1)} mm`}
           />
         </div>
       </CardContent>

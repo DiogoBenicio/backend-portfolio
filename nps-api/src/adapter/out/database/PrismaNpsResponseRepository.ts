@@ -10,14 +10,24 @@ export class PrismaNpsResponseRepository implements NpsResponseRepository {
   constructor(private readonly prisma: PrismaClient) {}
 
   async create(input: CreateNpsResponseInput): Promise<NpsResponse> {
-    return this.prisma.npsResponse.create({
-      data: {
-        score: input.score,
-        comment: input.comment,
-        name: input.name,
-        page: input.page,
-      },
-    });
+    try {
+      const record = await this.prisma.npsResponse.create({
+        data: {
+          score: input.score,
+          comment: input.comment,
+          name: input.name,
+          page: input.page,
+        },
+      });
+      return record;
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError) {
+        throw Object.assign(new Error("Erro ao salvar avaliação"), {
+          statusCode: 500,
+        });
+      }
+      throw Object.assign(new Error("Erro interno"), { statusCode: 500 });
+    }
   }
 
   async findMany(
@@ -71,7 +81,9 @@ export class PrismaNpsResponseRepository implements NpsResponseRepository {
       ) {
         throw Object.assign(new Error("ID inválido"), { statusCode: 422 });
       }
-      throw err;
+      throw Object.assign(new Error("Erro interno do banco de dados"), {
+        statusCode: 500,
+      });
     }
   }
 }

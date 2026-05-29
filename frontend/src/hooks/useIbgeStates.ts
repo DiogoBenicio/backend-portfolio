@@ -21,7 +21,10 @@ export function useIbgeStates() {
     queryFn: () =>
       fetch(
         'https://raw.githubusercontent.com/codeforamerica/click_that_hood/master/public/data/brazil-states.geojson'
-      ).then((r) => r.json()),
+      ).then((r) => {
+        if (!r.ok) throw new Error(`GeoJSON error ${r.status}`)
+        return r.json()
+      }),
     staleTime: Infinity,
   })
 
@@ -29,9 +32,10 @@ export function useIbgeStates() {
   const mesoQuery = useQuery({
     queryKey: ['ibge-mesorregioes'],
     queryFn: () =>
-      fetch('https://servicodados.ibge.gov.br/api/v1/localidades/mesorregioes').then((r) =>
-        r.json()
-      ) as Promise<MesoregiaoBr[]>,
+      fetch('https://servicodados.ibge.gov.br/api/v1/localidades/mesorregioes').then((r) => {
+        if (!r.ok) throw new Error(`IBGE error ${r.status}`)
+        return r.json() as Promise<MesoregiaoBr[]>
+      }),
     staleTime: Infinity,
   })
 

@@ -301,15 +301,20 @@ function SelectedCityMarker() {
   } | null>(null)
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem('selectedMapCity')
-      if (raw) {
-        const parsed = JSON.parse(raw)
-        if (typeof parsed?.lat === 'number' && typeof parsed?.lng === 'number') {
-          setSelected(parsed)
+    function readFromStorage() {
+      try {
+        const raw = localStorage.getItem('selectedMapCity')
+        if (raw) {
+          const parsed = JSON.parse(raw)
+          if (typeof parsed?.lat === 'number' && typeof parsed?.lng === 'number') {
+            setSelected(parsed)
+          }
         }
-      }
-    } catch {}
+      } catch {}
+    }
+    readFromStorage()
+    window.addEventListener('storage', readFromStorage)
+    return () => window.removeEventListener('storage', readFromStorage)
   }, [])
 
   if (!selected) return null

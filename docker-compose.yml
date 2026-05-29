@@ -134,6 +134,12 @@ services:
         condition: service_healthy
     networks:
       - portfolio-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/nginx-health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
 
   # ─── Certbot (somente prod) ───────────────────────────────────
   # NOTA: após renovação automática, o nginx NÃO é recarregado automaticamente.
@@ -142,6 +148,7 @@ services:
     profiles: [prod]
     image: certbot/certbot:v2.11.0
     container_name: portfolio-certbot
+    restart: unless-stopped
     volumes:
       - certbot-certs:/etc/letsencrypt
       - certbot-webroot:/var/www/certbot
@@ -151,7 +158,7 @@ services:
 
   # ─── Seed weather (idempotente, roda a cada startup) ────────
   seed:
-    image: alpine:3.19
+    image: alpine:3.19.1
     container_name: portfolio-seed
     depends_on:
       weather-api:
@@ -165,7 +172,7 @@ services:
 
   # ─── Seed NPS (idempotente, roda a cada startup) ─────────────
   seed-nps:
-    image: postgres:15-alpine
+    image: postgres:15.6-alpine
     container_name: portfolio-seed-nps
     environment:
       PGPASSWORD: ${POSTGRES_PASSWORD}

@@ -176,11 +176,14 @@ describe("PrismaNpsResponseRepository", () => {
       });
     });
 
-    it("deve repassar outros erros do Prisma sem modificar", async () => {
+    it("deve repassar outros erros do Prisma como erro genérico", async () => {
       const dbErr = new Error("Connection refused");
       mockPrisma.npsResponse.delete.mockRejectedValue(dbErr);
 
-      await expect(repo.deleteById("qualquer")).rejects.toBe(dbErr);
+      await expect(repo.deleteById("qualquer")).rejects.toMatchObject({
+        message: "Erro interno do banco de dados",
+        statusCode: 500,
+      });
     });
   });
 });
