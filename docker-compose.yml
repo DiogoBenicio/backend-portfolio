@@ -41,6 +41,11 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       JAVA_TOOL_OPTIONS: -Xms64m -Xmx128m -XX:+UseSerialGC -XX:MaxMetaspaceSize=160m
     mem_limit: 420m
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     depends_on:
       postgres:
         condition: service_healthy
@@ -67,6 +72,11 @@ services:
       CORS_ORIGIN: http://gateway-api:4000
       NODE_OPTIONS: --max-old-space-size=64
     mem_limit: 128m
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     depends_on:
       postgres:
         condition: service_healthy
@@ -96,6 +106,11 @@ services:
       NPS_API_URL: http://nps-api:3001
       NODE_OPTIONS: --max-old-space-size=64
     mem_limit: 96m
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     depends_on:
       weather-api:
         condition: service_healthy
@@ -126,6 +141,11 @@ services:
     volumes:
       - certbot-certs:/etc/letsencrypt:ro
       - certbot-webroot:/var/www/certbot
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     depends_on:
       gateway-api:
         condition: service_healthy
@@ -158,14 +178,14 @@ services:
 
   # ─── Seed weather (idempotente, roda a cada startup) ────────
   seed:
-    image: alpine:3.19.1
+    image: curlimages/curl:8.7.1
     container_name: portfolio-seed
     depends_on:
       weather-api:
         condition: service_healthy
     volumes:
       - ./scripts/seed-weather.sh:/seed.sh:ro
-    entrypoint: sh -c "apk add --no-cache curl -q && sh /seed.sh"
+    entrypoint: sh /seed.sh
     restart: "no"
     networks:
       - portfolio-network
