@@ -31,7 +31,9 @@ export function unescapeHtml(str: string): string {
 
 export function extractTableField(html: string, fieldName: string): string {
   const re = new RegExp(
-    "<th[^>]*>\\s*" + fieldName + "\\s*</th>\\s*<td[^>]*>([^<]{0,500}(?:<(?!/td>)[^<]{0,200})*)</td>",
+    "<th[^>]*>\\s*" +
+      fieldName +
+      "\\s*</th>\\s*<td[^>]*>([^<]{0,500}(?:<(?!/td>)[^<]{0,200})*)</td>",
     "i",
   );
   const m = html.match(re);

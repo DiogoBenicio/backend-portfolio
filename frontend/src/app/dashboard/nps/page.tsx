@@ -110,10 +110,12 @@ export default function NpsPage() {
                     <div className="h-40">
                       <ResponsiveContainer width="100%" height="100%">
                         <BarChart
-                          data={Object.entries(summary.distribution ?? {}).map(([score, count]) => ({
-                            score: Number(score),
-                            count,
-                          }))}
+                          data={Object.entries(summary.distribution ?? {}).map(
+                            ([score, count]) => ({
+                              score: Number(score),
+                              count,
+                            })
+                          )}
                           margin={{ top: 0, right: 5, left: -20, bottom: 0 }}
                         >
                           <XAxis dataKey="score" tick={{ fontSize: 11 }} />

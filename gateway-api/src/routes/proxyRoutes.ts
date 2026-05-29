@@ -93,14 +93,34 @@ const HEAVY_RATE_LIMIT = {
 export function registerProxyRoutes(server: FastifyInstance): void {
   // Rotas sensíveis com rate limit próprio (300 req/min) — OPTIONS excluído (preflight CORS)
   for (const method of ["GET", "POST", "PUT", "PATCH", "DELETE"] as const) {
-    server.route({ method, url: "/api/weather/sensors", ...HEAVY_RATE_LIMIT, handler: proxyHandler });
-    server.route({ method, url: "/api/weather/calendar", ...HEAVY_RATE_LIMIT, handler: proxyHandler });
-    server.route({ method, url: "/api/weather/populate", ...HEAVY_RATE_LIMIT, handler: proxyHandler });
+    server.route({
+      method,
+      url: "/api/weather/sensors",
+      ...HEAVY_RATE_LIMIT,
+      handler: proxyHandler,
+    });
+    server.route({
+      method,
+      url: "/api/weather/calendar",
+      ...HEAVY_RATE_LIMIT,
+      handler: proxyHandler,
+    });
+    server.route({
+      method,
+      url: "/api/weather/populate",
+      ...HEAVY_RATE_LIMIT,
+      handler: proxyHandler,
+    });
   }
 
   // NPS com rate limit próprio generoso — OPTIONS excluído
   for (const method of ["GET", "POST", "PUT", "PATCH", "DELETE"] as const) {
-    server.route({ method, url: "/api/nps/*", ...NPS_RATE_LIMIT, handler: proxyHandler });
+    server.route({
+      method,
+      url: "/api/nps/*",
+      ...NPS_RATE_LIMIT,
+      handler: proxyHandler,
+    });
   }
 
   // Captura todas as rotas restantes de /api/weather/*

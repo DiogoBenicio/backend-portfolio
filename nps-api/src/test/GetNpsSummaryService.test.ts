@@ -50,7 +50,11 @@ describe("GetNpsSummaryService", () => {
 
   it("deve retornar NPS 100 com todos promotores", async () => {
     vi.mocked(repository.findAllByPage).mockResolvedValue({
-      data: [makeResponse(10, "1"), makeResponse(9, "2"), makeResponse(10, "3")],
+      data: [
+        makeResponse(10, "1"),
+        makeResponse(9, "2"),
+        makeResponse(10, "3"),
+      ],
       truncated: false,
     });
 
@@ -61,7 +65,10 @@ describe("GetNpsSummaryService", () => {
   });
 
   it("deve retornar sumário vazio quando sem respostas", async () => {
-    vi.mocked(repository.findAllByPage).mockResolvedValue({ data: [], truncated: false });
+    vi.mocked(repository.findAllByPage).mockResolvedValue({
+      data: [],
+      truncated: false,
+    });
 
     const summary = await service.execute();
 

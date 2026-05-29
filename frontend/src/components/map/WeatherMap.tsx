@@ -168,7 +168,7 @@ function RainViewerLayer({ pane }: { pane: string }) {
           setTileUrl(`https://tilecache.rainviewer.com${latest}/512/{z}/{x}/{y}/4/1_1.png`)
         }
       })
-      .catch((err) => {
+      .catch(() => {
         // RainViewer fetch failed — non-critical, map continues without radar layer
       })
     return () => controller.abort()

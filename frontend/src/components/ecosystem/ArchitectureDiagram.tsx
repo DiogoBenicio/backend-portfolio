@@ -168,20 +168,39 @@ const MOBILE_FLOW = [
   {
     split: [
       { label: 'Frontend', sublabel: 'Next.js 14', color: 'border-blue-400 dark:border-blue-600' },
-      { label: 'Gateway-API', sublabel: 'Rate Limit · Proxy', color: 'border-slate-400 dark:border-slate-500', statusKey: 'gateway' as const },
+      {
+        label: 'Gateway-API',
+        sublabel: 'Rate Limit · Proxy',
+        color: 'border-slate-400 dark:border-slate-500',
+        statusKey: 'gateway' as const,
+      },
     ],
     nginxBranch: true,
   },
   {
     split: [
-      { label: 'Weather-API', sublabel: 'Spring Boot 3', color: 'border-orange-400 dark:border-orange-600', statusKey: 'weather' as const },
-      { label: 'NPS-API', sublabel: 'Fastify + Prisma', color: 'border-blue-400 dark:border-blue-600', statusKey: 'nps' as const },
+      {
+        label: 'Weather-API',
+        sublabel: 'Spring Boot 3',
+        color: 'border-orange-400 dark:border-orange-600',
+        statusKey: 'weather' as const,
+      },
+      {
+        label: 'NPS-API',
+        sublabel: 'Fastify + Prisma',
+        color: 'border-blue-400 dark:border-blue-600',
+        statusKey: 'nps' as const,
+      },
     ],
     arrowRight: true,
   },
   {
     split: [
-      { label: 'Elasticsearch', sublabel: 'design', color: 'border-orange-400 dark:border-orange-600' },
+      {
+        label: 'Elasticsearch',
+        sublabel: 'design',
+        color: 'border-orange-400 dark:border-orange-600',
+      },
       { label: 'PostgreSQL', sublabel: 'produção', color: 'border-blue-400 dark:border-blue-600' },
     ],
     parallelArrows: true,
@@ -200,14 +219,39 @@ function MobileArrow() {
 // Duas setas paralelas (Weather→Elastic e NPS→Postgres)
 function ParallelArrows() {
   return (
-    <svg width="100%" viewBox="0 0 200 28" fill="none" preserveAspectRatio="none" className="my-0.5" style={{ height: 28 }}>
+    <svg
+      width="100%"
+      viewBox="0 0 200 28"
+      fill="none"
+      preserveAspectRatio="none"
+      className="my-0.5"
+      style={{ height: 28 }}
+    >
       <defs>
         <marker id="m-arr-p" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
           <polygon points="0 0, 6 2.5, 0 5" fill="#64748b" />
         </marker>
       </defs>
-      <line x1="50" y1="0" x2="50" y2="22" stroke="#64748b" strokeWidth="1.2" strokeDasharray="3 2" markerEnd="url(#m-arr-p)" />
-      <line x1="150" y1="0" x2="150" y2="22" stroke="#64748b" strokeWidth="1.2" strokeDasharray="3 2" markerEnd="url(#m-arr-p)" />
+      <line
+        x1="50"
+        y1="0"
+        x2="50"
+        y2="22"
+        stroke="#64748b"
+        strokeWidth="1.2"
+        strokeDasharray="3 2"
+        markerEnd="url(#m-arr-p)"
+      />
+      <line
+        x1="150"
+        y1="0"
+        x2="150"
+        y2="22"
+        stroke="#64748b"
+        strokeWidth="1.2"
+        strokeDasharray="3 2"
+        markerEnd="url(#m-arr-p)"
+      />
     </svg>
   )
 }
@@ -215,16 +259,57 @@ function ParallelArrows() {
 // Seta que parte do centro (Nginx) e bifurca para esquerda (Frontend) e direita (Gateway)
 function NginxBranchArrow() {
   return (
-    <svg width="100%" viewBox="0 0 200 48" fill="none" preserveAspectRatio="none" className="my-0.5" style={{ height: 48 }}>
+    <svg
+      width="100%"
+      viewBox="0 0 200 48"
+      fill="none"
+      preserveAspectRatio="none"
+      className="my-0.5"
+      style={{ height: 48 }}
+    >
       <defs>
         <marker id="m-arr-n" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
           <polygon points="0 0, 6 2.5, 0 5" fill="#64748b" />
         </marker>
       </defs>
-      <line x1="100" y1="0" x2="100" y2="22" stroke="#64748b" strokeWidth="1.2" strokeDasharray="3 2" />
-      <line x1="50" y1="22" x2="150" y2="22" stroke="#64748b" strokeWidth="1.2" strokeDasharray="3 2" />
-      <line x1="50" y1="22" x2="50" y2="42" stroke="#64748b" strokeWidth="1.2" strokeDasharray="3 2" markerEnd="url(#m-arr-n)" />
-      <line x1="150" y1="22" x2="150" y2="42" stroke="#64748b" strokeWidth="1.2" strokeDasharray="3 2" markerEnd="url(#m-arr-n)" />
+      <line
+        x1="100"
+        y1="0"
+        x2="100"
+        y2="22"
+        stroke="#64748b"
+        strokeWidth="1.2"
+        strokeDasharray="3 2"
+      />
+      <line
+        x1="50"
+        y1="22"
+        x2="150"
+        y2="22"
+        stroke="#64748b"
+        strokeWidth="1.2"
+        strokeDasharray="3 2"
+      />
+      <line
+        x1="50"
+        y1="22"
+        x2="50"
+        y2="42"
+        stroke="#64748b"
+        strokeWidth="1.2"
+        strokeDasharray="3 2"
+        markerEnd="url(#m-arr-n)"
+      />
+      <line
+        x1="150"
+        y1="22"
+        x2="150"
+        y2="42"
+        stroke="#64748b"
+        strokeWidth="1.2"
+        strokeDasharray="3 2"
+        markerEnd="url(#m-arr-n)"
+      />
     </svg>
   )
 }
@@ -248,13 +333,47 @@ function GatewayBranchArrow() {
         </marker>
       </defs>
       {/* Linha saindo do Gateway (centro-direito) para baixo até bifurcação */}
-      <line x1="150" y1="0" x2="150" y2="22" stroke="#64748b" strokeWidth="1.2" strokeDasharray="3 2" />
+      <line
+        x1="150"
+        y1="0"
+        x2="150"
+        y2="22"
+        stroke="#64748b"
+        strokeWidth="1.2"
+        strokeDasharray="3 2"
+      />
       {/* Braço horizontal */}
-      <line x1="50" y1="22" x2="150" y2="22" stroke="#64748b" strokeWidth="1.2" strokeDasharray="3 2" />
+      <line
+        x1="50"
+        y1="22"
+        x2="150"
+        y2="22"
+        stroke="#64748b"
+        strokeWidth="1.2"
+        strokeDasharray="3 2"
+      />
       {/* Seta esquerda → Weather */}
-      <line x1="50" y1="22" x2="50" y2="42" stroke="#64748b" strokeWidth="1.2" strokeDasharray="3 2" markerEnd="url(#m-arr)" />
+      <line
+        x1="50"
+        y1="22"
+        x2="50"
+        y2="42"
+        stroke="#64748b"
+        strokeWidth="1.2"
+        strokeDasharray="3 2"
+        markerEnd="url(#m-arr)"
+      />
       {/* Seta direita → NPS */}
-      <line x1="150" y1="22" x2="150" y2="42" stroke="#64748b" strokeWidth="1.2" strokeDasharray="3 2" markerEnd="url(#m-arr)" />
+      <line
+        x1="150"
+        y1="22"
+        x2="150"
+        y2="42"
+        stroke="#64748b"
+        strokeWidth="1.2"
+        strokeDasharray="3 2"
+        markerEnd="url(#m-arr)"
+      />
     </svg>
   )
 }
@@ -276,7 +395,10 @@ function MobileFlow({ statuses }: { statuses: ServiceHealthResult }) {
             )}
             <div className="flex w-full justify-center gap-3">
               {step.split!.map((s) => {
-                const status = 'statusKey' in s ? statuses[s.statusKey as keyof ServiceHealthResult]?.status : undefined
+                const status =
+                  'statusKey' in s
+                    ? statuses[s.statusKey as keyof ServiceHealthResult]?.status
+                    : undefined
                 return (
                   <div
                     key={s.label}
@@ -286,10 +408,14 @@ function MobileFlow({ statuses }: { statuses: ServiceHealthResult }) {
                     )}
                   >
                     <div className="flex items-center gap-1.5">
-                      <span className="text-xs font-semibold text-gray-800 dark:text-slate-200">{s.label}</span>
+                      <span className="text-xs font-semibold text-gray-800 dark:text-slate-200">
+                        {s.label}
+                      </span>
                       {status && <StatusDot status={status} />}
                     </div>
-                    <span className="text-[10px] text-gray-400 dark:text-slate-500">{s.sublabel}</span>
+                    <span className="text-[10px] text-gray-400 dark:text-slate-500">
+                      {s.sublabel}
+                    </span>
                   </div>
                 )
               })}
@@ -300,9 +426,13 @@ function MobileFlow({ statuses }: { statuses: ServiceHealthResult }) {
             {i > 0 && <MobileArrow />}
             <div className="w-full rounded-lg border-2 border-slate-400 bg-slate-100/60 px-3 py-2 text-center dark:border-slate-600 dark:bg-slate-800/60">
               <div className="flex items-center justify-center gap-1.5">
-                <span className="text-xs font-semibold text-gray-800 dark:text-slate-200">{step.label}</span>
+                <span className="text-xs font-semibold text-gray-800 dark:text-slate-200">
+                  {step.label}
+                </span>
                 {'statusKey' in step && step.statusKey && (
-                  <StatusDot status={statuses[step.statusKey as keyof ServiceHealthResult]?.status} />
+                  <StatusDot
+                    status={statuses[step.statusKey as keyof ServiceHealthResult]?.status}
+                  />
                 )}
               </div>
               <span className="text-[10px] text-gray-400 dark:text-slate-500">{step.sublabel}</span>
@@ -348,28 +478,13 @@ export function ArchitectureDiagram({ statuses }: Props) {
             </defs>
 
             {/* Browser → Nginx */}
-            <Connector
-              x1={cx('browser')}
-              y1={btm('browser')}
-              x2={cx('nginx')}
-              y2={tp('nginx')}
-            />
+            <Connector x1={cx('browser')} y1={btm('browser')} x2={cx('nginx')} y2={tp('nginx')} />
 
             {/* Nginx → Frontend */}
-            <Connector
-              x1={cx('nginx')}
-              y1={btm('nginx')}
-              x2={cx('frontend')}
-              y2={tp('frontend')}
-            />
+            <Connector x1={cx('nginx')} y1={btm('nginx')} x2={cx('frontend')} y2={tp('frontend')} />
 
             {/* Nginx → Gateway */}
-            <Connector
-              x1={cx('nginx')}
-              y1={btm('nginx')}
-              x2={cx('gateway')}
-              y2={tp('gateway')}
-            />
+            <Connector x1={cx('nginx')} y1={btm('nginx')} x2={cx('gateway')} y2={tp('gateway')} />
 
             {/* Gateway → Weather */}
             <Connector
