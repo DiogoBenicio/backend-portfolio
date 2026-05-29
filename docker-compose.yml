@@ -78,7 +78,6 @@ services:
       timeout: 5s
       retries: 6
       start_period: 30s
-      start_period: 30s
 
   # ─── Projeto 4: API Gateway ───────────────────────────────────
   gateway-api:
