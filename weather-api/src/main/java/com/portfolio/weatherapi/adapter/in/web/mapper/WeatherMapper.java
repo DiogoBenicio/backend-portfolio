@@ -60,24 +60,6 @@ public class WeatherMapper {
         );
     }
 
-    public SensorDataResponse toSensorDataResponse(String city, List<Weather> data) {
-        List<SensorPointResponse> points = data.stream()
-                .map(w -> new SensorPointResponse(
-                        w.timestamp(),
-                        w.temperature(),
-                        w.feelsLike(),
-                        w.humidity(),
-                        w.pressure(),
-                        w.windSpeed(),
-                        w.rainfall(),
-                        w.uvIndex(),
-                        w.dewPoint(),
-                        w.radiation()
-                ))
-                .toList();
-        return new SensorDataResponse(city, points, false);
-    }
-
     public SensorDataResponse toSensorDataResponse(String city, List<Weather> data, boolean partial) {
         List<SensorPointResponse> points = data.stream()
                 .map(w -> new SensorPointResponse(
