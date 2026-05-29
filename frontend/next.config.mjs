@@ -12,6 +12,9 @@ export default function config(phase) {
     images: {
       unoptimized: true,
     },
+    // Lint e typecheck rodam separadamente no CI — não bloquear o build Docker
+    eslint: { ignoreDuringBuilds: true },
+    typescript: { ignoreBuildErrors: false },
     ...(isDev && {
       async rewrites() {
         return [
