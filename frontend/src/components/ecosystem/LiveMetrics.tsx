@@ -93,7 +93,7 @@ function NpsWidget() {
     <div className="mt-3 space-y-3">
       <div className="flex items-end gap-3">
         <span className={cn('text-4xl font-bold', getNpsZoneColor(data.zone))}>
-          {data.npsScore.toFixed(1)}
+          {Number(data.npsScore).toFixed(1)}
         </span>
         <span
           className={cn(

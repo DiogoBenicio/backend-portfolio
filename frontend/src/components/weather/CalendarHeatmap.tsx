@@ -42,6 +42,9 @@ export function CalendarHeatmap({ city, initialYear, initialMonth }: Props) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['weather', 'calendar', city, year, month] })
     },
+    onError: () => {
+      queryClient.invalidateQueries({ queryKey: ['weather', 'calendar', city, year, month] })
+    },
   })
 
   const daysWithData = new Set(data?.daysWithData ?? [])

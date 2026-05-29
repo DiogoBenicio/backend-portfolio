@@ -19,6 +19,6 @@ export function useInmetAlerts() {
         return r.json()
       }),
     staleTime: 30 * 60 * 1000,
-    refetchInterval: 30 * 60 * 1000,
+    refetchInterval: (query) => query.state.status === 'error' ? false : 30 * 60 * 1000,
   })
 }

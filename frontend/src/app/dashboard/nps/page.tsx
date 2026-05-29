@@ -131,7 +131,7 @@ export default function NpsPage() {
                             itemStyle={{ color: dark ? '#94a3b8' : '#6b7280' }}
                           />
                           <Bar dataKey="count" name="Respostas" radius={[3, 3, 0, 0]}>
-                            {Object.keys(summary.distribution).map((score) => {
+                            {Object.keys(summary.distribution ?? {}).map((score) => {
                               const s = Number(score)
                               const color = s >= 9 ? '#22c55e' : s >= 7 ? '#eab308' : '#ef4444'
                               return <Cell key={score} fill={color} />
