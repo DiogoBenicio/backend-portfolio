@@ -167,7 +167,7 @@ export default function HomePage() {
               LinkedIn
             </a>
             <span className="text-gray-200 dark:text-gray-700">|</span>
-            <span className="text-gray-400 dark:text-gray-500">v1.1.0 · Diogo Benício</span>
+            <span className="text-gray-400 dark:text-gray-500">v1.1.1 · Diogo Benício</span>
           </div>
         </div>
       </footer>
