@@ -57,6 +57,21 @@ export class ProxyService {
       if (contentTypeRes)
         responseHeaders["content-type"] = String(contentTypeRes);
 
+      // Sanitize upstream 5xx non-JSON responses to avoid leaking internal details
+      if (response.status >= 500) {
+        const ct = response.headers["content-type"] ?? "";
+        if (!ct.includes("application/json")) {
+          return {
+            status: response.status,
+            data: {
+              error: "Service Error",
+              message: "Erro interno no serviço de destino",
+            },
+            headers: { "content-type": "application/json" },
+          };
+        }
+      }
+
       return {
         status: response.status,
         data: response.data,
