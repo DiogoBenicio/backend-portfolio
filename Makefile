@@ -1,7 +1,8 @@
 .PHONY: dev prod cert-init down down-v logs ps
 
-# Lê CERTBOT_EMAIL do .env se não estiver exportado no shell
+# Lê CERTBOT_EMAIL e DOMAIN do .env se não estiverem exportados no shell
 CERTBOT_EMAIL ?= $(shell grep '^CERTBOT_EMAIL=' .env 2>/dev/null | cut -d= -f2 | tr -d '[:space:]')
+DOMAIN ?= $(shell grep '^DOMAIN=' .env 2>/dev/null | cut -d= -f2 | tr -d '[:space:]')
 
 # ─── Dev (HTTP, localhost) ────────────────────────────────────
 dev:
@@ -16,11 +17,12 @@ prod:
 # Após concluir, rode: make prod
 cert-init:
 	@test -n "$(CERTBOT_EMAIL)" || (echo "Erro: defina CERTBOT_EMAIL no .env ou como variável"; exit 1)
+	@test -n "$(DOMAIN)" || (echo "Erro: defina DOMAIN no .env ou como variável"; exit 1)
 	NGINX_CONF=nginx.dev.conf docker compose up -d --no-deps nginx
 	NGINX_CONF=nginx.dev.conf docker compose --profile prod run --rm certbot \
 	  certonly --webroot -w /var/www/certbot \
 	  --email $(CERTBOT_EMAIL) --agree-tos --no-eff-email \
-	  -d diogoportifolio.opiniaolivre.com
+	  -d $(DOMAIN)
 	docker compose down
 
 # ─── Utilitários ──────────────────────────────────────────────

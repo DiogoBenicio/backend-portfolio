@@ -143,6 +143,10 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    environment:
+      # Usada pelo entrypoint (envsubst) para renderizar o server_name e os
+      # paths dos certificados. Fonte única de verdade do domínio.
+      DOMAIN: ${DOMAIN}
     volumes:
       - certbot-certs:/etc/letsencrypt:ro
       - certbot-webroot:/var/www/certbot
@@ -164,9 +168,9 @@ services:
       start_period: 10s
 
   # ─── Certbot (somente prod) ───────────────────────────────────
-  # NOTA: após renovação automática, o nginx NÃO é recarregado automaticamente.
-  # O --deploy-hook registra a renovação no log. Para aplicar o certificado
-  # renovado, execute manualmente: docker compose exec nginx nginx -s reload
+  # O nginx recarrega a si mesmo a cada 6h (ver nginx/docker-entrypoint.sh),
+  # então o certificado renovado é aplicado automaticamente — sem reload manual.
+  # O --deploy-hook aqui serve apenas como registro de auditoria no log.
   certbot:
     profiles: [prod]
     image: certbot/certbot:v2.11.0

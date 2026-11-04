@@ -20,16 +20,22 @@ RUN npm run build
 # ─── Stage 2: nginx servindo arquivos estáticos ───────────────
 FROM nginx:1.27-alpine
 
+# envsubst (pacote gettext) — usado pelo entrypoint para renderizar ${DOMAIN}
+RUN apk add --no-cache gettext
+
 RUN rm /etc/nginx/conf.d/default.conf
 
 COPY nginx/nginx.dev.conf nginx/nginx.prod.conf nginx/security-headers.conf /etc/nginx/
+COPY nginx/docker-entrypoint.sh /etc/nginx/docker-entrypoint.sh
+RUN chmod +x /etc/nginx/docker-entrypoint.sh
 
+# O entrypoint renderiza ${DOMAIN} desta template para /etc/nginx/nginx.conf
 ARG NGINX_CONF=nginx.dev.conf
 RUN rm -f /etc/nginx/nginx.conf && \
-    ln -s /etc/nginx/${NGINX_CONF} /etc/nginx/nginx.conf
+    ln -s /etc/nginx/${NGINX_CONF} /etc/nginx/nginx.conf.template
 
 COPY --from=frontend-builder /app/out /var/www/frontend
 
 EXPOSE 80 443
 
-CMD ["nginx", "-g", "daemon off;"]
+ENTRYPOINT ["/etc/nginx/docker-entrypoint.sh"]

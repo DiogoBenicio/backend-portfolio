@@ -1,6 +1,10 @@
 #!/bin/sh
-# Renova certificados Let's Encrypt e recarrega o nginx.
-# Executar manualmente após a renovação automática do certbot não ter disparado reload.
+# Força renovação imediata do certificado Let's Encrypt + reload do nginx.
+#
+# NOTA: a renovação já é automática — o certbot roda `certbot renew` a cada 12h
+# e o nginx recarrega a si mesmo a cada 6h (ver nginx/docker-entrypoint.sh),
+# aplicando qualquer cert renovado sem intervenção. Este script é apenas um
+# fallback para disparar renovação + reload na hora (ex.: troubleshooting).
 #
 # Uso: ./scripts/renew-cert.sh
 #   (execute a partir da raiz do projeto onde está o docker-compose.yml)
